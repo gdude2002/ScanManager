@@ -324,7 +324,7 @@ class BinderWindow(val parent: MainWindow) {
     )
 
     fun TableRowScope.text(content: String?) = cell {
-        cell { Text(content ?: "", softWrap = false) }
+        Text(content ?: "", softWrap = false)
     }
 
     fun TableRowScope.checkbox(checked: Boolean, onCheckedChange: ((Boolean) -> Unit)?) = cell {
