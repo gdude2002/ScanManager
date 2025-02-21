@@ -43,7 +43,7 @@ dependencies {
     implementation("com.h2database", "h2", "2.3.232")
     implementation("org.flywaydb", "flyway-core", "11.3.1")
 
-    implementation("com.seanproctor", "data-table-material3", "0.10.1")
+    implementation("com.seanproctor", "data-table-material3", "0.11.2")
 
     implementation("org.jetbrains.exposed", "exposed-core", "0.59.0")
     implementation("org.jetbrains.exposed", "exposed-dao", "0.59.0")

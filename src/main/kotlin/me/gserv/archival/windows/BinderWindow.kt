@@ -4,6 +4,7 @@
  * applicable law is the (Republic of) Irish law and the Jurisdiction
  * Dublin.
  * Any redistribution must include the specific provision above.
+ *
  */
 
 @file:OptIn(ExperimentalFoundationApi::class)
@@ -34,6 +35,7 @@ import com.seanproctor.datatable.DataColumn
 import com.seanproctor.datatable.TableColumnWidth
 import com.seanproctor.datatable.TableRowScope
 import com.seanproctor.datatable.material3.DataTable
+import jdk.javadoc.internal.doclets.formats.html.markup.HtmlStyle.index
 import me.gserv.archival.Colors
 import me.gserv.archival.data.Database
 import me.gserv.archival.data.GlobalState
@@ -95,6 +97,11 @@ class BinderWindow(val parent: MainWindow) {
     @Composable
     @Preview
     fun create() {
+        val rowColorCurrentHovered = Colors.LightGreen
+        val rowColorCurrent = Colors.LightGray
+        val rowColorHovered = Colors.LighterGreen
+        val rowColorDefault = MaterialTheme.colors.surface
+
         if (isOpen) {
             Window({ close(); }, state = state, title = "Binder ${GlobalState.binder?.id}") {
                 scope = this
@@ -200,27 +207,24 @@ class BinderWindow(val parent: MainWindow) {
                                 HeaderColumn("Completion Date"),
                                 HeaderColumn("Description"),
                                 HeaderColumn("", TableColumnWidth.MinIntrinsic),
-                            ),
-
-                            rowBackgroundColor = {
-                                if (it % 2 == 0) {
-                                    if (dropTarget.isHovered && it == dropTarget.currentSet) {
-                                        Colors.LightGreen
-                                    } else {
-                                        Colors.LightGray
-                                    }
-                                } else {
-                                    if (dropTarget.isHovered && it == dropTarget.currentSet) {
-                                        Colors.LighterGreen
-                                    } else {
-                                        MaterialTheme.colors.surface
-                                    }
-                                    MaterialTheme.colors.surface
-                                }
-                            },
+                            )
                         ) {
-                            GlobalState.sets.forEach { set ->
+                            GlobalState.sets.forEachIndexed { index, set ->
                                 row {
+                                    this.backgroundColor = if (index % 2 == 0) {
+                                        if (dropTarget.isHovered && index == dropTarget.currentSet) {
+                                            rowColorCurrentHovered
+                                        } else {
+                                            rowColorCurrent
+                                        }
+                                    } else {
+                                        if (dropTarget.isHovered && index == dropTarget.currentSet) {
+                                            rowColorHovered
+                                        } else {
+                                            rowColorDefault
+                                        }
+                                    }
+
                                     text(set.id.value.toString())
                                     text(set.totalScans.toString())
 
