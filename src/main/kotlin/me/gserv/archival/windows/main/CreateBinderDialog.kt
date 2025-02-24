@@ -99,7 +99,7 @@ class CreateBinderDialog(
                                     }
                                 },
 
-                                placeholder = { Text("Name") },
+                                label = { Text("Name") },
                                 modifier = Modifier.fillMaxWidth()
                             )
                         }

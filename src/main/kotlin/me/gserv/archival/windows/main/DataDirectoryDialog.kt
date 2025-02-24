@@ -120,6 +120,7 @@ class DataDirectoryDialog(
                             TextField(
                                 newDirectory,
                                 { newDirectory = it },
+                                label = { Text("Data Folder") },
                                 modifier = Modifier.fillMaxWidth(0.9f).absolutePadding(right = 10.dp)
                             )
 

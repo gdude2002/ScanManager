@@ -21,14 +21,17 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.FolderOpen
+import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.toLowerCase
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.em
 import androidx.compose.ui.window.FrameWindowScope
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowState
@@ -51,313 +54,345 @@ import org.jetbrains.exposed.sql.SortOrder
 import java.awt.Dimension
 
 class BinderWindow(val parent: MainWindow) {
-    var isOpen by mutableStateOf(false)
-    var isDropdownOpen by mutableStateOf(false)
+	var isOpen by mutableStateOf(false)
+	var isDropdownOpen by mutableStateOf(false)
 
-    var filterState by mutableStateOf<FilterState>(FilterState.All)
+	var filterState by mutableStateOf<FilterState>(FilterState.All)
+	var filterText by mutableStateOf("")
 
-    var allSets: SnapshotStateList<Set> = mutableStateListOf()
+	var allSets: SnapshotStateList<Set> = mutableStateListOf()
 
-    val state = WindowState(
-        size = DpSize(1000.dp, 700.dp),
-    )
+	val state = WindowState(
+		size = DpSize(1000.dp, 700.dp),
+	)
 
-    lateinit var scope: FrameWindowScope
+	lateinit var scope: FrameWindowScope
 
-    fun close() {
-        GlobalState.binder = null
-        GlobalState.sets.clear()
+	fun close() {
+		GlobalState.binder = null
+		GlobalState.sets.clear()
 
-        allSets.clear()
+		allSets.clear()
 
-        isOpen = false
-        isDropdownOpen = false
-        filterState = FilterState.All
+		isOpen = false
+		isDropdownOpen = false
+		filterState = FilterState.All
+		filterText = ""
 
-        parent.scope.window.isVisible = true
-    }
+		parent.scope.window.isVisible = true
+	}
 
-    fun open(binder: Binder) {
-        GlobalState.binder = binder
+	fun open(binder: Binder) {
+		GlobalState.binder = binder
 
-        val sets = Database.transaction {
-            Set.find {
-                SetTable.binder eq binder.id
-            }.orderBy(SetTable.id to SortOrder.DESC)
-                .toList()
-        }
+		val sets = Database.transaction {
+			Set.find {
+				SetTable.binder eq binder.id
+			}.orderBy(SetTable.id to SortOrder.DESC)
+				.toList()
+		}
 
-        GlobalState.sets.addAll(sets)
-        this.allSets.addAll(sets)
+		GlobalState.sets.addAll(sets)
+		this.allSets.addAll(sets)
 
-        isOpen = true
-        parent.scope.window.isVisible = false
-    }
+		isOpen = true
+		parent.scope.window.isVisible = false
+	}
 
-    @Composable
-    @Preview
-    fun create() {
-        val rowColorEvenHovered = Colors.LightGreen
-        val rowColorEven = Colors.LightGray
+	@Composable
+	@Preview
+	fun create() {
+		val rowColorEvenHovered = Colors.LightGreen
+		val rowColorEven = Colors.LightGray
 
-        val rowColorOddHovered = Colors.LighterGreen
-        val rowColorOdd = MaterialTheme.colors.surface
+		val rowColorOddHovered = Colors.LighterGreen
+		val rowColorOdd = MaterialTheme.colors.surface
 
-        if (isOpen) {
-            Window({ close(); }, state = state, title = "Binder ${GlobalState.binder?.id}") {
-                scope = this
-                window.minimumSize = Dimension(1000, 700)
+		if (isOpen) {
+			LaunchedEffect(filterState, filterText) {
+				var filtered = allSets.toList()
 
-                val createSetDialog = CreateSetDialog(this@BinderWindow, GlobalState.binder!!)
-                createSetDialog.create()
+				when (filterState) {
+					FilterState.Incomplete -> filtered = filtered.filter { it.finishedAt == null }
+					FilterState.Complete -> filtered = filtered.filter { it.finishedAt != null }
 
-                Column(
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(10.dp),
-                        modifier = Modifier
-                            .background(
-                                Colors.LightGray
-                            )
-                            .padding(vertical = 10.dp, horizontal = 15.dp)
-                            .height(40.dp)
-                            .fillMaxWidth()
-                    ) {
-                        Button(
-                            { createSetDialog.open() }
-                        ) {
-                            Text("Add")
-                        }
+					FilterState.All -> { }
+				}
 
-                        Spacer(Modifier.weight(1f, true))
+				if (filterText.isNotBlank()) {
+					filtered = filtered.filter { it.description?.contains(filterText, true) == true }
+				}
 
-                        Box(Modifier) {
-                            OutlinedButton({ isDropdownOpen = !isDropdownOpen }, enabled = allSets.isNotEmpty()) {
-                                Row(
-                                    horizontalArrangement = Arrangement.spacedBy(5.dp),
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    if (allSets.isNotEmpty()) {
-                                        Text("Filter: ${filterState.readableName} Sets")
+				GlobalState.sets.clear()
+				GlobalState.sets = filtered.toMutableStateList()
+			}
 
-                                        if (isDropdownOpen) {
-                                            Icon(Icons.Default.ArrowDropUp, "")
-                                        } else {
-                                            Icon(Icons.Default.ArrowDropDown, "")
-                                        }
-                                    } else {
-                                        Text("No sets")
-                                    }
-                                }
-                            }
+			Window({ close(); }, state = state, title = "Binder ${GlobalState.binder?.id}") {
+				scope = this
+				window.minimumSize = Dimension(1000, 700)
 
-                            DropdownMenu(isDropdownOpen, { isDropdownOpen = false }) {
-                                DropdownMenuItem({
-                                    filterState = FilterState.All
+				val createSetDialog = CreateSetDialog(this@BinderWindow, GlobalState.binder!!)
+				createSetDialog.create()
 
-                                    GlobalState.sets.clear()
-                                    GlobalState.sets.addAll(allSets)
+				Column(
+					modifier = Modifier.fillMaxSize()
+				) {
+					Row(
+						horizontalArrangement = Arrangement.spacedBy(10.dp),
+						modifier = Modifier
+							.background(
+								Colors.LightGray
+							)
+							.padding(vertical = 10.dp, horizontal = 15.dp)
+							.height(50.dp)
+							.fillMaxWidth()
+					) {
+						Button(
+							{ createSetDialog.open() },
+							modifier = Modifier.fillMaxHeight()
+						) {
+							Text("Add")
+						}
 
-                                    isDropdownOpen = false
-                                }) {
-                                    Text("All Sets")
-                                }
+						Spacer(Modifier.weight(1f, true))
 
-                                Divider()
+						TextField(
+							value = filterText,
+							onValueChange = {filterText = it},
+							label = {
+								Text("Filter Descriptions")
+							},
+							modifier = Modifier.fillMaxHeight()
+						)
 
-                                DropdownMenuItem({
-                                    filterState = FilterState.Incomplete
+						Box(Modifier.fillMaxHeight()) {
+							OutlinedButton(
+								{ isDropdownOpen = !isDropdownOpen },
+								enabled = allSets.isNotEmpty(),
+								modifier = Modifier.fillMaxHeight()
+							) {
+								Row(
+									horizontalArrangement = Arrangement.spacedBy(5.dp),
+									verticalAlignment = Alignment.CenterVertically
+								) {
+									if (allSets.isNotEmpty()) {
+										Text("Filter: ${filterState.readableName} Sets")
 
-                                    GlobalState.sets.clear()
-                                    GlobalState.sets.addAll(allSets.filter { it.finishedAt == null })
+										if (isDropdownOpen) {
+											Icon(Icons.Default.ArrowDropUp, "")
+										} else {
+											Icon(Icons.Default.ArrowDropDown, "")
+										}
+									} else {
+										Text("No sets")
+									}
+								}
+							}
 
-                                    isDropdownOpen = false
-                                }) {
-                                    Text("Incomplete Sets")
-                                }
+							DropdownMenu(isDropdownOpen, { isDropdownOpen = false }) {
+								DropdownMenuItem({
+									filterState = FilterState.All
+									isDropdownOpen = false
+								}) {
+									Text("All Sets")
+								}
 
-                                DropdownMenuItem({
-                                    filterState = FilterState.Complete
+								Divider()
 
-                                    GlobalState.sets.clear()
-                                    GlobalState.sets.addAll(allSets.filter { it.finishedAt != null })
+								DropdownMenuItem({
+									filterState = FilterState.Incomplete
+									isDropdownOpen = false
+								}) {
+									Text("Incomplete Sets")
+								}
 
-                                    isDropdownOpen = false
-                                }) {
-                                    Text("Complete Sets")
-                                }
-                            }
-                        }
-                    }
+								DropdownMenuItem({
+									filterState = FilterState.Complete
+									isDropdownOpen = false
+								}) {
+									Text("Complete Sets")
+								}
+							}
+						}
 
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1f)
-                    ) {
-                        // TODO: Sorting!
-                        DataTable(
-                            modifier = Modifier.fillMaxSize(),
-                            sortColumnIndex = 0,
-                            sortAscending = true,
+						StringTooltip("Binder Settings") {
+							Button(
+								{ },
+								modifier = Modifier.fillMaxHeight(),
+								enabled = false,
+							) {
+								Icon(Icons.Rounded.Settings, "Binder settings")
+							}
+						}
+					}
 
-                            columns = listOf(
-                                HeaderColumn("Set"),
-                                HeaderColumn("Set Date"),
-                                HeaderColumn("Scans"),
-                                HeaderColumn("State"),
-                                HeaderColumn("Created"),
-                                HeaderColumn("Finished"),
-                                HeaderColumn("Description"),
-                                HeaderColumn("", TableColumnWidth.MinIntrinsic),
-                            )
-                        ) {
-                            GlobalState.sets.forEachIndexed { index, set ->
-                                row {
-                                    this.backgroundColor = if (index % 2 == 0) {
-                                        if (index == dropTarget.currentSet) {
-                                            rowColorEvenHovered
-                                        } else {
-                                            rowColorEven
-                                        }
-                                    } else {
-                                        if (index == dropTarget.currentSet) {
-                                            rowColorOddHovered
-                                        } else {
-                                            rowColorOdd
-                                        }
-                                    }
+					Box(
+						modifier = Modifier
+							.fillMaxWidth()
+							.weight(1f)
+					) {
+						// TODO: Sorting!
+						DataTable(
+							modifier = Modifier.fillMaxSize(),
+							sortColumnIndex = 0,
+							sortAscending = true,
 
-                                    text(set.id.value.toString().padStart(4, '0'))
-                                    text(set.date?.format())
-                                    text(set.totalScans.toString())
+							columns = listOf(
+								HeaderColumn("Set"),
+								HeaderColumn("Set Date"),
+								HeaderColumn("Scans"),
+								HeaderColumn("State"),
+								HeaderColumn("Created"),
+								HeaderColumn("Finished"),
+								HeaderColumn("Description"),
+								HeaderColumn("", TableColumnWidth.MinIntrinsic),
+							)
+						) {
+							GlobalState.sets.forEachIndexed { index, set ->
+								row {
+									this.backgroundColor = if (index % 2 == 0) {
+										if (index == dropTarget.currentSet) {
+											rowColorEvenHovered
+										} else {
+											rowColorEven
+										}
+									} else {
+										if (index == dropTarget.currentSet) {
+											rowColorOddHovered
+										} else {
+											rowColorOdd
+										}
+									}
 
-                                    if (set.finishedAt != null) {
-                                        text("Complete")
-                                    } else {
-                                        text("Incomplete")
-                                    }
+									text(set.id.value.toString())
+									text(set.date?.format())
+									text(set.totalScans.toString())
 
-                                    text(set.createdAt.format())
-                                    text(set.finishedAt?.format())
-                                    text(set.description, true)
+									if (set.finishedAt != null) {
+										text("Complete")
+									} else {
+										text("Incomplete")
+									}
 
-                                    cell {
-                                        Row(horizontalArrangement = Arrangement.End) {
-                                            StringTooltip("Delete set") {
-                                                TextButton(
-                                                    {
-                                                        // TODO: Delete action
-                                                    },
-                                                    modifier = Modifier.padding(horizontal = 0.dp).width(40.dp),
-                                                    contentPadding = PaddingValues(0.dp)
-                                                ) {
-                                                    Row(
-                                                        verticalAlignment = Alignment.CenterVertically,
-                                                        modifier = Modifier.padding(0.dp)
-                                                    ) {
-                                                        Icon(
-                                                            Icons.Rounded.Delete,
-                                                            "Delete set",
-                                                            tint = Color.Red
-                                                        )
-                                                    }
-                                                }
-                                            }
+									text(set.createdAt.format())
+									text(set.finishedAt?.format())
+									text(set.description, true)
 
-                                            StringTooltip("Open set") {
-                                                TextButton(
-                                                    {
-                                                        // TODO: Open action
-                                                    },
-                                                    modifier = Modifier.padding(horizontal = 0.dp).width(40.dp),
-                                                    contentPadding = PaddingValues(0.dp)
-                                                ) {
-                                                    Row(
-                                                        verticalAlignment = Alignment.CenterVertically,
-                                                        modifier = Modifier.padding(0.dp)
-                                                    ) {
-                                                        Icon(
-                                                            Icons.Rounded.FolderOpen,
-                                                            "Open set"
-                                                        )
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
+									cell {
+										Row(horizontalArrangement = Arrangement.End) {
+											StringTooltip("Delete set") {
+												TextButton(
+													{
+														// TODO: Delete action
+													},
+													modifier = Modifier.padding(horizontal = 0.dp).width(40.dp),
+													contentPadding = PaddingValues(0.dp)
+												) {
+													Row(
+														verticalAlignment = Alignment.CenterVertically,
+														modifier = Modifier.padding(0.dp)
+													) {
+														Icon(
+															Icons.Rounded.Delete,
+															"Delete set",
+															tint = Color.Red
+														)
+													}
+												}
+											}
 
-                    Row(
-                        modifier = Modifier
-                            .background(Colors.LightGray)
-                            .padding(vertical = 10.dp, horizontal = 15.dp)
-                            .height(20.dp)
-                            .fillMaxWidth()
-                    ) {
-                        Text(
-                            buildString {
-                                append("${allSets.size} total sets")
+											StringTooltip("Open set") {
+												TextButton(
+													{
+														// TODO: Open action
+													},
+													modifier = Modifier.padding(horizontal = 0.dp).width(40.dp),
+													contentPadding = PaddingValues(0.dp)
+												) {
+													Row(
+														verticalAlignment = Alignment.CenterVertically,
+														modifier = Modifier.padding(0.dp)
+													) {
+														Icon(
+															Icons.Rounded.FolderOpen,
+															"Open set"
+														)
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
 
-                                if (filterState != FilterState.All) {
-                                    append(
-                                        " (${allSets.size - GlobalState.sets.size} hidden, " +
-                                                "${GlobalState.sets.size} visible)"
-                                    )
-                                }
-                            }
-                        )
-                    }
-                }
-            }
-        }
-    }
+					Row(
+						modifier = Modifier
+							.background(Colors.LightGray)
+							.padding(vertical = 10.dp, horizontal = 15.dp)
+							.height(20.dp)
+							.fillMaxWidth()
+					) {
+						Text(
+							buildString {
+								append("${allSets.size} total sets")
 
-    @Composable
-    fun HeaderColumn(
-        content: String,
-        width: TableColumnWidth = TableColumnWidth.MaxIntrinsic,
-        fillTextWidth: Boolean = false
-    ) = DataColumn(
-        width = width
-    ) { HeaderText(content, fillTextWidth) }
+								if (filterState != FilterState.All || filterText.isNotBlank()) {
+									append(
+										" (${allSets.size - GlobalState.sets.size} hidden, " +
+												"${GlobalState.sets.size} visible)"
+									)
+								}
+							}
+						)
+					}
+				}
+			}
+		}
+	}
 
-    @Composable
-    fun HeaderText(content: String, fillWidth: Boolean = false) {
-        var modifier = Modifier.padding(horizontal = 16.dp)
+	@Composable
+	fun HeaderColumn(
+		content: String,
+		width: TableColumnWidth = TableColumnWidth.MaxIntrinsic,
+		fillTextWidth: Boolean = false
+	) = DataColumn(
+		width = width
+	) { HeaderText(content, fillTextWidth) }
 
-        if (fillWidth) {
-            modifier = modifier.fillMaxWidth()
-        }
+	@Composable
+	fun HeaderText(content: String, fillWidth: Boolean = false) {
+		var modifier = Modifier.padding(horizontal = 16.dp)
 
-        Text(
-            content,
-            softWrap = false,
-            modifier = modifier,
-            textAlign = TextAlign.Start
-        )
-    }
+		if (fillWidth) {
+			modifier = modifier.fillMaxWidth()
+		}
 
-    fun TableRowScope.text(content: String?, fillWidth: Boolean = false) = cell {
-        var modifier = Modifier.padding(horizontal = 16.dp)
+		Text(
+			content,
+			softWrap = false,
+			modifier = modifier,
+			textAlign = TextAlign.Start
+		)
+	}
 
-        if (fillWidth) {
-            modifier = modifier.fillMaxWidth()
-        }
+	fun TableRowScope.text(content: String?, fillWidth: Boolean = false) = cell {
+		var modifier = Modifier.padding(horizontal = 16.dp)
 
-        Text(
-            content ?: "",
-            softWrap = false,
-            modifier = modifier,
-            textAlign = TextAlign.Start
-        )
-    }
+		if (fillWidth) {
+			modifier = modifier.fillMaxWidth()
+		}
 
-    fun TableRowScope.checkbox(checked: Boolean, onCheckedChange: ((Boolean) -> Unit)?) = cell {
-        Checkbox(checked, onCheckedChange)
-    }
+		Text(
+			content ?: "",
+			softWrap = false,
+			modifier = modifier,
+			textAlign = TextAlign.Start
+		)
+	}
+
+	fun TableRowScope.checkbox(checked: Boolean, onCheckedChange: ((Boolean) -> Unit)?) = cell {
+		Checkbox(checked, onCheckedChange)
+	}
 }

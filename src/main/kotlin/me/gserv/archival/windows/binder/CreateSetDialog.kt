@@ -122,7 +122,7 @@ class CreateSetDialog(
                                 },
 
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                                placeholder = { Text("Identifier") },
+                                label = { Text("Identifier") },
                                 modifier = Modifier.fillMaxWidth()
                             )
                         }
@@ -132,7 +132,7 @@ class CreateSetDialog(
                                 setDescription,
                                 { setDescription = it },
 
-                                placeholder = { Text("Description") },
+                                label = { Text("Description") },
                                 modifier = Modifier.fillMaxWidth()
                             )
                         }
@@ -179,8 +179,6 @@ class CreateSetDialog(
                                             totalScans = binder.countSetScans(setIdentifier.toLong()).toLong()
                                         }
                                     }
-
-                                    parent.filterState = FilterState.All
 
                                     GlobalState.sets.add(set)
                                     GlobalState.sets.sortByDescending { it.id.value.toLong() }
