@@ -142,7 +142,7 @@ class BinderWindow(val parent: MainWindow) {
 								Colors.LightGray
 							)
 							.padding(vertical = 10.dp, horizontal = 15.dp)
-							.height(50.dp)
+							.height(55.dp)
 							.fillMaxWidth()
 					) {
 						Button(
@@ -153,15 +153,6 @@ class BinderWindow(val parent: MainWindow) {
 						}
 
 						Spacer(Modifier.weight(1f, true))
-
-						TextField(
-							value = filterText,
-							onValueChange = { filterText = it },
-							label = {
-								Text("Filter Descriptions")
-							},
-							modifier = Modifier.fillMaxHeight()
-						)
 
 						Box(Modifier.fillMaxHeight()) {
 							OutlinedButton(
@@ -213,6 +204,15 @@ class BinderWindow(val parent: MainWindow) {
 							}
 						}
 
+						TextField(
+							value = filterText,
+							onValueChange = { filterText = it },
+							label = {
+								Text("Description", modifier = Modifier.absolutePadding(bottom = 10.dp))
+							},
+							modifier = Modifier.fillMaxHeight()
+						)
+
 						StringTooltip("Binder Settings") {
 							Button(
 								{ },
@@ -237,8 +237,8 @@ class BinderWindow(val parent: MainWindow) {
 
 							columns = listOf(
 								HeaderColumn("Set"),
-								HeaderColumn("Set Date"),
 								HeaderColumn("Scans"),
+								HeaderColumn("Set Date"),
 								HeaderColumn("State"),
 								HeaderColumn("Created"),
 								HeaderColumn("Finished"),
@@ -248,6 +248,10 @@ class BinderWindow(val parent: MainWindow) {
 						) {
 							GlobalState.sets.forEachIndexed { index, set ->
 								row {
+									onClick = {
+										dropTarget.currentSet = index
+									}
+
 									this.backgroundColor = if (index % 2 == 0) {
 										if (index == dropTarget.currentSet) {
 											rowColorEvenHovered
@@ -263,8 +267,8 @@ class BinderWindow(val parent: MainWindow) {
 									}
 
 									text(set.id.value.toString())
-									text(set.date?.format())
 									text(set.totalScans.toString())
+									text(set.date?.format())
 
 									if (set.finishedAt != null) {
 										text("Complete")
