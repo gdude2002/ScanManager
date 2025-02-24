@@ -229,7 +229,7 @@ class BinderWindow(val parent: MainWindow) {
                                         }
                                     }
 
-                                    text(set.id.value.toString())
+                                    text(set.id.value.toString().padStart(4, '0'))
                                     text(set.date?.format())
                                     text(set.totalScans.toString())
 

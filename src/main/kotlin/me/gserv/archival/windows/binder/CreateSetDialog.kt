@@ -108,7 +108,13 @@ class CreateSetDialog(
                                         return@TextField
                                     }
 
-                                    setIdentifier = it
+                                    if (it.isEmpty()) {
+                                        setIdentifier = it
+
+                                        return@TextField
+                                    }
+
+                                    setIdentifier = it.trimStart('0').padStart(1, '0')
 
                                     Database.transaction {
                                         isError = Set.exists(setIdentifier.toLong(), binder)
@@ -177,10 +183,10 @@ class CreateSetDialog(
                                     parent.filterState = FilterState.All
 
                                     GlobalState.sets.add(set)
-                                    GlobalState.sets.sortByDescending { it.id.value }
+                                    GlobalState.sets.sortByDescending { it.id.value.toLong() }
 
                                     parent.allSets.add(set)
-                                    parent.allSets.sortByDescending { it.id.value }
+                                    parent.allSets.sortByDescending { it.id.value.toLong() }
 
                                     close()
                                 },
