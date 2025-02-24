@@ -185,8 +185,8 @@ class DropTargetWindow(val parent: MainWindow) {
                         } else {
 
                             Text(
-                                "Selected set",
-                                fontSize = 0.75.em,
+                                "Set",
+                                fontSize = 0.85.em,
                                 color = borderColor,
                                 textAlign = TextAlign.Center
                             )
@@ -219,11 +219,11 @@ class DropTargetWindow(val parent: MainWindow) {
     }
 
     fun onForwardClick(event: PointerEvent) {
-        onScrollUp(event)
+        onScrollDown(event)
     }
 
     fun onBackClick(event: PointerEvent) {
-        onScrollDown(event)
+        onScrollUp(event)
     }
 
     fun onScrollUp(event: PointerEvent) {

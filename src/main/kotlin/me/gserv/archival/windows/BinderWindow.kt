@@ -26,6 +26,7 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.FrameWindowScope
@@ -35,7 +36,6 @@ import com.seanproctor.datatable.DataColumn
 import com.seanproctor.datatable.TableColumnWidth
 import com.seanproctor.datatable.TableRowScope
 import com.seanproctor.datatable.material3.DataTable
-import jdk.javadoc.internal.doclets.formats.html.markup.HtmlStyle.index
 import me.gserv.archival.Colors
 import me.gserv.archival.data.Database
 import me.gserv.archival.data.GlobalState
@@ -97,10 +97,11 @@ class BinderWindow(val parent: MainWindow) {
     @Composable
     @Preview
     fun create() {
-        val rowColorCurrentHovered = Colors.LightGreen
-        val rowColorCurrent = Colors.LightGray
-        val rowColorHovered = Colors.LighterGreen
-        val rowColorDefault = MaterialTheme.colors.surface
+        val rowColorEvenHovered = Colors.LightGreen
+        val rowColorEven = Colors.LightGray
+
+        val rowColorOddHovered = Colors.LighterGreen
+        val rowColorOdd = MaterialTheme.colors.surface
 
         if (isOpen) {
             Window({ close(); }, state = state, title = "Binder ${GlobalState.binder?.id}") {
@@ -195,16 +196,19 @@ class BinderWindow(val parent: MainWindow) {
                             .fillMaxWidth()
                             .weight(1f)
                     ) {
+                        // TODO: Sorting!
                         DataTable(
                             modifier = Modifier.fillMaxSize(),
+                            sortColumnIndex = 0,
+                            sortAscending = true,
 
                             columns = listOf(
                                 HeaderColumn("Set"),
+                                HeaderColumn("Set Date"),
                                 HeaderColumn("Scans"),
                                 HeaderColumn("State"),
-                                HeaderColumn("Set Date"),
-                                HeaderColumn("Creation Date"),
-                                HeaderColumn("Completion Date"),
+                                HeaderColumn("Created"),
+                                HeaderColumn("Finished"),
                                 HeaderColumn("Description"),
                                 HeaderColumn("", TableColumnWidth.MinIntrinsic),
                             )
@@ -212,20 +216,21 @@ class BinderWindow(val parent: MainWindow) {
                             GlobalState.sets.forEachIndexed { index, set ->
                                 row {
                                     this.backgroundColor = if (index % 2 == 0) {
-                                        if (dropTarget.isHovered && index == dropTarget.currentSet) {
-                                            rowColorCurrentHovered
+                                        if (index == dropTarget.currentSet) {
+                                            rowColorEvenHovered
                                         } else {
-                                            rowColorCurrent
+                                            rowColorEven
                                         }
                                     } else {
-                                        if (dropTarget.isHovered && index == dropTarget.currentSet) {
-                                            rowColorHovered
+                                        if (index == dropTarget.currentSet) {
+                                            rowColorOddHovered
                                         } else {
-                                            rowColorDefault
+                                            rowColorOdd
                                         }
                                     }
 
                                     text(set.id.value.toString())
+                                    text(set.date?.format())
                                     text(set.totalScans.toString())
 
                                     if (set.finishedAt != null) {
@@ -234,49 +239,50 @@ class BinderWindow(val parent: MainWindow) {
                                         text("Incomplete")
                                     }
 
-                                    text(set.date?.format())
                                     text(set.createdAt.format())
                                     text(set.finishedAt?.format())
-                                    text(set.description)
+                                    text(set.description, true)
 
                                     cell {
-                                        StringTooltip("Delete set") {
-                                            TextButton(
-                                                {
-                                                    // TODO: Delete action
-                                                },
-                                                modifier = Modifier.padding(horizontal = 0.dp).width(40.dp),
-                                                contentPadding = PaddingValues(0.dp)
-                                            ) {
-                                                Row(
-                                                    verticalAlignment = Alignment.CenterVertically,
-                                                    modifier = Modifier.padding(0.dp)
+                                        Row(horizontalArrangement = Arrangement.End) {
+                                            StringTooltip("Delete set") {
+                                                TextButton(
+                                                    {
+                                                        // TODO: Delete action
+                                                    },
+                                                    modifier = Modifier.padding(horizontal = 0.dp).width(40.dp),
+                                                    contentPadding = PaddingValues(0.dp)
                                                 ) {
-                                                    Icon(
-                                                        Icons.Rounded.Delete,
-                                                        "Delete set",
-                                                        tint = Color.Red
-                                                    )
+                                                    Row(
+                                                        verticalAlignment = Alignment.CenterVertically,
+                                                        modifier = Modifier.padding(0.dp)
+                                                    ) {
+                                                        Icon(
+                                                            Icons.Rounded.Delete,
+                                                            "Delete set",
+                                                            tint = Color.Red
+                                                        )
+                                                    }
                                                 }
                                             }
-                                        }
 
-                                        StringTooltip("Open set") {
-                                            TextButton(
-                                                {
-                                                    // TODO: Open action
-                                                },
-                                                modifier = Modifier.padding(horizontal = 0.dp).width(40.dp),
-                                                contentPadding = PaddingValues(0.dp)
-                                            ) {
-                                                Row(
-                                                    verticalAlignment = Alignment.CenterVertically,
-                                                    modifier = Modifier.padding(0.dp)
+                                            StringTooltip("Open set") {
+                                                TextButton(
+                                                    {
+                                                        // TODO: Open action
+                                                    },
+                                                    modifier = Modifier.padding(horizontal = 0.dp).width(40.dp),
+                                                    contentPadding = PaddingValues(0.dp)
                                                 ) {
-                                                    Icon(
-                                                        Icons.Rounded.FolderOpen,
-                                                        "Open set"
-                                                    )
+                                                    Row(
+                                                        verticalAlignment = Alignment.CenterVertically,
+                                                        modifier = Modifier.padding(0.dp)
+                                                    ) {
+                                                        Icon(
+                                                            Icons.Rounded.FolderOpen,
+                                                            "Open set"
+                                                        )
+                                                    }
                                                 }
                                             }
                                         }
@@ -312,19 +318,43 @@ class BinderWindow(val parent: MainWindow) {
     }
 
     @Composable
-    fun HeaderColumn(content: String, width: TableColumnWidth = TableColumnWidth.MaxIntrinsic) = DataColumn(
+    fun HeaderColumn(
+        content: String,
+        width: TableColumnWidth = TableColumnWidth.MaxIntrinsic,
+        fillTextWidth: Boolean = false
+    ) = DataColumn(
         width = width
-    ) { HeaderText(content) }
+    ) { HeaderText(content, fillTextWidth) }
 
     @Composable
-    fun HeaderText(content: String) = Text(
-        content,
-        softWrap = false,
-        modifier = Modifier.padding(horizontal = 16.dp)
-    )
+    fun HeaderText(content: String, fillWidth: Boolean = false) {
+        var modifier = Modifier.padding(horizontal = 16.dp)
 
-    fun TableRowScope.text(content: String?) = cell {
-        Text(content ?: "", softWrap = false)
+        if (fillWidth) {
+            modifier = modifier.fillMaxWidth()
+        }
+
+        Text(
+            content,
+            softWrap = false,
+            modifier = modifier,
+            textAlign = TextAlign.Start
+        )
+    }
+
+    fun TableRowScope.text(content: String?, fillWidth: Boolean = false) = cell {
+        var modifier = Modifier.padding(horizontal = 16.dp)
+
+        if (fillWidth) {
+            modifier = modifier.fillMaxWidth()
+        }
+
+        Text(
+            content ?: "",
+            softWrap = false,
+            modifier = modifier,
+            textAlign = TextAlign.Start
+        )
     }
 
     fun TableRowScope.checkbox(checked: Boolean, onCheckedChange: ((Boolean) -> Unit)?) = cell {

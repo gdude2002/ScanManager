@@ -100,12 +100,11 @@ class CreateSetDialog(
                         )
 
                         Row {
-
                             TextField(
                                 setIdentifier,
 
                                 {
-                                    if (!setIdentifier.all { it.isDigit() }) {
+                                    if (!it.all { c -> c.isDigit() }) {
                                         return@TextField
                                     }
 
@@ -117,7 +116,7 @@ class CreateSetDialog(
                                 },
 
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                                placeholder = { Text("Name") },
+                                placeholder = { Text("Identifier") },
                                 modifier = Modifier.fillMaxWidth()
                             )
                         }
@@ -164,7 +163,6 @@ class CreateSetDialog(
 
                                 onClick = {
                                     val set = Database.transaction {
-
                                         Set.create(setIdentifier.toLong(), binder) {
                                             date = LocalDate.now()
 
@@ -179,7 +177,10 @@ class CreateSetDialog(
                                     parent.filterState = FilterState.All
 
                                     GlobalState.sets.add(set)
+                                    GlobalState.sets.sortByDescending { it.id.value }
+
                                     parent.allSets.add(set)
+                                    parent.allSets.sortByDescending { it.id.value }
 
                                     close()
                                 },
