@@ -8,30 +8,21 @@
 
 package me.gserv.archival.utils
 
-import kotlinx.datetime.Clock
-import kotlinx.datetime.LocalDate
-import kotlinx.datetime.LocalDateTime
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toJavaLocalDate
-import kotlinx.datetime.toJavaLocalDateTime
-import kotlinx.datetime.toLocalDateTime
-import java.text.DateFormat
+import kotlinx.datetime.*
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
-import java.util.Locale
-import javax.swing.text.DateFormatter
 
-private val dateTimeFormatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT, FormatStyle.SHORT);
-private val dateFormatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT);
+private val dateTimeFormatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT, FormatStyle.SHORT)
+private val dateFormatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT)
 
 fun LocalDateTime.Companion.now() =
-    Clock.System.now().toLocalDateTime(TimeZone.UTC)
+	Clock.System.now().toLocalDateTime(TimeZone.UTC)
 
 fun LocalDate.Companion.now() =
-    LocalDateTime.now().date
+	LocalDateTime.now().date
 
 fun LocalDateTime.format(): String =
-    dateTimeFormatter.format(toJavaLocalDateTime())
+	dateTimeFormatter.format(toJavaLocalDateTime())
 
 fun LocalDate.format(): String =
-    dateFormatter.format(toJavaLocalDate())
+	dateFormatter.format(toJavaLocalDate())

@@ -18,80 +18,82 @@ import kotlin.io.path.reader
 import kotlin.io.path.writer
 
 object AppConfig {
-    val configFile = Path(System.getProperty("user.home"), "ScanManager.properties")
+	val configFile = Path(System.getProperty("user.home"), "ScanManager.properties")
 
-    var loaded = false
+	var loaded = false
 
-    var dataFolder: String?
-        get() = current.dataFolder
-        set(value) {
-            current.dataFolder = value
+	var dataFolder: String?
+		get() = current.dataFolder
+		set(value) {
+			current.dataFolder = value
 
-            if (value != null) {
-                Database.connect(value)
-            } else {
-                Database.close()
-            }
-        }
+			if (value != null) {
+				Database.connect(value)
+			} else {
+				Database.close()
+			}
+		}
 
-    var theme: String?
-        get() = current.theme
-        set(value) { current.theme = value }
+	var theme: String?
+		get() = current.theme
+		set(value) {
+			current.theme = value
+		}
 
-    var currentState = mutableStateOf(Config())
+	var currentState = mutableStateOf(Config())
 
-    var current: Config
-        get() = currentState.value
-        set(value) {
-            currentState.value = value
-        }
+	var current: Config
+		get() = currentState.value
+		set(value) {
+			currentState.value = value
+		}
 
-    fun load(force: Boolean = true) {
-        if (loaded && !force) {
-            return
-        }
+	fun load(force: Boolean = true) {
+		if (loaded && !force) {
+			return
+		}
 
-        if (configFile.exists()) {
-            val props = Properties()
+		if (configFile.exists()) {
+			val props = Properties()
 
-            props.load(configFile.reader(Charsets.UTF_8))
+			props.load(configFile.reader(Charsets.UTF_8))
 
-            current = Config(
-                dataFolder = props.getProperty("dataFolder"),
-                theme = props.getProperty("theme"),
-            )
-        } else {
-            current = Config()
-            save(current)
-        }
+			current = Config(
+				dataFolder = props.getProperty("dataFolder"),
+				theme = props.getProperty("theme"),
+			)
+		} else {
+			current = Config()
+			save(current)
+		}
 
-        Filesystem.ensureBinders()
+		Filesystem.ensureBinders()
 
-        if (dataFolder != null) {
-            Database.connect(dataFolder!!)
-        }
+		if (dataFolder != null) {
+			Database.connect(dataFolder!!)
+		}
 
-        loaded = true
-    }
+		loaded = true
+	}
 
-    fun save(config: Config = current) {
-        val props = Properties()
+	fun save(config: Config = current) {
+		val props = Properties()
 
-        if (config.dataFolder != null) {
-            props.setProperty("dataFolder", config.dataFolder)
-        }
+		if (config.dataFolder != null) {
+			props.setProperty("dataFolder", config.dataFolder)
+		}
 
-        if (config.theme != null) {
-            props.setProperty("theme", config.theme)
-        }
+		if (config.theme != null) {
+			props.setProperty("theme", config.theme)
+		}
 
-        props.store(configFile.writer(Charsets.UTF_8), null)
-    }
+		props.store(configFile.writer(Charsets.UTF_8), null)
+	}
 
-    data class Config(
-        var dataFolder: String? = null,
-        var theme: String? = null,
-    ) {
-        fun save() = save(this)
-    }
+	data class Config(
+		var dataFolder: String? = null,
+		var theme: String? = null,
+	) {
+		fun save() = save(this)
+	}
 }

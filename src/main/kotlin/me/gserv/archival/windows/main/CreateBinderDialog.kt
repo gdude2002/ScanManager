@@ -13,7 +13,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.*
+import androidx.compose.material.icons.rounded.Book
+import androidx.compose.material.icons.rounded.Cancel
+import androidx.compose.material.icons.rounded.Check
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -35,129 +37,129 @@ import me.gserv.archival.data.GlobalState
 import me.gserv.archival.data.entities.Binder
 
 class CreateBinderDialog(
-    val parent: FrameWindowScope,
+	val parent: FrameWindowScope,
 ) {
-    init {
-        AppConfig.load()
-    }
+	init {
+		AppConfig.load()
+	}
 
-    var isError by mutableStateOf(false)
-    var isOpen by mutableStateOf(false)
-    var binderName by mutableStateOf("")
+	var isError by mutableStateOf(false)
+	var isOpen by mutableStateOf(false)
+	var binderName by mutableStateOf("")
 
-    fun close() {
-        isOpen = false
-        isError = false
+	fun close() {
+		isOpen = false
+		isError = false
 
-        binderName = ""
-    }
+		binderName = ""
+	}
 
-    fun open() {
-        isOpen = true
-        isError = false
+	fun open() {
+		isOpen = true
+		isError = false
 
-        binderName = ""
-    }
+		binderName = ""
+	}
 
-    @Composable
-    @Preview
-    fun create() {
-        if (isOpen) {
-            Dialog({}, DialogProperties(false, false, true)) {
-                Card(backgroundColor = Color.White, shape = RoundedCornerShape(15.dp)) {
-                    Column(modifier = Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(20.dp)) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(
-                                Icons.Rounded.Book,
-                                "Create binder",
-                                modifier = Modifier
-                                    .absolutePadding(right = 8.dp, top = 1.dp)
-                                    .size(30.dp)
-                            )
+	@Composable
+	@Preview
+	fun create() {
+		if (isOpen) {
+			Dialog({}, DialogProperties(false, false, true)) {
+				Card(backgroundColor = Color.White, shape = RoundedCornerShape(15.dp)) {
+					Column(modifier = Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(20.dp)) {
+						Row(verticalAlignment = Alignment.CenterVertically) {
+							Icon(
+								Icons.Rounded.Book,
+								"Create binder",
+								modifier = Modifier
+									.absolutePadding(right = 8.dp, top = 1.dp)
+									.size(30.dp)
+							)
 
-                            Text(
-                                "Create Binder",
-                                fontSize = TextUnit(1.5F, TextUnitType.Em)
-                            )
-                        }
+							Text(
+								"Create Binder",
+								fontSize = TextUnit(1.5F, TextUnitType.Em)
+							)
+						}
 
-                        Text(
-                            "Please enter a name for the new binder. If the binder has a label with an " +
-                                    "identifying code, we recommend using that code.\n\n" +
-                                    "Binder names must be unique."
-                        )
+						Text(
+							"Please enter a name for the new binder. If the binder has a label with an " +
+									"identifying code, we recommend using that code.\n\n" +
+									"Binder names must be unique."
+						)
 
-                        Row {
-                            TextField(
-                                binderName,
+						Row {
+							TextField(
+								binderName,
 
-                                {
-                                    binderName = it
+								{
+									binderName = it
 
-                                    Database.transaction {
-                                        isError = Binder.findById(binderName) != null
-                                    }
-                                },
+									Database.transaction {
+										isError = Binder.findById(binderName) != null
+									}
+								},
 
-                                label = { Text("Name") },
-                                modifier = Modifier.fillMaxWidth()
-                            )
-                        }
+								label = { Text("Name") },
+								modifier = Modifier.fillMaxWidth()
+							)
+						}
 
-                        if (isError) {
-                            Row {
-                                Text(
-                                    "A binder named $binderName already exists. Please pick another name.",
+						if (isError) {
+							Row {
+								Text(
+									"A binder named $binderName already exists. Please pick another name.",
 
-                                    color = Color.Red,
-                                    textAlign = TextAlign.Center
-                                )
-                            }
-                        }
+									color = Color.Red,
+									textAlign = TextAlign.Center
+								)
+							}
+						}
 
-                        Row {
-                            Button({ close() }) {
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Icon(
-                                        Icons.Rounded.Cancel,
-                                        "",
-                                        modifier = Modifier.absolutePadding(right = 4.dp)
-                                    )
+						Row {
+							Button({ close() }) {
+								Row(verticalAlignment = Alignment.CenterVertically) {
+									Icon(
+										Icons.Rounded.Cancel,
+										"",
+										modifier = Modifier.absolutePadding(right = 4.dp)
+									)
 
-                                    Text("Cancel")
-                                }
-                            }
+									Text("Cancel")
+								}
+							}
 
-                            Spacer(Modifier.weight(1f, true))
+							Spacer(Modifier.weight(1f, true))
 
-                            Button(
-                                onClick = {
-                                    val binder = Database.transaction {
-                                        Binder.create(binderName)
-                                    }
+							Button(
+								onClick = {
+									val binder = Database.transaction {
+										Binder.create(binderName)
+									}
 
-                                    Filesystem.ensureBinder(binder.slug)
-                                    GlobalState.loadBinders()
+									Filesystem.ensureBinder(binder.slug)
+									GlobalState.loadBinders()
 
-                                    close()
-                                },
+									close()
+								},
 
-                                enabled = binderName.isNotEmpty() && !isError
-                            ) {
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Icon(
-                                        Icons.Rounded.Check,
-                                        "",
-                                        modifier = Modifier.absolutePadding(right = 4.dp)
-                                    )
+								enabled = binderName.isNotEmpty() && !isError
+							) {
+								Row(verticalAlignment = Alignment.CenterVertically) {
+									Icon(
+										Icons.Rounded.Check,
+										"",
+										modifier = Modifier.absolutePadding(right = 4.dp)
+									)
 
-                                    Text("Okay")
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
+									Text("Okay")
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
 }

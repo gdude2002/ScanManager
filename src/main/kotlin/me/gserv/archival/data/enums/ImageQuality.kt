@@ -9,11 +9,11 @@
 package me.gserv.archival.data.enums
 
 enum class ImageQuality(val readableName: String) {
-    NOT_EVALUATED("Not Evaluated"),
+	NOT_EVALUATED("Not Evaluated"),
 
-    TERRIBLE("Terrible"),
-    BAD("Bad"),
-    FAIR("Fair"),
-    GOOD("Good"),
-    GREAT("Great");
+	TERRIBLE("Terrible"),
+	BAD("Bad"),
+	FAIR("Fair"),
+	GOOD("Good"),
+	GREAT("Great");
 }

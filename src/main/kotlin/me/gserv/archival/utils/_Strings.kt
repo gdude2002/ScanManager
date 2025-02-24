@@ -13,4 +13,4 @@ import com.github.slugify.Slugify
 private val slugify = Slugify.builder().transliterator(true).build()
 
 fun String.toSlug(): String =
-    slugify.slugify(this)!!
+	slugify.slugify(this)!!

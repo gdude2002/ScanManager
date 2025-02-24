@@ -17,28 +17,28 @@ import me.gserv.archival.data.entities.Binder
 import me.gserv.archival.data.entities.Set
 
 object GlobalState {
-    val binders = mutableStateListOf<Binder>()
-    var binder by mutableStateOf<Binder?>(null)
-    var sets: SnapshotStateList<Set> = mutableStateListOf()
+	val binders = mutableStateListOf<Binder>()
+	var binder by mutableStateOf<Binder?>(null)
+	var sets: SnapshotStateList<Set> = mutableStateListOf()
 
-    fun clear() {
-        binders.clear()
-    }
+	fun clear() {
+		binders.clear()
+	}
 
-    fun load() {
-        loadBinders()
-    }
+	fun load() {
+		loadBinders()
+	}
 
-    fun loadBinders() {
-        binders.clear()
+	fun loadBinders() {
+		binders.clear()
 
-        Database.transaction {
-            binders.addAll(
-                Binder.all()
-                    .sortedWith(
-                        compareBy({it.archived}, {it.id.value})
-                    )
-            )
-        }
-    }
+		Database.transaction {
+			binders.addAll(
+				Binder.all()
+					.sortedWith(
+						compareBy({ it.archived }, { it.id.value })
+					)
+			)
+		}
+	}
 }

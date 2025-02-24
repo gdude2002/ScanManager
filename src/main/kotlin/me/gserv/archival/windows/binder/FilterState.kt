@@ -9,7 +9,7 @@
 package me.gserv.archival.windows.binder
 
 sealed class FilterState(val readableName: String) {
-    object All : FilterState("All")
-    object Complete : FilterState("Complete")
-    object Incomplete : FilterState("Incomplete")
+	object All : FilterState("All")
+	object Complete : FilterState("Complete")
+	object Incomplete : FilterState("Incomplete")
 }

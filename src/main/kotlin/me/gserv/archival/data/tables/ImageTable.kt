@@ -12,15 +12,15 @@ import me.gserv.archival.data.enums.ImageQuality
 import org.jetbrains.exposed.dao.id.IdTable
 
 object ImageTable : IdTable<String>("images") {
-    override val id = text("id").entityId()
-    override val primaryKey: PrimaryKey = PrimaryKey(BinderTable.id)
+	override val id = text("id").entityId()
+	override val primaryKey: PrimaryKey = PrimaryKey(BinderTable.id)
 
-    val set = reference("set_id", SetTable.id)
-    val quality = enumeration<ImageQuality>("quality")
+	val set = reference("set_id", SetTable.id)
+	val quality = enumeration<ImageQuality>("quality")
 
-    val averageHash = text("average_hash")
-    val differenceHash = text("difference_hash")
-    val medianHash = text("median_hash")
-    val perceptiveHash = text("perceptive_hash")
-    val rotationalHash = text("rotational_hash")  // RotP
+	val averageHash = text("average_hash")
+	val differenceHash = text("difference_hash")
+	val medianHash = text("median_hash")
+	val perceptiveHash = text("perceptive_hash")
+	val rotationalHash = text("rotational_hash")  // RotP
 }

@@ -13,9 +13,9 @@ import org.jetbrains.exposed.dao.id.IdTable
 import org.jetbrains.exposed.sql.Column
 
 object BinderTable : IdTable<String>("binders") {
-    override val id: Column<EntityID<String>> = varchar("id", 128).entityId()
-    override val primaryKey: PrimaryKey = PrimaryKey(id)
+	override val id: Column<EntityID<String>> = varchar("id", 128).entityId()
+	override val primaryKey: PrimaryKey = PrimaryKey(id)
 
-    val slug = varchar("slug", 128)
-    val archived = bool("archived").default(false)
+	val slug = varchar("slug", 128)
+	val archived = bool("archived").default(false)
 }

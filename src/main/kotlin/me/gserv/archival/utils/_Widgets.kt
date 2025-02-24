@@ -26,54 +26,54 @@ import androidx.compose.ui.unit.dp
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun Tooltip(
-    tooltip: @Composable () -> Unit,
-    modifier: Modifier = Modifier,
-    delayMillis: Int = 500,
-    tooltipPlacement: TooltipPlacement = TooltipPlacement.CursorPoint(
-        DpOffset(0.dp, (-10).dp),
-        Alignment.TopCenter
-    ),
-    content: @Composable () -> Unit
+	tooltip: @Composable () -> Unit,
+	modifier: Modifier = Modifier,
+	delayMillis: Int = 500,
+	tooltipPlacement: TooltipPlacement = TooltipPlacement.CursorPoint(
+		DpOffset(0.dp, (-10).dp),
+		Alignment.TopCenter
+	),
+	content: @Composable () -> Unit
 ) {
-    TooltipArea(
-        tooltip = {
-            Surface(
-                modifier = Modifier.shadow(4.dp),
-                color = Color(255, 255, 210),
-                shape = RoundedCornerShape(4.dp)
-            ) {
-                tooltip()
-            }
-        },
-        modifier = modifier,
-        delayMillis = delayMillis,
-        tooltipPlacement = tooltipPlacement,
-        content = content,
-    )
+	TooltipArea(
+		tooltip = {
+			Surface(
+				modifier = Modifier.shadow(4.dp),
+				color = Color(255, 255, 210),
+				shape = RoundedCornerShape(4.dp)
+			) {
+				tooltip()
+			}
+		},
+		modifier = modifier,
+		delayMillis = delayMillis,
+		tooltipPlacement = tooltipPlacement,
+		content = content,
+	)
 }
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun StringTooltip(
-    text: String,
-    modifier: Modifier = Modifier,
-    delayMillis: Int = 500,
-    tooltipPlacement: TooltipPlacement = TooltipPlacement.CursorPoint(
-        DpOffset(0.dp, (-10).dp),
-        Alignment.TopCenter
-    ),
-    content: @Composable () -> Unit
+	text: String,
+	modifier: Modifier = Modifier,
+	delayMillis: Int = 500,
+	tooltipPlacement: TooltipPlacement = TooltipPlacement.CursorPoint(
+		DpOffset(0.dp, (-10).dp),
+		Alignment.TopCenter
+	),
+	content: @Composable () -> Unit
 ) {
-    Tooltip(
-        tooltip = {
-            Text(
-                text = text,
-                modifier = Modifier.padding(10.dp)
-            )
-        },
-        modifier = modifier,
-        delayMillis = delayMillis,
-        tooltipPlacement = tooltipPlacement,
-        content = content,
-    )
+	Tooltip(
+		tooltip = {
+			Text(
+				text = text,
+				modifier = Modifier.padding(10.dp)
+			)
+		},
+		modifier = modifier,
+		delayMillis = delayMillis,
+		tooltipPlacement = tooltipPlacement,
+		content = content,
+	)
 }

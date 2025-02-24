@@ -14,46 +14,47 @@ import kotlin.io.path.Path
 import kotlin.io.path.absolute
 
 object Filesystem {
-    const val ORIGINAL_FOLDER_NAME = "JPEG Originals"
-    const val EDIT_FOLDER_NAME = "PSD Edits"
+	const val ORIGINAL_FOLDER_NAME = "JPEG Originals"
+	const val EDIT_FOLDER_NAME = "PSD Edits"
 
-    val bindersFolder get() =
-        AppConfig.dataFolder?.let { Path(it, "binders").absolute() }
+	val bindersFolder
+		get() =
+			AppConfig.dataFolder?.let { Path(it, "binders").absolute() }
 
-    fun ensureBinders() {
-        val folder = bindersFolder
-            ?: error("Data folder hasn't been configured yet.")
+	fun ensureBinders() {
+		val folder = bindersFolder
+			?: error("Data folder hasn't been configured yet.")
 
-        folder.toFile().mkdirs()
-    }
+		folder.toFile().mkdirs()
+	}
 
-    fun binderExists(binder: String): Boolean {
-        val folder = bindersFolder
-            ?: return false
+	fun binderExists(binder: String): Boolean {
+		val folder = bindersFolder
+			?: return false
 
-        return File(folder.toFile(), binder).isDirectory()
-    }
+		return File(folder.toFile(), binder).isDirectory()
+	}
 
-    fun ensureBinder(binder: String): File {
-        val folder = bindersFolder
-            ?: error("Data folder hasn't been configured yet.")
+	fun ensureBinder(binder: String): File {
+		val folder = bindersFolder
+			?: error("Data folder hasn't been configured yet.")
 
-        val binderFile = File(folder.toFile(), binder)
+		val binderFile = File(folder.toFile(), binder)
 
-        File(binderFile, ORIGINAL_FOLDER_NAME).mkdirs()
-        File(binderFile, EDIT_FOLDER_NAME).mkdirs()
+		File(binderFile, ORIGINAL_FOLDER_NAME).mkdirs()
+		File(binderFile, EDIT_FOLDER_NAME).mkdirs()
 
-        return binderFile
-    }
+		return binderFile
+	}
 
-    fun deleteBinder(binder: String) {
-        val folder = bindersFolder
-            ?: error("Data folder hasn't been configured yet.")
+	fun deleteBinder(binder: String) {
+		val folder = bindersFolder
+			?: error("Data folder hasn't been configured yet.")
 
-        val binderFile = File(folder.toFile(), binder)
+		val binderFile = File(folder.toFile(), binder)
 
-        if (binderFile.exists()) {
-            binderFile.deleteRecursively()
-        }
-    }
+		if (binderFile.exists()) {
+			binderFile.deleteRecursively()
+		}
+	}
 }

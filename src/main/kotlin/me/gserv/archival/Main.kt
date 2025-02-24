@@ -18,16 +18,16 @@ lateinit var mainWindow: MainWindow
 lateinit var dropTarget: DropTargetWindow
 
 fun main() = application {
-    if (System.getenv().contains("NO_LOAD")) {
-        Database.connect("mem:test")
-        Database.printCreateStatements()
-    } else {
-        AppConfig.load()
+	if (System.getenv().contains("NO_LOAD")) {
+		Database.connect("mem:test")
+		Database.printCreateStatements()
+	} else {
+		AppConfig.load()
 
-        mainWindow = MainWindow(this)
-        dropTarget = DropTargetWindow(mainWindow)
+		mainWindow = MainWindow(this)
+		dropTarget = DropTargetWindow(mainWindow)
 
-        dropTarget.create()
-        mainWindow.open()
-    }
+		dropTarget.create()
+		mainWindow.open()
+	}
 }

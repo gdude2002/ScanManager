@@ -28,10 +28,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.toLowerCase
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.em
 import androidx.compose.ui.window.FrameWindowScope
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowState
@@ -116,7 +114,7 @@ class BinderWindow(val parent: MainWindow) {
 					FilterState.Incomplete -> filtered = filtered.filter { it.finishedAt == null }
 					FilterState.Complete -> filtered = filtered.filter { it.finishedAt != null }
 
-					FilterState.All -> { }
+					FilterState.All -> {}
 				}
 
 				if (filterText.isNotBlank()) {
@@ -158,7 +156,7 @@ class BinderWindow(val parent: MainWindow) {
 
 						TextField(
 							value = filterText,
-							onValueChange = {filterText = it},
+							onValueChange = { filterText = it },
 							label = {
 								Text("Filter Descriptions")
 							},

@@ -16,31 +16,31 @@ import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.and
 
 class Set(id: EntityID<Long>) : LongEntity(id) {
-    companion object : LongEntityClass<Set>(SetTable) {
-        fun create(
-            id: Long,
-            binder: Binder,
-            body: Set.() -> Unit = {}
-        ) = new(id) {
-            this.binder = binder
+	companion object : LongEntityClass<Set>(SetTable) {
+		fun create(
+			id: Long,
+			binder: Binder,
+			body: Set.() -> Unit = {}
+		) = new(id) {
+			this.binder = binder
 
-            body()
-        }
+			body()
+		}
 
-        fun exists(id: Long, binder: Binder): Boolean =
-            Database.transaction {
-                find {
-                    (SetTable.id eq id) and (SetTable.binder eq binder.id)
-                }.any()
-            }
-    }
+		fun exists(id: Long, binder: Binder): Boolean =
+			Database.transaction {
+				find {
+					(SetTable.id eq id) and (SetTable.binder eq binder.id)
+				}.any()
+			}
+	}
 
-    var binder by Binder referencedOn SetTable.binder
-    var description by SetTable.description
-    var date by SetTable.date
+	var binder by Binder referencedOn SetTable.binder
+	var description by SetTable.description
+	var date by SetTable.date
 
-    var createdAt by SetTable.createdAt
-    var finishedAt by SetTable.finishedAt
+	var createdAt by SetTable.createdAt
+	var finishedAt by SetTable.finishedAt
 
-    var totalScans by SetTable.totalScans
+	var totalScans by SetTable.totalScans
 }

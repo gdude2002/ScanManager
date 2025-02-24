@@ -17,23 +17,23 @@ import java.nio.file.Path
 import kotlin.io.path.absolutePathString
 
 class Image(id: EntityID<String>) : Entity<String>(id) {
-    companion object : EntityClass<String, Image>(ImageTable) {
-        fun create(path: Path, body: Image.() -> Unit) =
-            create(path.absolutePathString(), body)
+	companion object : EntityClass<String, Image>(ImageTable) {
+		fun create(path: Path, body: Image.() -> Unit) =
+			create(path.absolutePathString(), body)
 
-        fun create(path: File, body: Image.() -> Unit) =
-            create(path.absolutePath, body)
+		fun create(path: File, body: Image.() -> Unit) =
+			create(path.absolutePath, body)
 
-        fun create(path: String, body: Image.() -> Unit) =
-            new(path, body)
-    }
+		fun create(path: String, body: Image.() -> Unit) =
+			new(path, body)
+	}
 
-    val averageHash by ImageTable.averageHash
-    val differenceHash by ImageTable.differenceHash
-    val medianHash by ImageTable.medianHash
-    val perceptiveHash by ImageTable.perceptiveHash
-    val rotationalHash by ImageTable.rotationalHash
+	val averageHash by ImageTable.averageHash
+	val differenceHash by ImageTable.differenceHash
+	val medianHash by ImageTable.medianHash
+	val perceptiveHash by ImageTable.perceptiveHash
+	val rotationalHash by ImageTable.rotationalHash
 
-    val set by Set referencedOn ImageTable.set
-    val quality by ImageTable.quality
+	val set by Set referencedOn ImageTable.set
+	val quality by ImageTable.quality
 }
