@@ -41,6 +41,8 @@ import me.gserv.archival.utils.StringTooltip
 import me.gserv.archival.windows.main.CreateBinderDialog
 import me.gserv.archival.windows.main.DataDirectoryDialog
 import me.gserv.archival.windows.main.DeleteBinderDialog
+import java.awt.Desktop
+import java.net.URI
 
 class MainWindow(val applicationScope: ApplicationScope) {
     var isOpen by mutableStateOf(false)
@@ -110,8 +112,9 @@ class MainWindow(val applicationScope: ApplicationScope) {
 
                             Button(
                                 modifier = Modifier.size(60.dp),
-                                onClick = {},
-                                enabled = false
+                                onClick = {
+                                    Desktop.getDesktop().browse(URI("https://github.com/gdude2002/ScanManager/wiki"))
+                                },
                             ) {
                                 Column {
                                     Icon(
