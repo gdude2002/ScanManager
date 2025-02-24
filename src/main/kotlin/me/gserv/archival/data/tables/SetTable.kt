@@ -11,10 +11,16 @@ package me.gserv.archival.data.tables
 import kotlinx.datetime.LocalDate
 import me.gserv.archival.utils.now
 import org.jetbrains.exposed.dao.id.LongIdTable
+import org.jetbrains.exposed.sql.ReferenceOption
 import org.jetbrains.exposed.sql.kotlin.datetime.date
 
 object SetTable : LongIdTable("sets") {
-	val binder = reference("binder", BinderTable.id)
+	val binder = reference(
+		name = "binder",
+		refColumn = BinderTable.id,
+		onDelete = ReferenceOption.CASCADE,
+		onUpdate = ReferenceOption.CASCADE,
+	)
 
 	val description = text("description").nullable()
 	val date = date("date").nullable()

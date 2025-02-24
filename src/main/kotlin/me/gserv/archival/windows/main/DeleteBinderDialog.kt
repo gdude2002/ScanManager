@@ -86,10 +86,10 @@ class DeleteBinderDialog(
 						Text(
 							"Are you sure you wish to delete Binder ${binder?.id}?\n\n" +
 
-									"The binder, its data and its images will be permanently removed, and you won't " +
-									"be able to restore it.\n\n" +
+								"The binder, its data and its images will be permanently removed, and you won't " +
+								"be able to restore it.\n\n" +
 
-									"Consider using the backup function before deleting any binders."
+								"Consider using the backup function before deleting any binders."
 						)
 
 						Row {
@@ -121,7 +121,7 @@ class DeleteBinderDialog(
 										}
 									}
 
-									GlobalState.loadBinders()
+									GlobalState.binders.remove(binder)
 
 									close()
 								},
