@@ -123,13 +123,13 @@ class DropTargetWindow(val parent: MainWindow) {
 
 			WindowDraggableArea(
 				Modifier.fillMaxSize()
-					.clip(CircleShape)
 					.background(Color.Transparent, CircleShape)
+					.clip(CircleShape)
 			) {
 				Box(
 					Modifier.fillMaxSize()
-						.clip(CircleShape)
 						.background(backgroundColor, CircleShape)
+						.clip(CircleShape)
 						.pointerInput(Unit) {
 							awaitPointerEventScope {
 								while (true) {
