@@ -43,11 +43,14 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.window.rememberWindowState
+import io.github.oshai.kotlinlogging.KotlinLogging
 import me.gserv.archival.config.AppConfig
 import me.gserv.archival.data.GlobalState
 import java.awt.geom.RoundRectangle2D
 
 class DropTargetWindow(val parent: MainWindow) {
+	val logger = KotlinLogging.logger { }
+
 	lateinit var state: WindowState
 	lateinit var tooltipState: WindowState
 
@@ -113,15 +116,19 @@ class DropTargetWindow(val parent: MainWindow) {
 											if (event.buttons.isPrimaryPressed) {
 												onLeftClick(event)
 											}
+
 											if (event.buttons.isSecondaryPressed) {
 												onRightClick(event)
 											}
+
 											if (event.buttons.isTertiaryPressed) {
 												onMiddleClick(event)
 											}
+
 											if (event.buttons.isBackPressed) {
 												onBackClick(event)
 											}
+
 											if (event.buttons.isForwardPressed) {
 												onForwardClick(event)
 											}
@@ -131,6 +138,7 @@ class DropTargetWindow(val parent: MainWindow) {
 											if (event.changes.any { it.scrollDelta.y > 0 }) {
 												onScrollUp(event)
 											}
+
 											if (event.changes.any { it.scrollDelta.y < 0 }) {
 												onScrollDown(event)
 											}
@@ -207,26 +215,32 @@ class DropTargetWindow(val parent: MainWindow) {
 	}
 
 	fun onLeftClick(event: PointerEvent) {
-
+		logger.debug { "Left-click event received" }
 	}
 
 	fun onRightClick(event: PointerEvent) {
-
+		logger.debug { "Right-click event received" }
 	}
 
 	fun onMiddleClick(event: PointerEvent) {
-
+		logger.debug { "Middle-click event received" }
 	}
 
 	fun onForwardClick(event: PointerEvent) {
+		logger.debug { "Forward button press event received" }
+
 		onScrollDown(event)
 	}
 
 	fun onBackClick(event: PointerEvent) {
+		logger.debug { "Back button press event received" }
+
 		onScrollUp(event)
 	}
 
 	fun onScrollUp(event: PointerEvent) {
+		logger.debug { "Scroll-up event received" }
+
 		if (GlobalState.sets.isEmpty() || currentSet == GlobalState.sets.size - 1) {
 			return
 		}
@@ -235,6 +249,8 @@ class DropTargetWindow(val parent: MainWindow) {
 	}
 
 	fun onScrollDown(event: PointerEvent) {
+		logger.debug { "Scroll-down event received" }
+
 		if (GlobalState.sets.isEmpty() || currentSet == 0) {
 			return
 		}
@@ -243,10 +259,14 @@ class DropTargetWindow(val parent: MainWindow) {
 	}
 
 	fun onMouseEnter(event: PointerEvent) {
+		logger.debug { "Mouse cursor entered window" }
+
 		isHovered = false
 	}
 
 	fun onMouseExit(event: PointerEvent) {
+		logger.debug { "Mouse cursor exited window" }
+
 		isHovered = true
 	}
 }

@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.window.FrameWindowScope
+import io.github.oshai.kotlinlogging.KotlinLogging
 import io.github.vinceglb.filekit.compose.rememberDirectoryPickerLauncher
 import io.github.vinceglb.filekit.core.FileKitPlatformSettings
 import me.gserv.archival.config.AppConfig
@@ -42,6 +43,8 @@ class DataDirectoryDialog(
 	init {
 		AppConfig.load()
 	}
+
+	val logger = KotlinLogging.logger { }
 
 	var isOpen by mutableStateOf(false)
 	var isPickerOpen by mutableStateOf(false)
@@ -113,7 +116,7 @@ class DataDirectoryDialog(
 
 						Text(
 							"Please select the folder you wish to use to store management data.\n" +
-									"Select a folder containing existing data to use the data in that folder."
+								"Select a folder containing existing data to use the data in that folder."
 						)
 
 						Row {
@@ -136,6 +139,8 @@ class DataDirectoryDialog(
 
 						Row {
 							Button(onClick = {
+								logger.info { "Closing without changing data directory" }
+
 								close()
 							}) {
 								Row(verticalAlignment = Alignment.CenterVertically) {
@@ -152,12 +157,18 @@ class DataDirectoryDialog(
 							Spacer(Modifier.weight(1f, true))
 
 							Button(onClick = {
+								logger.info { "Changing data directory to $newDirectory" }
+
 								dataDirectory = newDirectory
 
 								AppConfig.dataFolder = dataDirectory
 								AppConfig.save()
 
+								logger.info { "Ensuring data directory exists..." }
+
 								Filesystem.ensureBinders()
+
+								logger.info { "Done, closing dialog" }
 
 								close()
 							}) {

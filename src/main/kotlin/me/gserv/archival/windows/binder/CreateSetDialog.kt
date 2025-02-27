@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.datetime.LocalDate
 import me.gserv.archival.data.Database
 import me.gserv.archival.data.GlobalState
@@ -43,6 +44,8 @@ class CreateSetDialog(
 	val parent: BinderWindow,
 	val binder: Binder,
 ) {
+	val logger = KotlinLogging.logger { }
+
 	var isError by mutableStateOf(false)
 	var isOpen by mutableStateOf(false)
 
@@ -89,9 +92,9 @@ class CreateSetDialog(
 
 						Text(
 							"Please enter a numeric identifier for the new set. If the set has a label with an " +
-									"identifying code, we recommend using that code. " +
-									"Don't include the binder name.\n\n" +
-									"Set identifiers must be unique within the binder."
+								"identifying code, we recommend using that code. " +
+								"Don't include the binder name.\n\n" +
+								"Set identifiers must be unique within the binder."
 						)
 
 						Row {
@@ -136,7 +139,7 @@ class CreateSetDialog(
 							Row {
 								Text(
 									"Identifier $setIdentifier is invalid, or a set with that identifier already " +
-											"exists. Please pick another identifier.",
+										"exists. Please pick another identifier.",
 
 									color = Color.Red,
 									textAlign = TextAlign.Center
@@ -145,7 +148,12 @@ class CreateSetDialog(
 						}
 
 						Row {
-							Button({ close() }) {
+							Button(
+								{
+									logger.info { "Closing dialog without creating set." }
+									close()
+								}
+							) {
 								Row(verticalAlignment = Alignment.CenterVertically) {
 									Icon(
 										Icons.Rounded.Cancel,
@@ -163,6 +171,9 @@ class CreateSetDialog(
 								enabled = setIdentifier.isNotEmpty() && !isError,
 
 								onClick = {
+									logger.info { "Creating set $setIdentifier in binder ${binder.id.value}" }
+									logger.info { "Description: $setDescription" }
+
 									val set = Database.transaction {
 										Set.create(setIdentifier.toLong(), binder) {
 											date = LocalDate.now()
@@ -175,11 +186,15 @@ class CreateSetDialog(
 										}
 									}
 
+									logger.info { "Set created, updating global and window states..." }
+
 									GlobalState.sets.add(set)
 									GlobalState.sets.sortByDescending { it.id.value.toLong() }
 
 									parent.allSets.add(set)
 									parent.allSets.sortByDescending { it.id.value.toLong() }
+
+									logger.info { "Done, closing dialog" }
 
 									close()
 								},

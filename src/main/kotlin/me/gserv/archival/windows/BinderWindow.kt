@@ -21,7 +21,6 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.FolderOpen
-import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
@@ -37,6 +36,7 @@ import com.seanproctor.datatable.DataColumn
 import com.seanproctor.datatable.TableColumnWidth
 import com.seanproctor.datatable.TableRowScope
 import com.seanproctor.datatable.material3.DataTable
+import io.github.oshai.kotlinlogging.KotlinLogging
 import me.gserv.archival.Colors
 import me.gserv.archival.data.Database
 import me.gserv.archival.data.GlobalState
@@ -53,6 +53,8 @@ import org.jetbrains.exposed.sql.SortOrder
 import java.awt.Dimension
 
 class BinderWindow(val parent: MainWindow) {
+	val logger = KotlinLogging.logger { }
+
 	var isOpen by mutableStateOf(false)
 	var isDropdownOpen by mutableStateOf(false)
 
@@ -184,6 +186,8 @@ class BinderWindow(val parent: MainWindow) {
 
 							DropdownMenu(isDropdownOpen, { isDropdownOpen = false }) {
 								DropdownMenuItem({
+									logger.info { "Updating completion filter: All sets" }
+
 									filterState = FilterState.All
 									isDropdownOpen = false
 								}) {
@@ -193,6 +197,8 @@ class BinderWindow(val parent: MainWindow) {
 								Divider()
 
 								DropdownMenuItem({
+									logger.info { "Updating completion filter: Incomplete sets only" }
+
 									filterState = FilterState.Incomplete
 									isDropdownOpen = false
 								}) {
@@ -200,6 +206,8 @@ class BinderWindow(val parent: MainWindow) {
 								}
 
 								DropdownMenuItem({
+									logger.info { "Updating completion filter: Complete sets only" }
+
 									filterState = FilterState.Complete
 									isDropdownOpen = false
 								}) {
@@ -210,22 +218,25 @@ class BinderWindow(val parent: MainWindow) {
 
 						TextField(
 							value = filterText,
-							onValueChange = { filterText = it },
+							onValueChange = {
+								logger.info { "Updating description filter: \"$it\"" }
+								filterText = it
+							},
 							label = {
 								Text("Description", modifier = Modifier.absolutePadding(bottom = 10.dp))
 							},
 							modifier = Modifier.fillMaxHeight()
 						)
 
-						StringTooltip("Binder Settings") {
-							Button(
-								{ },
-								modifier = Modifier.fillMaxHeight(),
-								enabled = false,
-							) {
-								Icon(Icons.Rounded.Settings, "Binder settings")
-							}
-						}
+//						StringTooltip("Binder Settings") {
+//							Button(
+//								{},
+//								modifier = Modifier.fillMaxHeight(),
+//								enabled = false,
+//							) {
+//								Icon(Icons.Rounded.Settings, "Binder settings")
+//							}
+//						}
 					}
 
 					Box(
@@ -346,7 +357,7 @@ class BinderWindow(val parent: MainWindow) {
 								if (filterState != FilterState.All || filterText.isNotBlank()) {
 									append(
 										" (${allSets.size - GlobalState.sets.size} hidden, " +
-												"${GlobalState.sets.size} visible)"
+											"${GlobalState.sets.size} visible)"
 									)
 								}
 							}

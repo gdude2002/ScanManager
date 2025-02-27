@@ -33,6 +33,7 @@ import androidx.compose.ui.window.FrameWindowScope
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.zIndex
+import io.github.oshai.kotlinlogging.KotlinLogging
 import me.gserv.archival.Colors
 import me.gserv.archival.config.AppConfig
 import me.gserv.archival.data.Database
@@ -45,6 +46,8 @@ import java.awt.Desktop
 import java.net.URI
 
 class MainWindow(val applicationScope: ApplicationScope) {
+	val logger = KotlinLogging.logger { }
+
 	var isOpen by mutableStateOf(false)
 	var showArchived by mutableStateOf(false)
 
@@ -248,11 +251,23 @@ class MainWindow(val applicationScope: ApplicationScope) {
 												StringTooltip(tooltipText) {
 													TextButton(
 														onClick = {
+															logger.info {
+																if (binder.archived) {
+																	"Un-archiving binder ${binder.id.value}"
+																} else {
+																	"Archiving binder ${binder.id.value}"
+																}
+															}
+
 															Database.transaction {
 																binder.archived = !binder.archived
 															}
 
+															logger.info { "Reloading global state..." }
+
 															GlobalState.loadBinders()
+
+															logger.info { "Done" }
 														},
 														modifier = Modifier.padding(horizontal = 0.dp).width(40.dp),
 														contentPadding = PaddingValues(0.dp)

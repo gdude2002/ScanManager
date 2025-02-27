@@ -32,11 +32,21 @@ class Binder(id: EntityID<String>) : Entity<String>(id) {
 	val editsDirectory by lazy { File(baseDirectory, Filesystem.EDIT_FOLDER_NAME) }
 	val originalsDirectory by lazy { File(baseDirectory, Filesystem.ORIGINAL_FOLDER_NAME) }
 
-	fun getSetEditFiles(set: Long) =
-		editsDirectory.listFiles { it.startsWith("${id.value}-$set-") }
+	fun getSetEditFiles(set: Long): Array<out File> {
+		val regex = Filesystem.fileName(id.value, set.toString(), extension = "psd").toRegex()
 
-	fun getSetOriginalFiles(set: Long) =
-		originalsDirectory.listFiles { it.startsWith("${id.value}-$set-") }
+		return editsDirectory.listFiles {
+			it.name.matches(regex)
+		}
+	}
+
+	fun getSetOriginalFiles(set: Long): Array<out File> {
+		val regex = Filesystem.fileName(id.value, set.toString(), extension = "jpeg").toRegex()
+
+		return originalsDirectory.listFiles {
+			it.name.matches(regex)
+		}
+	}
 
 	fun countSetScans(set: Long): Int {
 		val edits = getSetEditFiles(set).map { it.name }.toSet()

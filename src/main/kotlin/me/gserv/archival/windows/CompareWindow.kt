@@ -26,6 +26,7 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowState
 import com.github.romankh3.image.comparison.ImageComparison
 import com.twelvemonkeys.image.ResampleOp
+import io.github.oshai.kotlinlogging.KotlinLogging
 import io.github.vinceglb.filekit.compose.rememberFilePickerLauncher
 import io.github.vinceglb.filekit.core.FileKitPlatformSettings
 import io.github.vinceglb.filekit.core.PickerType
@@ -38,6 +39,8 @@ import javax.imageio.ImageIO
 import kotlin.math.floor
 
 class CompareWindow(val parent: MainWindow) {
+	val logger = KotlinLogging.logger { }
+
 	var isOpen by mutableStateOf(false)
 	var isPickerOpen by mutableStateOf(false)
 
@@ -138,8 +141,10 @@ class CompareWindow(val parent: MainWindow) {
 					) { file ->
 						if (file != null) {
 							processingScope.launch {
-								progress = null
+								logger.info { "Loading image: ${file.file.absolutePath}" }
+
 								statusText = "Loading image..."
+								progress = null
 
 								pickerFileTarget.value = file.file
 								pickerImageTarget.value = ImageIO.read(file.file)
@@ -162,6 +167,8 @@ class CompareWindow(val parent: MainWindow) {
 
 									val firstImageResized =
 										if (firstImage!!.width != maxWidth || firstImage!!.height != maxHeight) {
+											logger.info { "Resizing first image..." }
+
 											resampler.filter(firstImage, null)
 										} else {
 											firstImage!!
@@ -171,10 +178,14 @@ class CompareWindow(val parent: MainWindow) {
 
 									val secondImageResized =
 										if (secondImage!!.width != maxWidth || secondImage!!.height != maxHeight) {
+											logger.info { "Resizing second image..." }
+
 											resampler.filter(secondImage, null)
 										} else {
 											secondImage!!
 										}
+
+									logger.info { "Visually comparing images..." }
 
 									statusText = "Comparing images..."
 									progress = 0.66f
@@ -184,9 +195,13 @@ class CompareWindow(val parent: MainWindow) {
 										.compareImages()
 										.result
 
+									logger.info { "Comparison finished successfully" }
+
 									statusText = "Comparison done."
 									progress = 1f
 								} else {
+									logger.info { "Image loaded successfully" }
+
 									statusText = "Image loaded."
 									progress = 1f
 								}

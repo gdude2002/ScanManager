@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.window.FrameWindowScope
+import io.github.oshai.kotlinlogging.KotlinLogging
 import me.gserv.archival.Colors
 import me.gserv.archival.config.AppConfig
 import me.gserv.archival.data.Database
@@ -42,6 +43,8 @@ class DeleteBinderDialog(
 	init {
 		AppConfig.load()
 	}
+
+	val logger = KotlinLogging.logger { }
 
 	var binder: Binder? = null
 
@@ -93,6 +96,8 @@ class DeleteBinderDialog(
 						Row {
 							Button(
 								onClick = {
+									logger.info { "Closing dialog without deleting binder" }
+
 									close()
 								},
 							) {
@@ -111,6 +116,8 @@ class DeleteBinderDialog(
 
 							Button(
 								onClick = {
+									logger.info { "Deleting binder ${binder?.id?.value}" }
+
 									binder?.let {
 										Filesystem.deleteBinder(it.slug)
 
@@ -119,7 +126,11 @@ class DeleteBinderDialog(
 										}
 									}
 
+									logger.info { "Updating global state..." }
+
 									GlobalState.binders.remove(binder)
+
+									logger.info { "Done, closing dialog" }
 
 									close()
 								},

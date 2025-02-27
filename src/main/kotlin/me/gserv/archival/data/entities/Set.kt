@@ -52,6 +52,12 @@ class Set(id: EntityID<Long>) : LongEntity(id) {
 	fun originalFileName(index: String) =
 		Filesystem.fileName(binder.id.value, id.value.toString(), index, "jpeg")
 
+	fun getHighestIndex(): Long {
+		val files = getFiles()
+
+		return files.maxOfOrNull { it.index } ?: -1
+	}
+
 	fun getFiles(): List<FileContainer> {
 		val binderDir = Filesystem.ensureBinder(binder)
 
@@ -63,26 +69,24 @@ class Set(id: EntityID<Long>) : LongEntity(id) {
 
 		val containers = mutableMapOf<Long, MutableFileContainer>()
 
-		originalDir.listFiles().forEach { file ->
+		for (file in originalDir.listFiles()) {
 			val match = originalRegex.matchEntire(file.name)
+				?: continue
 
-			if (match != null) {
-				val index = match.groupValues[1].toLong()
+			val index = match.groupValues[1].toLong()
 
-				containers.getOrPut(index) { MutableFileContainer(index) }
-					.original = file
-			}
+			containers.getOrPut(index) { MutableFileContainer(index) }
+				.original = file
 		}
 
-		editDir.listFiles().forEach { file ->
+		for (file in editDir.listFiles()) {
 			val match = editRegex.matchEntire(file.name)
+				?: continue
 
-			if (match != null) {
-				val index = match.groupValues[1].toLong()
+			val index = match.groupValues[1].toLong()
 
-				containers.getOrPut(index) { MutableFileContainer(index) }
-					.edit = file
-			}
+			containers.getOrPut(index) { MutableFileContainer(index) }
+				.edit = file
 		}
 
 		return containers.values.map { it.toContainer() }

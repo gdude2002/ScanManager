@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.window.FrameWindowScope
+import io.github.oshai.kotlinlogging.KotlinLogging
 import me.gserv.archival.config.AppConfig
 import me.gserv.archival.data.Database
 import me.gserv.archival.data.Filesystem
@@ -42,6 +43,8 @@ class CreateBinderDialog(
 	init {
 		AppConfig.load()
 	}
+
+	val logger = KotlinLogging.logger { }
 
 	var isError by mutableStateOf(false)
 	var isOpen by mutableStateOf(false)
@@ -85,8 +88,8 @@ class CreateBinderDialog(
 
 						Text(
 							"Please enter a name for the new binder. If the binder has a label with an " +
-									"identifying code, we recommend using that code.\n\n" +
-									"Binder names must be unique."
+								"identifying code, we recommend using that code.\n\n" +
+								"Binder names must be unique."
 						)
 
 						Row {
@@ -118,7 +121,13 @@ class CreateBinderDialog(
 						}
 
 						Row {
-							Button({ close() }) {
+							Button(
+								{
+									logger.info { "Closing dialog without creating binder" }
+
+									close()
+								}
+							) {
 								Row(verticalAlignment = Alignment.CenterVertically) {
 									Icon(
 										Icons.Rounded.Cancel,
@@ -134,12 +143,19 @@ class CreateBinderDialog(
 
 							Button(
 								onClick = {
+									logger.info { "Creating binder $binderName" }
+
 									val binder = Database.transaction {
 										Binder.create(binderName)
 									}
 
 									Filesystem.ensureBinder(binder.slug)
+
+									logger.info { "Reloading global state..." }
+
 									GlobalState.loadBinders()
+
+									logger.info { "Done, closing dialog" }
 
 									close()
 								},

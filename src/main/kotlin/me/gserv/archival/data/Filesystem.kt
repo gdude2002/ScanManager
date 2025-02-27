@@ -8,7 +8,6 @@
 
 package me.gserv.archival.data
 
-import jdk.javadoc.internal.doclets.formats.html.markup.HtmlStyle.index
 import me.gserv.archival.config.AppConfig
 import me.gserv.archival.data.entities.Binder
 import java.io.File

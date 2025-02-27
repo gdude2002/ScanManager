@@ -11,11 +11,7 @@ package me.gserv.archival.windows.binder
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.Card
-import androidx.compose.material.Icon
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Cancel
 import androidx.compose.material.icons.rounded.Delete
@@ -32,22 +28,17 @@ import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import androidx.compose.ui.window.FrameWindowScope
+import io.github.oshai.kotlinlogging.KotlinLogging
 import me.gserv.archival.Colors
-import me.gserv.archival.config.AppConfig
 import me.gserv.archival.data.Database
-import me.gserv.archival.data.Filesystem
 import me.gserv.archival.data.GlobalState
-import me.gserv.archival.data.entities.Binder
 import me.gserv.archival.data.entities.Set
 import me.gserv.archival.windows.BinderWindow
 
 class DeleteSetDialog(
 	val parent: BinderWindow,
 ) {
-	init {
-		AppConfig.load()
-	}
+	val logger = KotlinLogging.logger { }
 
 	var set: Set? = null
 	var totalFiles: Int = 0
@@ -114,6 +105,8 @@ class DeleteSetDialog(
 						Row {
 							Button(
 								onClick = {
+									logger.info { "Closing dialog without deleting set: ${set?.id?.value}" }
+
 									close()
 								},
 							) {
@@ -132,19 +125,34 @@ class DeleteSetDialog(
 
 							Button(
 								onClick = {
+									logger.info { "Deleting set ${set?.id?.value}" }
+
 									set?.let {
 										Database.transaction {
 											it.getFiles().forEach { container ->
-												container.original?.delete()
-												container.edit?.delete()
+												if (container.original != null) {
+													logger.info { "Deleting file: ${container.original.absolutePath}" }
+
+													container.original.delete()
+												}
+
+												if (container.edit != null) {
+													logger.info { "Deleting file: ${container.edit.absolutePath}" }
+
+													container.edit.delete()
+												}
 											}
 
 											it.delete()
 										}
 									}
 
+									logger.info { "Updating global and window states..." }
+
 									parent.allSets.remove(set)
 									GlobalState.sets.remove(set)
+
+									logger.info { "Done, closing dialog" }
 
 									close()
 								},

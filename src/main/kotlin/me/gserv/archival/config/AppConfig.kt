@@ -9,15 +9,14 @@
 package me.gserv.archival.config
 
 import androidx.compose.runtime.mutableStateOf
+import io.github.oshai.kotlinlogging.KotlinLogging
 import me.gserv.archival.data.Database
 import me.gserv.archival.data.Filesystem
 import java.util.*
-import kotlin.io.path.Path
-import kotlin.io.path.exists
-import kotlin.io.path.reader
-import kotlin.io.path.writer
+import kotlin.io.path.*
 
 object AppConfig {
+	val logger = KotlinLogging.logger { }
 	val configFile = Path(System.getProperty("user.home"), "ScanManager.properties")
 
 	var loaded = false
@@ -49,11 +48,17 @@ object AppConfig {
 		}
 
 	fun load(force: Boolean = true) {
+		logger.info { "Loading configuration..." }
+
 		if (loaded && !force) {
+			logger.info { "Skipped: Not reloading existing configuration" }
+
 			return
 		}
 
 		if (configFile.exists()) {
+			logger.info { "Loading file: ${configFile.absolutePathString()}" }
+
 			val props = Properties()
 
 			props.load(configFile.reader(Charsets.UTF_8))
@@ -63,13 +68,19 @@ object AppConfig {
 				theme = props.getProperty("theme"),
 			)
 		} else {
+			logger.info { "Saving default configuration to file: ${configFile.absolutePathString()}" }
+
 			current = Config()
 			save(current)
 		}
 
+		logger.info { "Ensuring data folder exists..." }
+
 		Filesystem.ensureBinders()
 
 		if (dataFolder != null) {
+			logger.info { "Connecting to database..." }
+
 			Database.connect(dataFolder!!)
 		}
 
@@ -88,6 +99,8 @@ object AppConfig {
 		}
 
 		props.store(configFile.writer(Charsets.UTF_8), null)
+
+		logger.info { "Configuration saved successfully" }
 	}
 
 	data class Config(
