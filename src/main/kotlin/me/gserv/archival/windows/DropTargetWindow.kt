@@ -10,6 +10,8 @@
 
 package me.gserv.archival.windows
 
+import androidx.compose.animation.*
+import androidx.compose.animation.core.tween
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -20,12 +22,10 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.window.WindowDraggableArea
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.FolderOff
-import androidx.compose.material.icons.filled.QuestionMark
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.BiasAlignment
@@ -33,6 +33,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.*
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
@@ -44,8 +45,8 @@ import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.window.rememberWindowState
 import io.github.oshai.kotlinlogging.KotlinLogging
-import me.gserv.archival.config.AppConfig
 import me.gserv.archival.data.GlobalState
+import me.gserv.archival.utils.isInteger
 import java.awt.geom.RoundRectangle2D
 
 class DropTargetWindow(val parent: MainWindow) {
@@ -57,6 +58,30 @@ class DropTargetWindow(val parent: MainWindow) {
 	var isHovered by mutableStateOf(true)
 	var tooltipText by mutableStateOf<String?>(null)
 	var currentSet by mutableStateOf(0)
+
+	var bigText by mutableStateOf<String?>(null)
+	var composableBody by mutableStateOf<(@Composable DropTargetWindow.() -> Unit)?>(null)
+	var icon by mutableStateOf<ImageVector?>(null)
+	var iconDescription by mutableStateOf<String?>(null)
+	var loadingProgress by mutableStateOf<Float?>(1f)
+	var smallText by mutableStateOf<String?>(null)
+
+	fun clearState() {
+		bigText = null
+		composableBody = null
+		icon = null
+		iconDescription = null
+		loadingProgress = 1f
+		smallText = null
+	}
+
+	fun state(body: (@Composable DropTargetWindow.() -> Unit)? = null) {
+		composableBody = {
+			clearState()
+
+			body?.invoke(this@DropTargetWindow)
+		}
+	}
 
 	@Preview
 	@Composable
@@ -105,7 +130,6 @@ class DropTargetWindow(val parent: MainWindow) {
 					Modifier.fillMaxSize()
 						.clip(CircleShape)
 						.background(backgroundColor, CircleShape)
-						.border(3.dp, borderColor, CircleShape)
 						.pointerInput(Unit) {
 							awaitPointerEventScope {
 								while (true) {
@@ -151,61 +175,59 @@ class DropTargetWindow(val parent: MainWindow) {
 							}
 						}
 				) {
+					if (loadingProgress != null) {
+						CircularProgressIndicator(
+							color = borderColor,
+							backgroundColor = backgroundColor,
+							progress = loadingProgress!!,
+							modifier = Modifier.fillMaxSize()
+						)
+					} else {
+						CircularProgressIndicator(
+							color = borderColor,
+							backgroundColor = backgroundColor,
+							modifier = Modifier.fillMaxSize()
+						)
+					}
+
 					Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxSize()) {
 						Spacer(Modifier.weight(1f, true))
 
-						if (AppConfig.dataFolder == null) {
-							Icon(
-								Icons.Default.FolderOff, "",
-								tint = borderColor,
-							)
-
-							Text(
-								"No data\nfolder",
-								fontSize = 0.75.em,
-								color = borderColor,
-								textAlign = TextAlign.Center
-							)
-						} else if (GlobalState.binder == null) {
-							Icon(
-								Icons.Default.FolderOff, "",
-								tint = borderColor,
-							)
-
-							Text(
-								"No binder\nselected",
-								fontSize = 0.75.em,
-								color = borderColor,
-								textAlign = TextAlign.Center
-							)
-						} else if (GlobalState.sets.isEmpty()) {
-							Icon(
-								Icons.Default.QuestionMark, "",
-								tint = borderColor,
-							)
-
-							Text(
-								"No sets\nin binder",
-								fontSize = 0.75.em,
-								color = borderColor,
-								textAlign = TextAlign.Center
-							)
-						} else {
-
-							Text(
-								"Set",
-								fontSize = 0.85.em,
-								color = borderColor,
-								textAlign = TextAlign.Center
-							)
-
-							Text(
-								"${GlobalState.sets[currentSet].id}",
-								fontSize = 1.25.em,
-								color = borderColor,
-								textAlign = TextAlign.Center
-							)
+						AnimatedContent(icon) {
+							if (it != null) {
+								Icon(it, iconDescription, tint = borderColor)
+							}
 						}
+
+						AnimatedContent(
+							smallText,
+							transitionSpec = { slideTransition() }
+						) {
+							if (it != null) {
+								Text(
+									it,
+									fontSize = 0.75.em,
+									color = borderColor,
+									textAlign = TextAlign.Center
+								)
+							}
+						}
+
+						AnimatedContent(
+							bigText,
+							transitionSpec = { slideTransition() }
+						) {
+							if (it != null) {
+								Text(
+									it,
+									fontSize = 1.25.em,
+									color = borderColor,
+									textAlign = TextAlign.Center
+								)
+							}
+						}
+
+						composableBody?.invoke(this@DropTargetWindow)
 
 						Spacer(Modifier.weight(1f, true))
 					}
@@ -215,33 +237,36 @@ class DropTargetWindow(val parent: MainWindow) {
 	}
 
 	fun onLeftClick(event: PointerEvent) {
-		logger.debug { "Left-click event received" }
+		logger.info { "Left-click event received" }
 	}
 
 	fun onRightClick(event: PointerEvent) {
-		logger.debug { "Right-click event received" }
+		logger.info { "Right-click event received" }
 	}
 
 	fun onMiddleClick(event: PointerEvent) {
-		logger.debug { "Middle-click event received" }
+		logger.info { "Middle-click event received" }
 	}
 
 	fun onForwardClick(event: PointerEvent) {
-		logger.debug { "Forward button press event received" }
+		logger.info { "Forward button press event received" }
 
 		onScrollDown(event)
 	}
 
 	fun onBackClick(event: PointerEvent) {
-		logger.debug { "Back button press event received" }
+		logger.info { "Back button press event received" }
 
 		onScrollUp(event)
 	}
 
 	fun onScrollUp(event: PointerEvent) {
-		logger.debug { "Scroll-up event received" }
+		logger.info { "Scroll-up event received" }
 
-		if (GlobalState.sets.isEmpty() || currentSet == GlobalState.sets.size - 1) {
+		if (
+			GlobalState.sets.isEmpty() ||
+			currentSet == GlobalState.sets.size - 1
+		) {
 			return
 		}
 
@@ -249,9 +274,12 @@ class DropTargetWindow(val parent: MainWindow) {
 	}
 
 	fun onScrollDown(event: PointerEvent) {
-		logger.debug { "Scroll-down event received" }
+		logger.info { "Scroll-down event received" }
 
-		if (GlobalState.sets.isEmpty() || currentSet == 0) {
+		if (
+			GlobalState.sets.isEmpty() ||
+			currentSet == 0
+		) {
 			return
 		}
 
@@ -259,14 +287,43 @@ class DropTargetWindow(val parent: MainWindow) {
 	}
 
 	fun onMouseEnter(event: PointerEvent) {
-		logger.debug { "Mouse cursor entered window" }
+		logger.info { "Mouse cursor entered window" }
 
 		isHovered = false
 	}
 
 	fun onMouseExit(event: PointerEvent) {
-		logger.debug { "Mouse cursor exited window" }
+		logger.info { "Mouse cursor exited window" }
 
 		isHovered = true
+	}
+
+	// ...
+
+	fun <S : String?> AnimatedContentTransitionScope<S>.slideTransition(): ContentTransform {
+		var transition: ContentTransform = (  // Default Compose transform
+			fadeIn(animationSpec = tween(220, delayMillis = 90)) + scaleIn(
+				initialScale = 0.92f,
+				animationSpec = tween(220, delayMillis = 90)
+			)).togetherWith(
+			fadeOut(animationSpec = tween(90))
+		)
+
+		if (initialState != null && targetState != null) {
+			if (initialState!!.isInteger() && targetState!!.isInteger()) {
+				val initialInt = initialState!!.toLong()
+				val targetInt = targetState!!.toLong()
+
+				transition = if (targetInt > initialInt) {
+					(slideInHorizontally { width -> width } + fadeIn() togetherWith
+						slideOutHorizontally { width -> -width } + fadeOut())
+				} else {
+					(slideInHorizontally { width -> -width } + fadeIn() togetherWith
+						slideOutHorizontally { width -> width } + fadeOut())
+				}.using(SizeTransform(clip = false))
+			}
+		}
+
+		return transition
 	}
 }

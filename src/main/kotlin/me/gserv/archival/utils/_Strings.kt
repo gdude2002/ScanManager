@@ -14,3 +14,9 @@ private val slugify = Slugify.builder().transliterator(true).build()
 
 fun String.toSlug(): String =
 	slugify.slugify(this)!!
+
+fun String.isInteger() =
+	all { it.isDigit() }
+
+fun String.isFloat() =
+	all { it.isDigit() || it == '.' }

@@ -19,6 +19,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowDropUp
+import androidx.compose.material.icons.filled.QuestionMark
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.FolderOpen
 import androidx.compose.runtime.*
@@ -76,14 +77,18 @@ class BinderWindow(val parent: MainWindow) {
 		allSets.clear()
 
 		isOpen = false
+
+		parent.show()
+
 		isDropdownOpen = false
 		filterState = FilterState.All
 		filterText = ""
 
-		parent.scope.window.isVisible = true
 	}
 
 	fun open(binder: Binder) {
+		parent.hide()
+
 		GlobalState.binder = binder
 
 		val sets = Database.transaction {
@@ -97,7 +102,6 @@ class BinderWindow(val parent: MainWindow) {
 		this.allSets.addAll(sets)
 
 		isOpen = true
-		parent.scope.window.isVisible = false
 	}
 
 	@Composable
@@ -110,6 +114,18 @@ class BinderWindow(val parent: MainWindow) {
 		val rowColorOdd = MaterialTheme.colors.surface
 
 		if (isOpen) {
+			LaunchedEffect(GlobalState.sets, dropTarget.currentSet) {
+				dropTarget.state {
+					if (GlobalState.sets.isEmpty()) {
+						icon = Icons.Default.QuestionMark
+						smallText = "No sets\nvisible"
+					} else {
+						smallText = "Set"
+						bigText = GlobalState.sets[dropTarget.currentSet].id.value.toString()
+					}
+				}
+			}
+
 			LaunchedEffect(filterState, filterText) {
 				var filtered = allSets.toList()
 
@@ -128,7 +144,7 @@ class BinderWindow(val parent: MainWindow) {
 				GlobalState.sets = filtered.toMutableStateList()
 			}
 
-			Window({ close(); }, state = state, title = "Binder ${GlobalState.binder?.id}") {
+			Window(::close, state = state, title = "Binder ${GlobalState.binder?.id}") {
 				scope = this
 				window.minimumSize = Dimension(1000, 700)
 

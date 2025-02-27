@@ -17,11 +17,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.Help
+import androidx.compose.material.icons.filled.FolderOff
+import androidx.compose.material.icons.filled.WavingHand
 import androidx.compose.material.icons.rounded.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -38,6 +37,7 @@ import me.gserv.archival.Colors
 import me.gserv.archival.config.AppConfig
 import me.gserv.archival.data.Database
 import me.gserv.archival.data.GlobalState
+import me.gserv.archival.dropTarget
 import me.gserv.archival.utils.StringTooltip
 import me.gserv.archival.windows.main.CreateBinderDialog
 import me.gserv.archival.windows.main.DataDirectoryDialog
@@ -48,7 +48,7 @@ import java.net.URI
 class MainWindow(val applicationScope: ApplicationScope) {
 	val logger = KotlinLogging.logger { }
 
-	var isOpen by mutableStateOf(false)
+	var isVisible by mutableStateOf(true)
 	var showArchived by mutableStateOf(false)
 
 	val state = WindowState(
@@ -57,15 +57,20 @@ class MainWindow(val applicationScope: ApplicationScope) {
 
 	lateinit var scope: FrameWindowScope
 
-	fun close() {
-		isOpen = false
+	fun hide() {
+		isVisible = false
+		scope.window.isVisible = false
+	}
+
+	fun show() {
+		isVisible = true
+		scope.window.isVisible = true
+		scope.window.requestFocus()
 	}
 
 	@Composable
 	@Preview
 	fun open() {
-		isOpen = true
-
 		if (::scope.isInitialized) {
 			return
 		}
@@ -76,199 +81,164 @@ class MainWindow(val applicationScope: ApplicationScope) {
 		val compareWindow = CompareWindow(this@MainWindow)
 		compareWindow.create()
 
-		if (isOpen) {
-			Window(
-				onCloseRequest = {
-					Database.close()
-					applicationScope.exitApplication()
-				},
+		Window(
+			onCloseRequest = {
+				Database.close()
+				applicationScope.exitApplication()
+			},
 
-				resizable = false,
-				state = state,
-				title = "Scan Manager"
-			) {
-				scope = this
+			resizable = false,
+			state = state,
+			title = "Scan Manager"
+		) {
+			scope = this
 
-				val dataDirectoryDialog = DataDirectoryDialog(this)
-				dataDirectoryDialog.create()
+			val dataDirectoryDialog = DataDirectoryDialog(this)
+			dataDirectoryDialog.create()
 
-				val createBinderDialog = CreateBinderDialog(this)
-				createBinderDialog.create()
+			val createBinderDialog = CreateBinderDialog(this)
+			createBinderDialog.create()
 
-				val deleteBinderDialog = DeleteBinderDialog(this)
-				deleteBinderDialog.create()
+			val deleteBinderDialog = DeleteBinderDialog(this)
+			deleteBinderDialog.create()
 
-				MaterialTheme {
-					Column(modifier = Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-						Row(
-							horizontalArrangement = Arrangement.spacedBy(10.dp),
-							modifier = Modifier
-								.background(Colors.LightGray, RoundedCornerShape(15.dp))
-								.padding(vertical = 10.dp, horizontal = 15.dp)
-						) {
-							Column {
-								Text("Welcome!", fontSize = TextUnit(1.5F, TextUnitType.Em))
-								Text("Please select a binder or one of the tools to get started.")
-							}
+			if (isVisible) {
+				dropTarget.state {
+					if (AppConfig.dataFolder == null) {
+						icon = Icons.Default.FolderOff
+						smallText = "No data\nfolder"
+					} else {
+						icon = Icons.Default.WavingHand
+						smallText = "Welcome!"
+					}
+				}
+			}
 
-							Spacer(Modifier.weight(1f))
-
-							Button(
-								modifier = Modifier.size(60.dp),
-								onClick = {
-									Desktop.getDesktop().browse(URI("https://github.com/gdude2002/ScanManager/wiki"))
-								},
-							) {
-								Column {
-									Icon(
-										Icons.AutoMirrored.Rounded.Help,
-										"help"
-									)
-
-									Text("Help", fontSize = TextUnit(0.65F, TextUnitType.Em))
-								}
-							}
+			MaterialTheme {
+				Column(modifier = Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+					Row(
+						horizontalArrangement = Arrangement.spacedBy(10.dp),
+						modifier = Modifier
+							.background(Colors.LightGray, RoundedCornerShape(15.dp))
+							.padding(vertical = 10.dp, horizontal = 15.dp)
+					) {
+						Column {
+							Text("Welcome!", fontSize = TextUnit(1.5F, TextUnitType.Em))
+							Text("Please select a binder or one of the tools to get started.")
 						}
 
-						Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-							val verticalScrollState = rememberScrollState(0)
+						Spacer(Modifier.weight(1f))
 
-							Box(
-								modifier = Modifier
-									.background(Colors.LightGray, RoundedCornerShape(15.dp))
-									.fillMaxWidth(0.5F)
-									.padding(vertical = 10.dp, horizontal = 15.dp)
-									.requiredHeight(500.dp)
-							) {
-								Text(
-									"Binders",
-									fontSize = TextUnit(1.5F, TextUnitType.Em),
-									modifier = Modifier
-										.background(Colors.LightGray)
-										.padding(vertical = 5.dp)
-										.fillMaxWidth()
-										.zIndex(10f)
+						Button(
+							modifier = Modifier.size(60.dp),
+							onClick = {
+								Desktop.getDesktop().browse(URI("https://github.com/gdude2002/ScanManager/wiki"))
+							},
+						) {
+							Column {
+								Icon(
+									Icons.AutoMirrored.Rounded.Help,
+									"help"
 								)
 
-								Column(
-									modifier = Modifier
-										.verticalScroll(verticalScrollState)
-										.absolutePadding(right = 17.dp, top = 42.dp)
-								) {
-									if (showArchived) {
-										if (GlobalState.binders.isEmpty()) {
-											Text(
-												"No binders found. Click \"Add Binder\" below to create one."
-											)
-										}
-									} else {
-										if (GlobalState.binders.none { !it.archived }) {
-											Text(
-												"No binders found. Click \"Add Binder\" below to create one."
-											)
-										}
+								Text("Help", fontSize = TextUnit(0.65F, TextUnitType.Em))
+							}
+						}
+					}
+
+					Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+						val verticalScrollState = rememberScrollState(0)
+
+						Box(
+							modifier = Modifier
+								.background(Colors.LightGray, RoundedCornerShape(15.dp))
+								.fillMaxWidth(0.5F)
+								.padding(vertical = 10.dp, horizontal = 15.dp)
+								.requiredHeight(500.dp)
+						) {
+							Text(
+								"Binders",
+								fontSize = TextUnit(1.5F, TextUnitType.Em),
+								modifier = Modifier
+									.background(Colors.LightGray)
+									.padding(vertical = 5.dp)
+									.fillMaxWidth()
+									.zIndex(10f)
+							)
+
+							Column(
+								modifier = Modifier
+									.verticalScroll(verticalScrollState)
+									.absolutePadding(right = 17.dp, top = 42.dp)
+							) {
+								if (showArchived) {
+									if (GlobalState.binders.isEmpty()) {
+										Text(
+											"No binders found. Click \"Add Binder\" below to create one."
+										)
 									}
+								} else {
+									if (GlobalState.binders.none { !it.archived }) {
+										Text(
+											"No binders found. Click \"Add Binder\" below to create one."
+										)
+									}
+								}
 
-									for (binder in GlobalState.binders) {
-										if (!binder.archived || showArchived) {
-											Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-												OutlinedButton(
-													modifier = Modifier.weight(1f),
-													onClick = {
-														binderWindow.open(binder)
-													},
-													enabled = !binder.archived
-												) {
-													Row(verticalAlignment = Alignment.CenterVertically) {
-														if (binder.archived) {
-															Icon(
-																Icons.Rounded.Lock,
-																"Archived binder",
-																tint = Color.Gray
-															)
-														} else {
-															Icon(
-																Icons.Rounded.FolderOpen,
-																"Binder"
-															)
-														}
+								for (binder in GlobalState.binders) {
+									if (!binder.archived || showArchived) {
+										Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+											OutlinedButton(
+												modifier = Modifier.weight(1f),
+												onClick = {
+													binderWindow.open(binder)
+												},
+												enabled = !binder.archived
+											) {
+												Row(verticalAlignment = Alignment.CenterVertically) {
+													if (binder.archived) {
+														Icon(
+															Icons.Rounded.Lock,
+															"Archived binder",
+															tint = Color.Gray
+														)
+													} else {
+														Icon(
+															Icons.Rounded.FolderOpen,
+															"Binder"
+														)
+													}
 
-														if (binder.archived) {
-															Text(
-																"Binder ${binder.id.value}",
-																modifier = Modifier.fillMaxWidth()
-																	.padding(horizontal = 8.dp),
-																textAlign = TextAlign.Left,
-																softWrap = false,
-																overflow = TextOverflow.Ellipsis,
-																color = Color.Gray
-															)
-														} else {
-															Text(
-																"Binder ${binder.id.value}",
-																modifier = Modifier.fillMaxWidth()
-																	.padding(horizontal = 8.dp),
-																textAlign = TextAlign.Left,
-																softWrap = false,
-																overflow = TextOverflow.Ellipsis,
-															)
-														}
+													if (binder.archived) {
+														Text(
+															"Binder ${binder.id.value}",
+															modifier = Modifier.fillMaxWidth()
+																.padding(horizontal = 8.dp),
+															textAlign = TextAlign.Left,
+															softWrap = false,
+															overflow = TextOverflow.Ellipsis,
+															color = Color.Gray
+														)
+													} else {
+														Text(
+															"Binder ${binder.id.value}",
+															modifier = Modifier.fillMaxWidth()
+																.padding(horizontal = 8.dp),
+															textAlign = TextAlign.Left,
+															softWrap = false,
+															overflow = TextOverflow.Ellipsis,
+														)
 													}
 												}
+											}
 
-												if (binder.archived) {
-													StringTooltip("Delete binder") {
-														TextButton(
-															onClick = {
-																deleteBinderDialog.open(binder)
-															},
-
-															modifier = Modifier.padding(horizontal = 0.dp).width(40.dp),
-															contentPadding = PaddingValues(0.dp)
-														) {
-															Row(
-																verticalAlignment = Alignment.CenterVertically,
-																modifier = Modifier.padding(0.dp)
-															) {
-																Icon(
-																	Icons.Rounded.Delete,
-																	"Delete binder",
-																	tint = Color.Red
-																)
-															}
-														}
-													}
-												} else if (showArchived && GlobalState.binders.any { it.archived }) {
-													Spacer(Modifier.width(40.dp))
-												}
-
-												val tooltipText = if (binder.archived) {
-													"Un-archive binder"
-												} else {
-													"Archive binder"
-												}
-
-												StringTooltip(tooltipText) {
+											if (binder.archived) {
+												StringTooltip("Delete binder") {
 													TextButton(
 														onClick = {
-															logger.info {
-																if (binder.archived) {
-																	"Un-archiving binder ${binder.id.value}"
-																} else {
-																	"Archiving binder ${binder.id.value}"
-																}
-															}
-
-															Database.transaction {
-																binder.archived = !binder.archived
-															}
-
-															logger.info { "Reloading global state..." }
-
-															GlobalState.loadBinders()
-
-															logger.info { "Done" }
+															deleteBinderDialog.open(binder)
 														},
+
 														modifier = Modifier.padding(horizontal = 0.dp).width(40.dp),
 														contentPadding = PaddingValues(0.dp)
 													) {
@@ -276,17 +246,62 @@ class MainWindow(val applicationScope: ApplicationScope) {
 															verticalAlignment = Alignment.CenterVertically,
 															modifier = Modifier.padding(0.dp)
 														) {
+															Icon(
+																Icons.Rounded.Delete,
+																"Delete binder",
+																tint = Color.Red
+															)
+														}
+													}
+												}
+											} else if (showArchived && GlobalState.binders.any { it.archived }) {
+												Spacer(Modifier.width(40.dp))
+											}
+
+											val tooltipText = if (binder.archived) {
+												"Un-archive binder"
+											} else {
+												"Archive binder"
+											}
+
+											StringTooltip(tooltipText) {
+												TextButton(
+													onClick = {
+														logger.info {
 															if (binder.archived) {
-																Icon(
-																	Icons.Rounded.LockOpen,
-																	"Un-archive binder"
-																)
+																"Un-archiving binder ${binder.id.value}"
 															} else {
-																Icon(
-																	Icons.Rounded.Lock,
-																	"Archive binder"
-																)
+																"Archiving binder ${binder.id.value}"
 															}
+														}
+
+														Database.transaction {
+															binder.archived = !binder.archived
+														}
+
+														logger.info { "Reloading global state..." }
+
+														GlobalState.loadBinders()
+
+														logger.info { "Done" }
+													},
+													modifier = Modifier.padding(horizontal = 0.dp).width(40.dp),
+													contentPadding = PaddingValues(0.dp)
+												) {
+													Row(
+														verticalAlignment = Alignment.CenterVertically,
+														modifier = Modifier.padding(0.dp)
+													) {
+														if (binder.archived) {
+															Icon(
+																Icons.Rounded.LockOpen,
+																"Un-archive binder"
+															)
+														} else {
+															Icon(
+																Icons.Rounded.Lock,
+																"Archive binder"
+															)
 														}
 													}
 												}
@@ -294,194 +309,194 @@ class MainWindow(val applicationScope: ApplicationScope) {
 										}
 									}
 								}
-
-								VerticalScrollbar(
-									modifier = Modifier.align(Alignment.CenterEnd)
-										.height(state.size.height)
-										.absolutePadding(top = 45.dp),
-									adapter = rememberScrollbarAdapter(verticalScrollState)
-								)
 							}
 
-							Column(
-								modifier = Modifier
-									.background(Colors.LightGray, RoundedCornerShape(15.dp))
-									.fillMaxWidth()
-									.padding(vertical = 10.dp, horizontal = 15.dp)
-									.requiredHeight(500.dp)
+							VerticalScrollbar(
+								modifier = Modifier.align(Alignment.CenterEnd)
+									.height(state.size.height)
+									.absolutePadding(top = 45.dp),
+								adapter = rememberScrollbarAdapter(verticalScrollState)
+							)
+						}
+
+						Column(
+							modifier = Modifier
+								.background(Colors.LightGray, RoundedCornerShape(15.dp))
+								.fillMaxWidth()
+								.padding(vertical = 10.dp, horizontal = 15.dp)
+								.requiredHeight(500.dp)
+						) {
+							Text(
+								"Tools",
+								fontSize = TextUnit(1.5F, TextUnitType.Em),
+								modifier = Modifier.padding(vertical = 5.dp)
+							)
+
+							OutlinedButton(
+								modifier = Modifier.fillMaxWidth().align(Alignment.Start),
+								onClick = {},
+								enabled = false
 							) {
-								Text(
-									"Tools",
-									fontSize = TextUnit(1.5F, TextUnitType.Em),
-									modifier = Modifier.padding(vertical = 5.dp)
-								)
+								Row(verticalAlignment = Alignment.CenterVertically) {
+									Icon(
+										Icons.Rounded.SettingsBackupRestore,
+										""
+									)
 
-								OutlinedButton(
-									modifier = Modifier.fillMaxWidth().align(Alignment.Start),
-									onClick = {},
-									enabled = false
-								) {
-									Row(verticalAlignment = Alignment.CenterVertically) {
-										Icon(
-											Icons.Rounded.SettingsBackupRestore,
-											""
-										)
-
-										Text(
-											"Back Up Binders",
-											modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
-											textAlign = TextAlign.Left
-										)
-									}
+									Text(
+										"Back Up Binders",
+										modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
+										textAlign = TextAlign.Left
+									)
 								}
+							}
 
-								OutlinedButton(
-									modifier = Modifier.fillMaxWidth().align(Alignment.Start),
-									onClick = { compareWindow.open() },
-								) {
-									Row(verticalAlignment = Alignment.CenterVertically) {
-										Icon(
-											Icons.Rounded.Image,
-											""
-										)
+							OutlinedButton(
+								modifier = Modifier.fillMaxWidth().align(Alignment.Start),
+								onClick = { compareWindow.open() },
+							) {
+								Row(verticalAlignment = Alignment.CenterVertically) {
+									Icon(
+										Icons.Rounded.Image,
+										""
+									)
 
-										Text(
-											"Compare Images",
-											modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
-											textAlign = TextAlign.Left
-										)
-									}
+									Text(
+										"Compare Images",
+										modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
+										textAlign = TextAlign.Left
+									)
 								}
+							}
 
-								OutlinedButton(
-									modifier = Modifier.fillMaxWidth().align(Alignment.Start),
-									onClick = {},
-									enabled = false
-								) {
-									Row(verticalAlignment = Alignment.CenterVertically) {
-										Icon(
-											Icons.Rounded.Healing,
-											""
-										)
+							OutlinedButton(
+								modifier = Modifier.fillMaxWidth().align(Alignment.Start),
+								onClick = {},
+								enabled = false
+							) {
+								Row(verticalAlignment = Alignment.CenterVertically) {
+									Icon(
+										Icons.Rounded.Healing,
+										""
+									)
 
-										Text(
-											"Fix Scans",
-											modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
-											textAlign = TextAlign.Left
-										)
-									}
+									Text(
+										"Fix Scans",
+										modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
+										textAlign = TextAlign.Left
+									)
 								}
+							}
 
-								OutlinedButton(
-									modifier = Modifier.fillMaxWidth().align(Alignment.Start),
-									onClick = {},
-									enabled = false
-								) {
-									Row(verticalAlignment = Alignment.CenterVertically) {
-										Icon(
-											Icons.Rounded.Download,
-											""
-										)
+							OutlinedButton(
+								modifier = Modifier.fillMaxWidth().align(Alignment.Start),
+								onClick = {},
+								enabled = false
+							) {
+								Row(verticalAlignment = Alignment.CenterVertically) {
+									Icon(
+										Icons.Rounded.Download,
+										""
+									)
 
-										Text(
-											"Import Scans",
-											modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
-											textAlign = TextAlign.Left
-										)
-									}
+									Text(
+										"Import Scans",
+										modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
+										textAlign = TextAlign.Left
+									)
 								}
+							}
 
-								OutlinedButton(
-									modifier = Modifier.fillMaxWidth().align(Alignment.Start),
-									onClick = {},
-									enabled = false
-								) {
-									Row(verticalAlignment = Alignment.CenterVertically) {
-										Icon(
-											Icons.Rounded.Search,
-											""
-										)
+							OutlinedButton(
+								modifier = Modifier.fillMaxWidth().align(Alignment.Start),
+								onClick = {},
+								enabled = false
+							) {
+								Row(verticalAlignment = Alignment.CenterVertically) {
+									Icon(
+										Icons.Rounded.Search,
+										""
+									)
 
-										Text(
-											"Search Scans",
-											modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
-											textAlign = TextAlign.Left
-										)
+									Text(
+										"Search Scans",
+										modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
+										textAlign = TextAlign.Left
+									)
+								}
+							}
+
+							Spacer(Modifier.weight(1f))
+
+							if (AppConfig.dataFolder != null) {
+								Row(verticalAlignment = Alignment.CenterVertically) {
+									Icon(
+										Icons.Rounded.Folder,
+										"Data folder",
+										modifier = Modifier.absolutePadding(right = 4.dp)
+									)
+
+									Text(
+										dataDirectoryDialog.dataDirectory,
+
+										maxLines = 1,
+										modifier = Modifier.weight(1f),
+										overflow = TextOverflow.Ellipsis,
+										softWrap = false,
+									)
+								}
+							}
+						}
+					}
+
+					Row(
+						horizontalArrangement = Arrangement.spacedBy(10.dp),
+						modifier = Modifier.requiredHeight(60.dp)
+					) {
+						Column(
+							modifier = Modifier
+								.background(Colors.LightGray, RoundedCornerShape(15.dp))
+								.fillMaxWidth(0.5F)
+								.padding(vertical = 10.dp, horizontal = 15.dp)
+								.align(Alignment.CenterVertically)
+						) {
+							Row {
+								OutlinedButton(onClick = { showArchived = !showArchived }) {
+									if (showArchived) {
+										Text("Hide Archived")
+									} else {
+										Text("Show Archived")
 									}
 								}
 
 								Spacer(Modifier.weight(1f))
 
-								if (AppConfig.dataFolder != null) {
-									Row(verticalAlignment = Alignment.CenterVertically) {
-										Icon(
-											Icons.Rounded.Folder,
-											"Data folder",
-											modifier = Modifier.absolutePadding(right = 4.dp)
-										)
-
-										Text(
-											dataDirectoryDialog.dataDirectory,
-
-											maxLines = 1,
-											modifier = Modifier.weight(1f),
-											overflow = TextOverflow.Ellipsis,
-											softWrap = false,
-										)
-									}
+								Button(onClick = { createBinderDialog.open() }) {
+									Text("Add Binder")
 								}
 							}
 						}
 
-						Row(
-							horizontalArrangement = Arrangement.spacedBy(10.dp),
-							modifier = Modifier.requiredHeight(60.dp)
+						Column(
+							modifier = Modifier
+								.background(Colors.LightGray, RoundedCornerShape(15.dp))
+								.fillMaxWidth()
+								.padding(vertical = 10.dp, horizontal = 15.dp)
 						) {
-							Column(
-								modifier = Modifier
-									.background(Colors.LightGray, RoundedCornerShape(15.dp))
-									.fillMaxWidth(0.5F)
-									.padding(vertical = 10.dp, horizontal = 15.dp)
-									.align(Alignment.CenterVertically)
-							) {
-								Row {
-									OutlinedButton(onClick = { showArchived = !showArchived }) {
-										if (showArchived) {
-											Text("Hide Archived")
-										} else {
-											Text("Show Archived")
-										}
-									}
-
-									Spacer(Modifier.weight(1f))
-
-									Button(onClick = { createBinderDialog.open() }) {
-										Text("Add Binder")
-									}
+							Row {
+								Button(
+									onClick = {},
+									enabled = false
+								) {
+									Text("Check Integrity")
 								}
-							}
 
-							Column(
-								modifier = Modifier
-									.background(Colors.LightGray, RoundedCornerShape(15.dp))
-									.fillMaxWidth()
-									.padding(vertical = 10.dp, horizontal = 15.dp)
-							) {
-								Row {
-									Button(
-										onClick = {},
-										enabled = false
-									) {
-										Text("Check Integrity")
-									}
+								Spacer(Modifier.weight(1f))
 
-									Spacer(Modifier.weight(1f))
-
-									Button(onClick = {
-										dataDirectoryDialog.open()
-									}) {
-										Text("Change Folder")
-									}
+								Button(onClick = {
+									dataDirectoryDialog.open()
+								}) {
+									Text("Change Folder")
 								}
 							}
 						}

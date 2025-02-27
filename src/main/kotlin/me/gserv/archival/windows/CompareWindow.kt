@@ -14,6 +14,13 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Downloading
+import androidx.compose.material.icons.filled.FormatSize
+import androidx.compose.material.icons.filled.Image
+import androidx.compose.material.icons.filled.Pending
+import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toPainter
@@ -33,6 +40,8 @@ import io.github.vinceglb.filekit.core.PickerType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import me.gserv.archival.Colors
+import me.gserv.archival.dropTarget
+import org.jetbrains.exposed.sql.SchemaUtils.drop
 import java.awt.image.BufferedImage
 import java.io.File
 import javax.imageio.ImageIO
@@ -88,7 +97,12 @@ class CompareWindow(val parent: MainWindow) {
 	lateinit var scope: FrameWindowScope
 
 	fun close() {
+		dropTarget.clearState()
+
 		isOpen = false
+
+		parent.show()
+
 		isPickerOpen = false
 
 		firstImageFile = null
@@ -101,14 +115,17 @@ class CompareWindow(val parent: MainWindow) {
 
 		progress = 0f
 		statusText = "Waiting for input..."
-
-		parent.state.isMinimized = false
-		parent.scope.window.requestFocus()
 	}
 
 	fun open() {
+		parent.hide()
+
 		isOpen = true
-		parent.state.isMinimized = true
+
+		dropTarget.clearState()
+
+		dropTarget.smallText = "Waiting..."
+		dropTarget.icon = Icons.Default.Image
 	}
 
 	fun pickFile(fileTarget: MutableState<File?>, imageTarget: MutableState<BufferedImage?>) {
@@ -124,7 +141,7 @@ class CompareWindow(val parent: MainWindow) {
 		val processingScope = rememberCoroutineScope { Dispatchers.IO }
 
 		if (isOpen) {
-			Window({ close() }, state = state, resizable = false, title = "Compare Images") {
+			Window(::close, state = state, resizable = false, title = "Compare Images") {
 				scope = this
 
 				if (isPickerOpen) {
@@ -144,14 +161,21 @@ class CompareWindow(val parent: MainWindow) {
 								logger.info { "Loading image: ${file.file.absolutePath}" }
 
 								statusText = "Loading image..."
+								dropTarget.smallText = "Loading..."
+
 								progress = null
+								dropTarget.loadingProgress = null
 
 								pickerFileTarget.value = file.file
 								pickerImageTarget.value = ImageIO.read(file.file)
 
 								if (firstImage != null && secondImage != null) {
 									statusText = "Resizing images..."
+									dropTarget.smallText = "Resizing..."
+									dropTarget.icon = Icons.Default.FormatSize
+
 									progress = 0f
+									dropTarget.loadingProgress = 0f
 
 									var maxWidth = maxOf(firstImage!!.width, secondImage!!.width)
 									var maxHeight = maxOf(firstImage!!.height, secondImage!!.height)
@@ -175,6 +199,7 @@ class CompareWindow(val parent: MainWindow) {
 										}
 
 									progress = 0.33f
+									dropTarget.loadingProgress = 0.33f
 
 									val secondImageResized =
 										if (secondImage!!.width != maxWidth || secondImage!!.height != maxHeight) {
@@ -188,7 +213,11 @@ class CompareWindow(val parent: MainWindow) {
 									logger.info { "Visually comparing images..." }
 
 									statusText = "Comparing images..."
+									dropTarget.smallText = "Comparing..."
+									dropTarget.icon = Icons.Default.Visibility
+
 									progress = 0.66f
+									dropTarget.loadingProgress = 0.66f
 
 									comparisonImage = ImageComparison(firstImageResized, secondImageResized)
 										.setRectangleLineWidth(5)
@@ -198,12 +227,20 @@ class CompareWindow(val parent: MainWindow) {
 									logger.info { "Comparison finished successfully" }
 
 									statusText = "Comparison done."
+									dropTarget.smallText = "Done."
+									dropTarget.icon = Icons.Default.Check
+
 									progress = 1f
+									dropTarget.loadingProgress = 1f
 								} else {
 									logger.info { "Image loaded successfully" }
 
 									statusText = "Image loaded."
+									dropTarget.smallText = "Done."
+									dropTarget.icon = Icons.Default.Check
+
 									progress = 1f
+									dropTarget.loadingProgress = 1f
 								}
 							}
 
