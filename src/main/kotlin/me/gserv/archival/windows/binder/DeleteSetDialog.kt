@@ -6,12 +6,16 @@
  * Any redistribution must include the specific provision above.
  */
 
-package me.gserv.archival.windows.main
+package me.gserv.archival.windows.binder
 
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.Card
+import androidx.compose.material.Icon
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Cancel
 import androidx.compose.material.icons.rounded.Delete
@@ -35,26 +39,42 @@ import me.gserv.archival.data.Database
 import me.gserv.archival.data.Filesystem
 import me.gserv.archival.data.GlobalState
 import me.gserv.archival.data.entities.Binder
+import me.gserv.archival.data.entities.Set
+import me.gserv.archival.windows.BinderWindow
 
-class DeleteBinderDialog(
-	val parent: FrameWindowScope,
+class DeleteSetDialog(
+	val parent: BinderWindow,
 ) {
 	init {
 		AppConfig.load()
 	}
 
-	var binder: Binder? = null
+	var set: Set? = null
+	var totalFiles: Int = 0
 
 	var isOpen by mutableStateOf(false)
 
 	fun close() {
-		this.binder = null
+		this.set = null
+		this.totalFiles = 0
 
 		isOpen = false
 	}
 
-	fun open(binder: Binder) {
-		this.binder = binder
+	fun open(set: Set) {
+		this.set = set
+
+		Database.transaction {
+			set.getFiles().forEach {
+				if (it.original != null) {
+					totalFiles += 1
+				}
+
+				if (it.edit != null) {
+					totalFiles += 1
+				}
+			}
+		}
 
 		isOpen = true
 	}
@@ -69,25 +89,26 @@ class DeleteBinderDialog(
 						Row(verticalAlignment = Alignment.CenterVertically) {
 							Icon(
 								Icons.Rounded.Warning,
-								"Delete binder",
+								"Delete set",
 								modifier = Modifier
 									.absolutePadding(right = 8.dp, top = 1.dp)
 									.size(30.dp)
 							)
 
 							Text(
-								"Delete Binder",
+								"Delete Set",
 								fontSize = TextUnit(1.5F, TextUnitType.Em)
 							)
 						}
 
 						Text(
-							"Are you sure you wish to delete Binder ${binder?.id}?\n\n" +
+							"Are you sure you wish to delete Set ${set?.id?.value} and its $totalFiles associated " +
+								"images?\n\n" +
 
-								"The binder, its data and its images will be permanently removed, and you won't " +
+								"The set, its data and its images will be permanently removed, and you won't " +
 								"be able to restore it.\n\n" +
 
-								"Consider using the backup function before deleting any binders."
+								"Consider using the backup function before deleting any sets."
 						)
 
 						Row {
@@ -111,22 +132,26 @@ class DeleteBinderDialog(
 
 							Button(
 								onClick = {
-									binder?.let {
-										Filesystem.deleteBinder(it.slug)
-
+									set?.let {
 										Database.transaction {
+											it.getFiles().forEach { container ->
+												container.original?.delete()
+												container.edit?.delete()
+											}
+
 											it.delete()
 										}
 									}
 
-									GlobalState.binders.remove(binder)
+									parent.allSets.remove(set)
+									GlobalState.sets.remove(set)
 
 									close()
 								},
 								colors = ButtonDefaults.buttonColors(
 									backgroundColor = Colors.Danger,
 									contentColor = Color.White
-								)
+								),
 							) {
 								Row(verticalAlignment = Alignment.CenterVertically) {
 									Icon(
@@ -135,7 +160,7 @@ class DeleteBinderDialog(
 										modifier = Modifier.absolutePadding(right = 4.dp)
 									)
 
-									Text("Delete Binder")
+									Text("Delete Set")
 								}
 							}
 						}

@@ -14,4 +14,6 @@ object Colors {
 	val LightGray = Color(0xFFEEEEEE)
 	val LightGreen = Color(0xFFBBFFBB)
 	val LighterGreen = Color(0xFFDDFFDD)
+
+	val Danger = Color(0xFFEE0000)
 }

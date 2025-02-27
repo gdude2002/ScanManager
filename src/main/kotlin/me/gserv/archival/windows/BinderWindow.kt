@@ -47,6 +47,7 @@ import me.gserv.archival.dropTarget
 import me.gserv.archival.utils.StringTooltip
 import me.gserv.archival.utils.format
 import me.gserv.archival.windows.binder.CreateSetDialog
+import me.gserv.archival.windows.binder.DeleteSetDialog
 import me.gserv.archival.windows.binder.FilterState
 import org.jetbrains.exposed.sql.SortOrder
 import java.awt.Dimension
@@ -131,6 +132,9 @@ class BinderWindow(val parent: MainWindow) {
 
 				val createSetDialog = CreateSetDialog(this@BinderWindow, GlobalState.binder!!)
 				createSetDialog.create()
+
+				val deleteSetDialog = DeleteSetDialog(this@BinderWindow)
+				deleteSetDialog.create()
 
 				Column(
 					modifier = Modifier.fillMaxSize()
@@ -229,7 +233,6 @@ class BinderWindow(val parent: MainWindow) {
 							.fillMaxWidth()
 							.weight(1f)
 					) {
-						// TODO: Sorting!
 						DataTable(
 							modifier = Modifier.fillMaxSize(),
 							sortColumnIndex = 0,
@@ -285,7 +288,7 @@ class BinderWindow(val parent: MainWindow) {
 											StringTooltip("Delete set") {
 												TextButton(
 													{
-														// TODO: Delete action
+														deleteSetDialog.open(set)
 													},
 													modifier = Modifier.padding(horizontal = 0.dp).width(40.dp),
 													contentPadding = PaddingValues(0.dp)
