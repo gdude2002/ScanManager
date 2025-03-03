@@ -33,12 +33,6 @@ object AppConfig {
 			}
 		}
 
-	var theme: String?
-		get() = current.theme
-		set(value) {
-			current.theme = value
-		}
-
 	var currentState = mutableStateOf(Config())
 
 	var current: Config
@@ -65,7 +59,6 @@ object AppConfig {
 
 			current = Config(
 				dataFolder = props.getProperty("dataFolder"),
-				theme = props.getProperty("theme"),
 			)
 		} else {
 			logger.info { "Saving default configuration to file: ${configFile.absolutePathString()}" }
@@ -94,10 +87,6 @@ object AppConfig {
 			props.setProperty("dataFolder", config.dataFolder)
 		}
 
-		if (config.theme != null) {
-			props.setProperty("theme", config.theme)
-		}
-
 		props.store(configFile.writer(Charsets.UTF_8), null)
 
 		logger.info { "Configuration saved successfully" }
@@ -105,7 +94,6 @@ object AppConfig {
 
 	data class Config(
 		var dataFolder: String? = null,
-		var theme: String? = null,
 	) {
 		fun save() = save(this)
 	}
