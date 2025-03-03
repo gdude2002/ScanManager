@@ -27,9 +27,15 @@ object Colors {
 
 	@Composable
 	fun getMaterial() = if (isSystemInDarkMode()) {
-		darkColors().copy(primary = Color(0xFF552BB3), primaryVariant = Color(0xFFBB86FC))
+		darkColors().copy(
+			primary = Color(0xFF552BB3), primaryVariant = Color(0xFFBB86FC),
+			secondary = Color(0xFF018786), secondaryVariant = Color(0xFF03DAC6),
+		)
 	} else {
-		lightColors().copy(primary = Color(0xFFBB86FC), primaryVariant = Color(0xFF552BB3))
+		lightColors().copy(
+			primary = Color(0xFFBB86FC), primaryVariant = Color(0xFF552BB3),
+			secondary = Color(0xFF03DAC6), secondaryVariant = Color(0xFF018786),
+		)
 	}
 
 	@Composable
@@ -42,7 +48,9 @@ object Colors {
 	}
 
 	object Dark : IColors {
-		override val Danger: Color = Color(0xFFCF6679)
+		override val DangerBackground: Color = Color(0xFFEE0000)
+		override val DangerForeground = Color.White
+
 		override val Text = Color.White
 
 		override val SectionBackground: Color = Color(0xFF222222)
@@ -54,7 +62,9 @@ object Colors {
 	}
 
 	object Light : IColors {
-		override val Danger: Color = Color(0xFFEE0000)
+		override val DangerBackground: Color = Color(0xFFFC6E6E)
+		override val DangerForeground = Color.Black
+
 		override val Text = Color.Black
 
 		override val SectionBackground: Color = Color(0xFFEEEEEE)
@@ -66,7 +76,9 @@ object Colors {
 	}
 
 	interface IColors {
-		val Danger: Color
+		val DangerBackground: Color
+		val DangerForeground: Color
+
 		val Text: Color
 
 		val SectionBackground: Color

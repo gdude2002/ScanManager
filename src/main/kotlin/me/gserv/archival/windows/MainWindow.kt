@@ -14,7 +14,10 @@ import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material.Icon
+import androidx.compose.material.OutlinedButton
+import androidx.compose.material.Text
+import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.Help
 import androidx.compose.material.icons.filled.FolderOff
@@ -43,6 +46,7 @@ import me.gserv.archival.data.Database
 import me.gserv.archival.data.GlobalState
 import me.gserv.archival.dropTarget
 import me.gserv.archival.utils.StringTooltip
+import me.gserv.archival.utils.components.PrimaryButton
 import me.gserv.archival.windows.main.CreateBinderDialog
 import me.gserv.archival.windows.main.DataDirectoryDialog
 import me.gserv.archival.windows.main.DeleteBinderDialog
@@ -136,7 +140,7 @@ class MainWindow(val applicationScope: ApplicationScope) {
 
 							Spacer(Modifier.weight(1f))
 
-							Button(
+							PrimaryButton(
 								modifier = Modifier.size(60.dp),
 								onClick = {
 									Desktop.getDesktop().browse(URI("https://github.com/gdude2002/ScanManager/wiki"))
@@ -257,7 +261,7 @@ class MainWindow(val applicationScope: ApplicationScope) {
 																Icon(
 																	Icons.Rounded.Delete,
 																	"Delete binder",
-																	tint = Color.Red
+																	tint = colors.DangerBackground
 																)
 															}
 														}
@@ -340,7 +344,7 @@ class MainWindow(val applicationScope: ApplicationScope) {
 									modifier = Modifier.padding(vertical = 5.dp)
 								)
 
-								Button(
+								PrimaryButton(
 									modifier = Modifier.fillMaxWidth().align(Alignment.Start),
 									onClick = {},
 									enabled = false
@@ -377,7 +381,7 @@ class MainWindow(val applicationScope: ApplicationScope) {
 									}
 								}
 
-								Button(
+								PrimaryButton(
 									modifier = Modifier.fillMaxWidth().align(Alignment.Start),
 									onClick = {},
 									enabled = false
@@ -396,7 +400,7 @@ class MainWindow(val applicationScope: ApplicationScope) {
 									}
 								}
 
-								Button(
+								PrimaryButton(
 									modifier = Modifier.fillMaxWidth().align(Alignment.Start),
 									onClick = {},
 									enabled = false
@@ -415,7 +419,7 @@ class MainWindow(val applicationScope: ApplicationScope) {
 									}
 								}
 
-								Button(
+								PrimaryButton(
 									modifier = Modifier.fillMaxWidth().align(Alignment.Start),
 									onClick = {},
 									enabled = false
@@ -479,7 +483,7 @@ class MainWindow(val applicationScope: ApplicationScope) {
 
 									Spacer(Modifier.weight(1f))
 
-									Button(onClick = { createBinderDialog.open() }) {
+									PrimaryButton(onClick = { createBinderDialog.open() }) {
 										Text("Add Binder")
 									}
 								}
@@ -492,7 +496,7 @@ class MainWindow(val applicationScope: ApplicationScope) {
 									.padding(vertical = 10.dp, horizontal = 15.dp)
 							) {
 								Row {
-									Button(
+									PrimaryButton(
 										onClick = {},
 										enabled = false
 									) {
@@ -501,7 +505,7 @@ class MainWindow(val applicationScope: ApplicationScope) {
 
 									Spacer(Modifier.weight(1f))
 
-									Button(onClick = {
+									PrimaryButton(onClick = {
 										dataDirectoryDialog.open()
 									}) {
 										Text("Change Folder")

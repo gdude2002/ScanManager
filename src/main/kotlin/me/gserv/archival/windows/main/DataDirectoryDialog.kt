@@ -11,7 +11,10 @@ package me.gserv.archival.windows.main
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material.Card
+import androidx.compose.material.Icon
+import androidx.compose.material.Text
+import androidx.compose.material.TextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Cancel
 import androidx.compose.material.icons.rounded.Check
@@ -35,6 +38,8 @@ import io.github.vinceglb.filekit.core.FileKitPlatformSettings
 import me.gserv.archival.Colors
 import me.gserv.archival.config.AppConfig
 import me.gserv.archival.data.Filesystem
+import me.gserv.archival.utils.components.PrimaryButton
+import me.gserv.archival.utils.components.SecondaryButton
 import java.io.File
 
 class DataDirectoryDialog(
@@ -97,8 +102,8 @@ class DataDirectoryDialog(
 			}
 
 			Dialog({}, DialogProperties(false, false, true)) {
-				Colors.Theme {
-					Card(backgroundColor = Colors.get().SectionBackground, shape = RoundedCornerShape(15.dp)) {
+				Colors.Theme { colors ->
+					Card(backgroundColor = colors.SectionBackground, shape = RoundedCornerShape(15.dp)) {
 						Column(modifier = Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(20.dp)) {
 							Row(verticalAlignment = Alignment.CenterVertically) {
 								Icon(
@@ -128,7 +133,7 @@ class DataDirectoryDialog(
 									modifier = Modifier.fillMaxWidth(0.9f).absolutePadding(right = 10.dp)
 								)
 
-								Button(modifier = Modifier.size(56.dp), onClick = {
+								PrimaryButton(modifier = Modifier.size(56.dp), onClick = {
 									isPickerOpen = true
 								}) {
 									Icon(
@@ -139,7 +144,7 @@ class DataDirectoryDialog(
 							}
 
 							Row {
-								Button(onClick = {
+								SecondaryButton(onClick = {
 									logger.info { "Closing without changing data directory" }
 
 									close()
@@ -157,7 +162,7 @@ class DataDirectoryDialog(
 
 								Spacer(Modifier.weight(1f, true))
 
-								Button(onClick = {
+								PrimaryButton(onClick = {
 									logger.info { "Changing data directory to $newDirectory" }
 
 									dataDirectory = newDirectory

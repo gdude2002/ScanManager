@@ -11,7 +11,10 @@ package me.gserv.archival.windows.main
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material.Card
+import androidx.compose.material.Icon
+import androidx.compose.material.Text
+import androidx.compose.material.TextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Book
 import androidx.compose.material.icons.rounded.Cancel
@@ -22,7 +25,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
@@ -37,6 +39,8 @@ import me.gserv.archival.data.Database
 import me.gserv.archival.data.Filesystem
 import me.gserv.archival.data.GlobalState
 import me.gserv.archival.data.entities.Binder
+import me.gserv.archival.utils.components.PrimaryButton
+import me.gserv.archival.utils.components.SecondaryButton
 
 class CreateBinderDialog(
 	val parent: FrameWindowScope,
@@ -70,8 +74,8 @@ class CreateBinderDialog(
 	fun create() {
 		if (isOpen) {
 			Dialog({}, DialogProperties(false, false, true)) {
-				Colors.Theme {
-					Card(backgroundColor = Colors.get().SectionBackground, shape = RoundedCornerShape(15.dp)) {
+				Colors.Theme { colors ->
+					Card(backgroundColor = colors.SectionBackground, shape = RoundedCornerShape(15.dp)) {
 						Column(modifier = Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(20.dp)) {
 							Row(verticalAlignment = Alignment.CenterVertically) {
 								Icon(
@@ -116,14 +120,14 @@ class CreateBinderDialog(
 									Text(
 										"A binder named $binderName already exists. Please pick another name.",
 
-										color = Color.Red,
+										color = colors.DangerBackground,
 										textAlign = TextAlign.Center
 									)
 								}
 							}
 
 							Row {
-								Button(
+								SecondaryButton(
 									{
 										logger.info { "Closing dialog without creating binder" }
 
@@ -143,7 +147,7 @@ class CreateBinderDialog(
 
 								Spacer(Modifier.weight(1f, true))
 
-								Button(
+								PrimaryButton(
 									onClick = {
 										logger.info { "Creating binder $binderName" }
 

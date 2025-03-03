@@ -11,7 +11,9 @@ package me.gserv.archival.windows.main
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material.Card
+import androidx.compose.material.Icon
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Cancel
 import androidx.compose.material.icons.rounded.Delete
@@ -22,7 +24,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
@@ -36,6 +37,8 @@ import me.gserv.archival.data.Database
 import me.gserv.archival.data.Filesystem
 import me.gserv.archival.data.GlobalState
 import me.gserv.archival.data.entities.Binder
+import me.gserv.archival.utils.components.DangerButton
+import me.gserv.archival.utils.components.SecondaryButton
 
 class DeleteBinderDialog(
 	val parent: FrameWindowScope,
@@ -67,8 +70,8 @@ class DeleteBinderDialog(
 	fun create() {
 		if (isOpen) {
 			Dialog({}, DialogProperties(false, false, true)) {
-				Colors.Theme {
-					Card(backgroundColor = Colors.get().SectionBackground, shape = RoundedCornerShape(15.dp)) {
+				Colors.Theme { colors ->
+					Card(backgroundColor = colors.SectionBackground, shape = RoundedCornerShape(15.dp)) {
 						Column(modifier = Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(20.dp)) {
 							Row(verticalAlignment = Alignment.CenterVertically) {
 								Icon(
@@ -95,7 +98,7 @@ class DeleteBinderDialog(
 							)
 
 							Row {
-								Button(
+								SecondaryButton(
 									onClick = {
 										logger.info { "Closing dialog without deleting binder" }
 
@@ -115,7 +118,7 @@ class DeleteBinderDialog(
 
 								Spacer(Modifier.weight(1f, true))
 
-								Button(
+								DangerButton(
 									onClick = {
 										logger.info { "Deleting binder ${binder?.id?.value}" }
 
@@ -135,10 +138,6 @@ class DeleteBinderDialog(
 
 										close()
 									},
-									colors = ButtonDefaults.buttonColors(
-										backgroundColor = Colors.get().Danger,
-										contentColor = Color.White
-									)
 								) {
 									Row(verticalAlignment = Alignment.CenterVertically) {
 										Icon(

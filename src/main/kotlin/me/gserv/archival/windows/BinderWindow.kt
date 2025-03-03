@@ -26,7 +26,6 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
@@ -46,6 +45,7 @@ import me.gserv.archival.data.entities.Set
 import me.gserv.archival.data.tables.SetTable
 import me.gserv.archival.dropTarget
 import me.gserv.archival.utils.StringTooltip
+import me.gserv.archival.utils.components.PrimaryButton
 import me.gserv.archival.utils.format
 import me.gserv.archival.windows.binder.CreateSetDialog
 import me.gserv.archival.windows.binder.DeleteSetDialog
@@ -166,7 +166,7 @@ class BinderWindow(val parent: MainWindow) {
 								.height(55.dp)
 								.fillMaxWidth()
 						) {
-							Button(
+							PrimaryButton(
 								{ createSetDialog.open() },
 								modifier = Modifier.fillMaxHeight()
 							) {
@@ -246,16 +246,6 @@ class BinderWindow(val parent: MainWindow) {
 								},
 								modifier = Modifier.fillMaxHeight()
 							)
-
-//						StringTooltip("Binder Settings") {
-//							Button(
-//								{},
-//								modifier = Modifier.fillMaxHeight(),
-//								enabled = false,
-//							) {
-//								Icon(Icons.Rounded.Settings, "Binder settings")
-//							}
-//						}
 						}
 
 						Box(
@@ -331,7 +321,7 @@ class BinderWindow(val parent: MainWindow) {
 															Icon(
 																Icons.Rounded.Delete,
 																"Delete set",
-																tint = Color.Red
+																tint = colors.DangerBackground
 															)
 														}
 													}
@@ -365,7 +355,7 @@ class BinderWindow(val parent: MainWindow) {
 
 						Row(
 							modifier = Modifier
-								.background(Colors.get().SectionBackground)
+								.background(colors.SectionBackground)
 								.padding(vertical = 10.dp, horizontal = 15.dp)
 								.height(20.dp)
 								.fillMaxWidth()

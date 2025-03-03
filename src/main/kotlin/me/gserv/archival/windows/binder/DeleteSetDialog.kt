@@ -11,7 +11,9 @@ package me.gserv.archival.windows.binder
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material.Card
+import androidx.compose.material.Icon
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Cancel
 import androidx.compose.material.icons.rounded.Delete
@@ -22,7 +24,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
@@ -33,6 +34,8 @@ import me.gserv.archival.Colors
 import me.gserv.archival.data.Database
 import me.gserv.archival.data.GlobalState
 import me.gserv.archival.data.entities.Set
+import me.gserv.archival.utils.components.DangerButton
+import me.gserv.archival.utils.components.SecondaryButton
 import me.gserv.archival.windows.BinderWindow
 
 class DeleteSetDialog(
@@ -75,105 +78,104 @@ class DeleteSetDialog(
 	fun create() {
 		if (isOpen) {
 			Dialog({}, DialogProperties(false, false, true)) {
-				Card(backgroundColor = Color.White, shape = RoundedCornerShape(15.dp)) {
-					Column(modifier = Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(20.dp)) {
-						Row(verticalAlignment = Alignment.CenterVertically) {
-							Icon(
-								Icons.Rounded.Warning,
-								"Delete set",
-								modifier = Modifier
-									.absolutePadding(right = 8.dp, top = 1.dp)
-									.size(30.dp)
-							)
+				Colors.Theme { colors ->
+					Card(backgroundColor = colors.SectionBackground, shape = RoundedCornerShape(15.dp)) {
+						Column(modifier = Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(20.dp)) {
+							Row(verticalAlignment = Alignment.CenterVertically) {
+								Icon(
+									Icons.Rounded.Warning,
+									"Delete set",
+									modifier = Modifier
+										.absolutePadding(right = 8.dp, top = 1.dp)
+										.size(30.dp)
+								)
 
-							Text(
-								"Delete Set",
-								fontSize = TextUnit(1.5F, TextUnitType.Em)
-							)
-						}
-
-						Text(
-							"Are you sure you wish to delete Set ${set?.id?.value} and its $totalFiles associated " +
-								"images?\n\n" +
-
-								"The set, its data and its images will be permanently removed, and you won't " +
-								"be able to restore it.\n\n" +
-
-								"Consider using the backup function before deleting any sets."
-						)
-
-						Row {
-							Button(
-								onClick = {
-									logger.info { "Closing dialog without deleting set: ${set?.id?.value}" }
-
-									close()
-								},
-							) {
-								Row(verticalAlignment = Alignment.CenterVertically) {
-									Icon(
-										Icons.Rounded.Cancel,
-										"",
-										modifier = Modifier.absolutePadding(right = 4.dp)
-									)
-
-									Text("Cancel")
-								}
+								Text(
+									"Delete Set",
+									fontSize = TextUnit(1.5F, TextUnitType.Em)
+								)
 							}
 
-							Spacer(Modifier.weight(1f, true))
+							Text(
+								"Are you sure you wish to delete Set ${set?.id?.value} and its $totalFiles associated " +
+									"images?\n\n" +
 
-							Button(
-								onClick = {
-									logger.info { "Deleting set ${set?.id?.value}" }
+									"The set, its data and its images will be permanently removed, and you won't " +
+									"be able to restore it.\n\n" +
 
-									set?.let {
-										Database.transaction {
-											it.getFiles().forEach { container ->
-												if (container.original != null) {
-													logger.info { "Deleting file: ${container.original.absolutePath}" }
+									"Consider using the backup function before deleting any sets."
+							)
 
-													container.original.delete()
-												}
+							Row {
+								SecondaryButton(
+									onClick = {
+										logger.info { "Closing dialog without deleting set: ${set?.id?.value}" }
 
-												if (container.edit != null) {
-													logger.info { "Deleting file: ${container.edit.absolutePath}" }
+										close()
+									},
+								) {
+									Row(verticalAlignment = Alignment.CenterVertically) {
+										Icon(
+											Icons.Rounded.Cancel,
+											"",
+											modifier = Modifier.absolutePadding(right = 4.dp)
+										)
 
-													container.edit.delete()
-												}
-											}
-
-											it.delete()
-										}
+										Text("Cancel")
 									}
+								}
 
-									logger.info { "Updating global and window states..." }
+								Spacer(Modifier.weight(1f, true))
 
-									parent.allSets.remove(set)
-									GlobalState.sets.remove(set)
+								DangerButton(
+									onClick = {
+										logger.info { "Deleting set ${set?.id?.value}" }
 
-									logger.info { "Done, closing dialog" }
+										set?.let {
+											Database.transaction {
+												it.getFiles().forEach { container ->
+													if (container.original != null) {
+														logger.info { "Deleting file: ${container.original.absolutePath}" }
 
-									close()
-								},
-								colors = ButtonDefaults.buttonColors(
-									backgroundColor = Colors.get().Danger,
-									contentColor = Color.White
-								),
-							) {
-								Row(verticalAlignment = Alignment.CenterVertically) {
-									Icon(
-										Icons.Rounded.Delete,
-										"",
-										modifier = Modifier.absolutePadding(right = 4.dp)
-									)
+														container.original.delete()
+													}
 
-									Text("Delete Set")
+													if (container.edit != null) {
+														logger.info { "Deleting file: ${container.edit.absolutePath}" }
+
+														container.edit.delete()
+													}
+												}
+
+												it.delete()
+											}
+										}
+
+										logger.info { "Updating global and window states..." }
+
+										parent.allSets.remove(set)
+										GlobalState.sets.remove(set)
+
+										logger.info { "Done, closing dialog" }
+
+										close()
+									},
+								) {
+									Row(verticalAlignment = Alignment.CenterVertically) {
+										Icon(
+											Icons.Rounded.Delete,
+											"",
+											modifier = Modifier.absolutePadding(right = 4.dp)
+										)
+
+										Text("Delete Set")
+									}
 								}
 							}
 						}
 					}
 				}
+
 			}
 		}
 	}

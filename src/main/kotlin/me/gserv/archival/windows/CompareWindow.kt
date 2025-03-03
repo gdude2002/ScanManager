@@ -13,7 +13,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Button
 import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
@@ -42,6 +41,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import me.gserv.archival.Colors
 import me.gserv.archival.dropTarget
+import me.gserv.archival.utils.components.PrimaryButton
 import java.awt.image.BufferedImage
 import java.io.File
 import javax.imageio.ImageIO
@@ -251,8 +251,8 @@ class CompareWindow(val parent: MainWindow) {
 					launcher.launch()
 				}
 
-				Colors.Theme {
-					Box(Modifier.background(color = Colors.get().WindowBackground)) {
+				Colors.Theme { colors ->
+					Box(Modifier.background(color = colors.WindowBackground)) {
 						Row(
 							horizontalArrangement = Arrangement.spacedBy(10.dp),
 							modifier = Modifier.padding(10.dp)
@@ -261,7 +261,7 @@ class CompareWindow(val parent: MainWindow) {
 							Column(
 								verticalArrangement = Arrangement.spacedBy(10.dp),
 								modifier = Modifier
-									.background(Colors.get().SectionBackground, RoundedCornerShape(15.dp))
+									.background(colors.SectionBackground, RoundedCornerShape(15.dp))
 									.padding(vertical = 10.dp, horizontal = 15.dp)
 									.requiredWidth(200.dp)
 									.fillMaxHeight()
@@ -269,7 +269,7 @@ class CompareWindow(val parent: MainWindow) {
 								Text("Pick two images to compare; click a loaded image below to replace it.")
 
 								if (firstImageFile == null || firstImage == null) {
-									Button(
+									PrimaryButton(
 										{ pickFile(firstImageFileState, firstImageState) },
 										modifier = Modifier.fillMaxWidth()
 									) {
@@ -296,7 +296,7 @@ class CompareWindow(val parent: MainWindow) {
 								}
 
 								if (secondImageFile == null || secondImage == null) {
-									Button(
+									PrimaryButton(
 										{ pickFile(secondImageFileState, secondImageState) },
 										modifier = Modifier.fillMaxWidth()
 									) {
@@ -337,7 +337,7 @@ class CompareWindow(val parent: MainWindow) {
 
 							Column(
 								modifier = Modifier
-									.background(Colors.get().SectionBackground, RoundedCornerShape(15.dp))
+									.background(colors.SectionBackground, RoundedCornerShape(15.dp))
 									.padding(vertical = 10.dp, horizontal = 15.dp)
 									.fillMaxHeight()
 									.fillMaxWidth()
