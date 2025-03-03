@@ -13,13 +13,14 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material.Button
+import androidx.compose.material.LinearProgressIndicator
+import androidx.compose.material.Text
+import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Downloading
 import androidx.compose.material.icons.filled.FormatSize
 import androidx.compose.material.icons.filled.Image
-import androidx.compose.material.icons.filled.Pending
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -41,7 +42,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import me.gserv.archival.Colors
 import me.gserv.archival.dropTarget
-import org.jetbrains.exposed.sql.SchemaUtils.drop
 import java.awt.image.BufferedImage
 import java.io.File
 import javax.imageio.ImageIO
@@ -251,103 +251,105 @@ class CompareWindow(val parent: MainWindow) {
 					launcher.launch()
 				}
 
-				MaterialTheme {
-					Row(
-						horizontalArrangement = Arrangement.spacedBy(10.dp),
-						modifier = Modifier.padding(10.dp)
-							.fillMaxSize()
-					) {
-						Column(
-							verticalArrangement = Arrangement.spacedBy(10.dp),
-							modifier = Modifier
-								.background(Colors.LightGray, RoundedCornerShape(15.dp))
-								.padding(vertical = 10.dp, horizontal = 15.dp)
-								.requiredWidth(200.dp)
-								.fillMaxHeight()
+				Colors.Theme {
+					Box(Modifier.background(color = Colors.get().WindowBackground)) {
+						Row(
+							horizontalArrangement = Arrangement.spacedBy(10.dp),
+							modifier = Modifier.padding(10.dp)
+								.fillMaxSize()
 						) {
-							Text("Pick two images to compare; click a loaded image below to replace it.")
+							Column(
+								verticalArrangement = Arrangement.spacedBy(10.dp),
+								modifier = Modifier
+									.background(Colors.get().SectionBackground, RoundedCornerShape(15.dp))
+									.padding(vertical = 10.dp, horizontal = 15.dp)
+									.requiredWidth(200.dp)
+									.fillMaxHeight()
+							) {
+								Text("Pick two images to compare; click a loaded image below to replace it.")
 
-							if (firstImageFile == null || firstImage == null) {
-								Button(
-									{ pickFile(firstImageFileState, firstImageState) },
-									modifier = Modifier.fillMaxWidth()
-								) {
-									Text("Pick first image")
-								}
-							} else {
-								Text(
-									firstImageFile!!.name,
-									overflow = TextOverflow.Ellipsis,
-									softWrap = false,
-								)
-
-								TextButton(
-									{ pickFile(firstImageFileState, firstImageState) },
-									modifier = Modifier.fillMaxWidth()
-								) {
-									Image(
-										firstImage!!.toPainter(),
-										"First comparison image",
-										contentScale = ContentScale.Fit,
+								if (firstImageFile == null || firstImage == null) {
+									Button(
+										{ pickFile(firstImageFileState, firstImageState) },
 										modifier = Modifier.fillMaxWidth()
+									) {
+										Text("Pick first image")
+									}
+								} else {
+									Text(
+										firstImageFile!!.name,
+										overflow = TextOverflow.Ellipsis,
+										softWrap = false,
+									)
+
+									TextButton(
+										{ pickFile(firstImageFileState, firstImageState) },
+										modifier = Modifier.fillMaxWidth()
+									) {
+										Image(
+											firstImage!!.toPainter(),
+											"First comparison image",
+											contentScale = ContentScale.Fit,
+											modifier = Modifier.fillMaxWidth()
+										)
+									}
+								}
+
+								if (secondImageFile == null || secondImage == null) {
+									Button(
+										{ pickFile(secondImageFileState, secondImageState) },
+										modifier = Modifier.fillMaxWidth()
+									) {
+										Text("Pick second image")
+									}
+								} else {
+									Text(
+										secondImageFile!!.name,
+										overflow = TextOverflow.Ellipsis,
+										softWrap = false,
+									)
+
+									TextButton(
+										{ pickFile(secondImageFileState, secondImageState) },
+										modifier = Modifier.fillMaxWidth()
+									) {
+										Image(
+											secondImage!!.toPainter(),
+											"Second comparison image",
+											contentScale = ContentScale.Fit,
+											modifier = Modifier.fillMaxWidth()
+										)
+									}
+								}
+
+								Spacer(Modifier.weight(1f, true))
+
+								if (statusText.isNotEmpty()) {
+									Text(statusText, modifier = Modifier.fillMaxWidth())
+								}
+
+								if (progress != null) {
+									LinearProgressIndicator(progress!!, Modifier.fillMaxWidth())
+								} else {
+									LinearProgressIndicator(Modifier.fillMaxWidth())
+								}
+							}
+
+							Column(
+								modifier = Modifier
+									.background(Colors.get().SectionBackground, RoundedCornerShape(15.dp))
+									.padding(vertical = 10.dp, horizontal = 15.dp)
+									.fillMaxHeight()
+									.fillMaxWidth()
+							) {
+								if (comparisonImage != null) {
+									Image(
+										comparisonImage!!.toPainter(),
+										"Comparison image",
+										contentScale = ContentScale.Fit,
+										modifier = Modifier.fillMaxSize()
 									)
 								}
-							}
-
-							if (secondImageFile == null || secondImage == null) {
-								Button(
-									{ pickFile(secondImageFileState, secondImageState) },
-									modifier = Modifier.fillMaxWidth()
-								) {
-									Text("Pick second image")
-								}
-							} else {
-								Text(
-									secondImageFile!!.name,
-									overflow = TextOverflow.Ellipsis,
-									softWrap = false,
-								)
-
-								TextButton(
-									{ pickFile(secondImageFileState, secondImageState) },
-									modifier = Modifier.fillMaxWidth()
-								) {
-									Image(
-										secondImage!!.toPainter(),
-										"Second comparison image",
-										contentScale = ContentScale.Fit,
-										modifier = Modifier.fillMaxWidth()
-									)
-								}
-							}
-
-							Spacer(Modifier.weight(1f, true))
-
-							if (statusText.isNotEmpty()) {
-								Text(statusText, modifier = Modifier.fillMaxWidth())
-							}
-
-							if (progress != null) {
-								LinearProgressIndicator(progress!!, Modifier.fillMaxWidth())
-							} else {
-								LinearProgressIndicator(Modifier.fillMaxWidth())
-							}
-						}
-
-						Column(
-							modifier = Modifier
-								.background(Colors.LightGray, RoundedCornerShape(15.dp))
-								.padding(vertical = 10.dp, horizontal = 15.dp)
-								.fillMaxHeight()
-								.fillMaxWidth()
-						) {
-							if (comparisonImage != null) {
-								Image(
-									comparisonImage!!.toPainter(),
-									"Comparison image",
-									contentScale = ContentScale.Fit,
-									modifier = Modifier.fillMaxSize()
-								)
 							}
 						}
 					}

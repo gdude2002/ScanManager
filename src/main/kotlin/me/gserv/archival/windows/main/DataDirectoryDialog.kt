@@ -23,7 +23,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
@@ -33,6 +32,7 @@ import androidx.compose.ui.window.FrameWindowScope
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.github.vinceglb.filekit.compose.rememberDirectoryPickerLauncher
 import io.github.vinceglb.filekit.core.FileKitPlatformSettings
+import me.gserv.archival.Colors
 import me.gserv.archival.config.AppConfig
 import me.gserv.archival.data.Filesystem
 import java.io.File
@@ -97,89 +97,91 @@ class DataDirectoryDialog(
 			}
 
 			Dialog({}, DialogProperties(false, false, true)) {
-				Card(backgroundColor = Color.White, shape = RoundedCornerShape(15.dp)) {
-					Column(modifier = Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(20.dp)) {
-						Row(verticalAlignment = Alignment.CenterVertically) {
-							Icon(
-								Icons.Rounded.Folder,
-								"Open folder",
-								modifier = Modifier
-									.absolutePadding(right = 8.dp, top = 1.dp)
-									.size(30.dp)
-							)
-
-							Text(
-								"Select Data Folder",
-								fontSize = TextUnit(1.5F, TextUnitType.Em)
-							)
-						}
-
-						Text(
-							"Please select the folder you wish to use to store management data.\n" +
-								"Select a folder containing existing data to use the data in that folder."
-						)
-
-						Row {
-							TextField(
-								newDirectory,
-								{ newDirectory = it },
-								label = { Text("Data Folder") },
-								modifier = Modifier.fillMaxWidth(0.9f).absolutePadding(right = 10.dp)
-							)
-
-							Button(modifier = Modifier.size(56.dp), onClick = {
-								isPickerOpen = true
-							}) {
+				Colors.Theme {
+					Card(backgroundColor = Colors.get().SectionBackground, shape = RoundedCornerShape(15.dp)) {
+						Column(modifier = Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(20.dp)) {
+							Row(verticalAlignment = Alignment.CenterVertically) {
 								Icon(
-									Icons.Rounded.FolderOpen,
-									"Open folder"
+									Icons.Rounded.Folder,
+									"Open folder",
+									modifier = Modifier
+										.absolutePadding(right = 8.dp, top = 1.dp)
+										.size(30.dp)
+								)
+
+								Text(
+									"Select Data Folder",
+									fontSize = TextUnit(1.5F, TextUnitType.Em)
 								)
 							}
-						}
 
-						Row {
-							Button(onClick = {
-								logger.info { "Closing without changing data directory" }
+							Text(
+								"Please select the folder you wish to use to store management data.\n" +
+									"Select a folder containing existing data to use the data in that folder."
+							)
 
-								close()
-							}) {
-								Row(verticalAlignment = Alignment.CenterVertically) {
+							Row {
+								TextField(
+									newDirectory,
+									{ newDirectory = it },
+									label = { Text("Data Folder") },
+									modifier = Modifier.fillMaxWidth(0.9f).absolutePadding(right = 10.dp)
+								)
+
+								Button(modifier = Modifier.size(56.dp), onClick = {
+									isPickerOpen = true
+								}) {
 									Icon(
-										Icons.Rounded.Cancel,
-										"",
-										modifier = Modifier.absolutePadding(right = 4.dp)
+										Icons.Rounded.FolderOpen,
+										"Open folder"
 									)
-
-									Text("Cancel")
 								}
 							}
 
-							Spacer(Modifier.weight(1f, true))
+							Row {
+								Button(onClick = {
+									logger.info { "Closing without changing data directory" }
 
-							Button(onClick = {
-								logger.info { "Changing data directory to $newDirectory" }
+									close()
+								}) {
+									Row(verticalAlignment = Alignment.CenterVertically) {
+										Icon(
+											Icons.Rounded.Cancel,
+											"",
+											modifier = Modifier.absolutePadding(right = 4.dp)
+										)
 
-								dataDirectory = newDirectory
+										Text("Cancel")
+									}
+								}
 
-								AppConfig.dataFolder = dataDirectory
-								AppConfig.save()
+								Spacer(Modifier.weight(1f, true))
 
-								logger.info { "Ensuring data directory exists..." }
+								Button(onClick = {
+									logger.info { "Changing data directory to $newDirectory" }
 
-								Filesystem.ensureBinders()
+									dataDirectory = newDirectory
 
-								logger.info { "Done, closing dialog" }
+									AppConfig.dataFolder = dataDirectory
+									AppConfig.save()
 
-								close()
-							}) {
-								Row(verticalAlignment = Alignment.CenterVertically) {
-									Icon(
-										Icons.Rounded.Check,
-										"",
-										modifier = Modifier.absolutePadding(right = 4.dp)
-									)
+									logger.info { "Ensuring data directory exists..." }
 
-									Text("Okay")
+									Filesystem.ensureBinders()
+
+									logger.info { "Done, closing dialog" }
+
+									close()
+								}) {
+									Row(verticalAlignment = Alignment.CenterVertically) {
+										Icon(
+											Icons.Rounded.Check,
+											"",
+											modifier = Modifier.absolutePadding(right = 4.dp)
+										)
+
+										Text("Okay")
+									}
 								}
 							}
 						}

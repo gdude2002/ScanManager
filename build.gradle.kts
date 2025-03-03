@@ -24,6 +24,7 @@ dependencies {
 	implementation("org.slf4j", "slf4j-simple", "2.0.16")
 	implementation("io.github.oshai", "kotlin-logging-jvm", "7.0.3")
 
+	implementation("io.github.kdroidfilter:platformtools.darkmodedetector:0.2.7")
 	implementation("io.github.vinceglb", "filekit-compose", "0.8.8")
 
 	implementation("com.github.slugify", "slugify", "3.0.7") {

@@ -107,14 +107,12 @@ class BinderWindow(val parent: MainWindow) {
 	@Composable
 	@Preview
 	fun create() {
-		val rowColorEvenHovered = Colors.LightGreen
-		val rowColorEven = Colors.LightGray
-
-		val rowColorOddHovered = Colors.LighterGreen
-		val rowColorOdd = MaterialTheme.colors.surface
-
 		if (isOpen) {
 			LaunchedEffect(GlobalState.sets, dropTarget.currentSet) {
+				if (dropTarget.currentSet >= GlobalState.sets.size) {
+					dropTarget.currentSet = 0
+				}
+
 				dropTarget.state {
 					if (GlobalState.sets.isEmpty()) {
 						icon = Icons.Default.QuestionMark
@@ -154,95 +152,100 @@ class BinderWindow(val parent: MainWindow) {
 				val deleteSetDialog = DeleteSetDialog(this@BinderWindow)
 				deleteSetDialog.create()
 
-				Column(
-					modifier = Modifier.fillMaxSize()
-				) {
-					Row(
-						horizontalArrangement = Arrangement.spacedBy(10.dp),
-						modifier = Modifier
-							.background(
-								Colors.LightGray
-							)
-							.padding(vertical = 10.dp, horizontal = 15.dp)
-							.height(55.dp)
-							.fillMaxWidth()
+				Colors.Theme { colors ->
+					Column(
+						modifier = Modifier.fillMaxSize()
 					) {
-						Button(
-							{ createSetDialog.open() },
-							modifier = Modifier.fillMaxHeight()
+						Row(
+							horizontalArrangement = Arrangement.spacedBy(10.dp),
+							modifier = Modifier
+								.background(
+									colors.SectionBackground
+								)
+								.padding(vertical = 10.dp, horizontal = 15.dp)
+								.height(55.dp)
+								.fillMaxWidth()
 						) {
-							Text("Add")
-						}
-
-						Spacer(Modifier.weight(1f, true))
-
-						Box(Modifier.fillMaxHeight()) {
-							OutlinedButton(
-								{ isDropdownOpen = !isDropdownOpen },
-								enabled = allSets.isNotEmpty(),
+							Button(
+								{ createSetDialog.open() },
 								modifier = Modifier.fillMaxHeight()
 							) {
-								Row(
-									horizontalArrangement = Arrangement.spacedBy(5.dp),
-									verticalAlignment = Alignment.CenterVertically
-								) {
-									if (allSets.isNotEmpty()) {
-										Text("Filter: ${filterState.readableName} Sets")
+								Text("Add")
+							}
 
-										if (isDropdownOpen) {
-											Icon(Icons.Default.ArrowDropUp, "")
+							Spacer(Modifier.weight(1f, true))
+
+							Box(Modifier.fillMaxHeight()) {
+								OutlinedButton(
+									{ isDropdownOpen = !isDropdownOpen },
+									enabled = allSets.isNotEmpty(),
+									modifier = Modifier.fillMaxHeight()
+								) {
+									Row(
+										horizontalArrangement = Arrangement.spacedBy(5.dp),
+										verticalAlignment = Alignment.CenterVertically
+									) {
+										if (allSets.isNotEmpty()) {
+											Text("Filter: ${filterState.readableName} Sets")
+
+											if (isDropdownOpen) {
+												Icon(Icons.Default.ArrowDropUp, "")
+											} else {
+												Icon(Icons.Default.ArrowDropDown, "")
+											}
 										} else {
-											Icon(Icons.Default.ArrowDropDown, "")
+											Text("No sets")
 										}
-									} else {
-										Text("No sets")
+									}
+								}
+
+								DropdownMenu(isDropdownOpen, { isDropdownOpen = false }) {
+									DropdownMenuItem({
+										logger.info { "Updating completion filter: All sets" }
+
+										filterState = FilterState.All
+										isDropdownOpen = false
+									}) {
+										Text("All Sets")
+									}
+
+									Divider()
+
+									DropdownMenuItem({
+										logger.info { "Updating completion filter: Incomplete sets only" }
+
+										filterState = FilterState.Incomplete
+										isDropdownOpen = false
+										dropTarget.currentSet = 0
+									}) {
+										Text("Incomplete Sets")
+									}
+
+									DropdownMenuItem({
+										logger.info { "Updating completion filter: Complete sets only" }
+
+										filterState = FilterState.Complete
+										isDropdownOpen = false
+										dropTarget.currentSet = 0
+									}) {
+										Text("Complete Sets")
 									}
 								}
 							}
 
-							DropdownMenu(isDropdownOpen, { isDropdownOpen = false }) {
-								DropdownMenuItem({
-									logger.info { "Updating completion filter: All sets" }
+							TextField(
+								value = filterText,
+								onValueChange = {
+									logger.info { "Updating description filter: \"$it\"" }
 
-									filterState = FilterState.All
-									isDropdownOpen = false
-								}) {
-									Text("All Sets")
-								}
-
-								Divider()
-
-								DropdownMenuItem({
-									logger.info { "Updating completion filter: Incomplete sets only" }
-
-									filterState = FilterState.Incomplete
-									isDropdownOpen = false
-								}) {
-									Text("Incomplete Sets")
-								}
-
-								DropdownMenuItem({
-									logger.info { "Updating completion filter: Complete sets only" }
-
-									filterState = FilterState.Complete
-									isDropdownOpen = false
-								}) {
-									Text("Complete Sets")
-								}
-							}
-						}
-
-						TextField(
-							value = filterText,
-							onValueChange = {
-								logger.info { "Updating description filter: \"$it\"" }
-								filterText = it
-							},
-							label = {
-								Text("Description", modifier = Modifier.absolutePadding(bottom = 10.dp))
-							},
-							modifier = Modifier.fillMaxHeight()
-						)
+									filterText = it
+									dropTarget.currentSet = 0
+								},
+								label = {
+									Text("Description", modifier = Modifier.absolutePadding(bottom = 10.dp))
+								},
+								modifier = Modifier.fillMaxHeight()
+							)
 
 //						StringTooltip("Binder Settings") {
 //							Button(
@@ -253,102 +256,104 @@ class BinderWindow(val parent: MainWindow) {
 //								Icon(Icons.Rounded.Settings, "Binder settings")
 //							}
 //						}
-					}
+						}
 
-					Box(
-						modifier = Modifier
-							.fillMaxWidth()
-							.weight(1f)
-					) {
-						DataTable(
-							modifier = Modifier.fillMaxSize(),
-							sortColumnIndex = 0,
-							sortAscending = true,
-
-							columns = listOf(
-								HeaderColumn("Set"),
-								HeaderColumn("Scans"),
-								HeaderColumn("Set Date"),
-								HeaderColumn("State"),
-								HeaderColumn("Created"),
-								HeaderColumn("Finished"),
-								HeaderColumn("Description"),
-								HeaderColumn("", TableColumnWidth.MinIntrinsic),
-							)
+						Box(
+							modifier = Modifier
+								.background(colors.WindowBackground)
+								.fillMaxWidth()
+								.weight(1f)
 						) {
-							GlobalState.sets.forEachIndexed { index, set ->
-								row {
-									onClick = {
-										dropTarget.currentSet = index
-									}
+							DataTable(
+								modifier = Modifier.fillMaxSize(),
+								sortColumnIndex = 0,
+								sortAscending = true,
 
-									this.backgroundColor = if (index % 2 == 0) {
-										if (index == dropTarget.currentSet) {
-											rowColorEvenHovered
-										} else {
-											rowColorEven
+								columns = listOf(
+									HeaderColumn("Set"),
+									HeaderColumn("Scans"),
+									HeaderColumn("Set Date"),
+									HeaderColumn("State"),
+									HeaderColumn("Created"),
+									HeaderColumn("Finished"),
+									HeaderColumn("Description"),
+									HeaderColumn("", TableColumnWidth.MinIntrinsic),
+								)
+							) {
+								GlobalState.sets.forEachIndexed { index, set ->
+									row {
+										onClick = {
+											dropTarget.currentSet = index
 										}
-									} else {
-										if (index == dropTarget.currentSet) {
-											rowColorOddHovered
+
+										this.backgroundColor = if (index % 2 == 0) {
+											if (index == dropTarget.currentSet) {
+												colors.RowHovered
+											} else {
+												colors.RowEven
+											}
 										} else {
-											rowColorOdd
+											if (index == dropTarget.currentSet) {
+												colors.RowHovered
+											} else {
+												colors.RowOdd
+											}
 										}
-									}
 
-									text(set.id.value.toString())
-									text(set.totalScans.toString())
-									text(set.date?.format())
+										text(set.id.value.toString())
+										text(set.totalScans.toString())
+										text(set.date?.format())
 
-									if (set.finishedAt != null) {
-										text("Complete")
-									} else {
-										text("Incomplete")
-									}
+										if (set.finishedAt != null) {
+											text("Complete")
+										} else {
+											text("Incomplete")
+										}
 
-									text(set.createdAt.format())
-									text(set.finishedAt?.format())
-									text(set.description, true)
+										text(set.createdAt.format())
+										text(set.finishedAt?.format())
+										text(set.description, true)
 
-									cell {
-										Row(horizontalArrangement = Arrangement.End) {
-											StringTooltip("Delete set") {
-												TextButton(
-													{
-														deleteSetDialog.open(set)
-													},
-													modifier = Modifier.padding(horizontal = 0.dp).width(40.dp),
-													contentPadding = PaddingValues(0.dp)
-												) {
-													Row(
-														verticalAlignment = Alignment.CenterVertically,
-														modifier = Modifier.padding(0.dp)
+										cell {
+											Row(horizontalArrangement = Arrangement.End) {
+												StringTooltip("Delete set") {
+													TextButton(
+														{
+															deleteSetDialog.open(set)
+														},
+														modifier = Modifier.padding(horizontal = 0.dp).width(40.dp),
+														contentPadding = PaddingValues(0.dp)
 													) {
-														Icon(
-															Icons.Rounded.Delete,
-															"Delete set",
-															tint = Color.Red
-														)
+														Row(
+															verticalAlignment = Alignment.CenterVertically,
+															modifier = Modifier.padding(0.dp)
+														) {
+															Icon(
+																Icons.Rounded.Delete,
+																"Delete set",
+																tint = Color.Red
+															)
+														}
 													}
 												}
-											}
 
-											StringTooltip("Open set") {
-												TextButton(
-													{
-														// TODO: Open action
-													},
-													modifier = Modifier.padding(horizontal = 0.dp).width(40.dp),
-													contentPadding = PaddingValues(0.dp)
-												) {
-													Row(
-														verticalAlignment = Alignment.CenterVertically,
-														modifier = Modifier.padding(0.dp)
+												StringTooltip("Open set") {
+													TextButton(
+														{
+															// TODO: Open action
+														},
+														modifier = Modifier.padding(horizontal = 0.dp).width(40.dp),
+														contentPadding = PaddingValues(0.dp)
 													) {
-														Icon(
-															Icons.Rounded.FolderOpen,
-															"Open set"
-														)
+														Row(
+															verticalAlignment = Alignment.CenterVertically,
+															modifier = Modifier.padding(0.dp)
+														) {
+															Icon(
+																Icons.Rounded.FolderOpen,
+																"Open set"
+															)
+														}
 													}
 												}
 											}
@@ -357,27 +362,27 @@ class BinderWindow(val parent: MainWindow) {
 								}
 							}
 						}
-					}
 
-					Row(
-						modifier = Modifier
-							.background(Colors.LightGray)
-							.padding(vertical = 10.dp, horizontal = 15.dp)
-							.height(20.dp)
-							.fillMaxWidth()
-					) {
-						Text(
-							buildString {
-								append("${allSets.size} total sets")
+						Row(
+							modifier = Modifier
+								.background(Colors.get().SectionBackground)
+								.padding(vertical = 10.dp, horizontal = 15.dp)
+								.height(20.dp)
+								.fillMaxWidth()
+						) {
+							Text(
+								buildString {
+									append("${allSets.size} total sets")
 
-								if (filterState != FilterState.All || filterText.isNotBlank()) {
-									append(
-										" (${allSets.size - GlobalState.sets.size} hidden, " +
-											"${GlobalState.sets.size} visible)"
-									)
+									if (filterState != FilterState.All || filterText.isNotBlank()) {
+										append(
+											" (${allSets.size - GlobalState.sets.size} hidden, " +
+												"${GlobalState.sets.size} visible)"
+										)
+									}
 								}
-							}
-						)
+							)
+						}
 					}
 				}
 			}

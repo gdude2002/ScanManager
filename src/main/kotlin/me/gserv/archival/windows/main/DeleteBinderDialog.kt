@@ -67,86 +67,88 @@ class DeleteBinderDialog(
 	fun create() {
 		if (isOpen) {
 			Dialog({}, DialogProperties(false, false, true)) {
-				Card(backgroundColor = Color.White, shape = RoundedCornerShape(15.dp)) {
-					Column(modifier = Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(20.dp)) {
-						Row(verticalAlignment = Alignment.CenterVertically) {
-							Icon(
-								Icons.Rounded.Warning,
-								"Delete binder",
-								modifier = Modifier
-									.absolutePadding(right = 8.dp, top = 1.dp)
-									.size(30.dp)
-							)
+				Colors.Theme {
+					Card(backgroundColor = Colors.get().SectionBackground, shape = RoundedCornerShape(15.dp)) {
+						Column(modifier = Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(20.dp)) {
+							Row(verticalAlignment = Alignment.CenterVertically) {
+								Icon(
+									Icons.Rounded.Warning,
+									"Delete binder",
+									modifier = Modifier
+										.absolutePadding(right = 8.dp, top = 1.dp)
+										.size(30.dp)
+								)
 
-							Text(
-								"Delete Binder",
-								fontSize = TextUnit(1.5F, TextUnitType.Em)
-							)
-						}
-
-						Text(
-							"Are you sure you wish to delete Binder ${binder?.id}?\n\n" +
-
-								"The binder, its data and its images will be permanently removed, and you won't " +
-								"be able to restore it.\n\n" +
-
-								"Consider using the backup function before deleting any binders."
-						)
-
-						Row {
-							Button(
-								onClick = {
-									logger.info { "Closing dialog without deleting binder" }
-
-									close()
-								},
-							) {
-								Row(verticalAlignment = Alignment.CenterVertically) {
-									Icon(
-										Icons.Rounded.Cancel,
-										"",
-										modifier = Modifier.absolutePadding(right = 4.dp)
-									)
-
-									Text("Cancel")
-								}
+								Text(
+									"Delete Binder",
+									fontSize = TextUnit(1.5F, TextUnitType.Em)
+								)
 							}
 
-							Spacer(Modifier.weight(1f, true))
+							Text(
+								"Are you sure you wish to delete Binder ${binder?.id}?\n\n" +
 
-							Button(
-								onClick = {
-									logger.info { "Deleting binder ${binder?.id?.value}" }
+									"The binder, its data and its images will be permanently removed, and you won't " +
+									"be able to restore it.\n\n" +
 
-									binder?.let {
-										Filesystem.deleteBinder(it.slug)
+									"Consider using the backup function before deleting any binders."
+							)
 
-										Database.transaction {
-											it.delete()
-										}
+							Row {
+								Button(
+									onClick = {
+										logger.info { "Closing dialog without deleting binder" }
+
+										close()
+									},
+								) {
+									Row(verticalAlignment = Alignment.CenterVertically) {
+										Icon(
+											Icons.Rounded.Cancel,
+											"",
+											modifier = Modifier.absolutePadding(right = 4.dp)
+										)
+
+										Text("Cancel")
 									}
+								}
 
-									logger.info { "Updating global state..." }
+								Spacer(Modifier.weight(1f, true))
 
-									GlobalState.binders.remove(binder)
+								Button(
+									onClick = {
+										logger.info { "Deleting binder ${binder?.id?.value}" }
 
-									logger.info { "Done, closing dialog" }
+										binder?.let {
+											Filesystem.deleteBinder(it.slug)
 
-									close()
-								},
-								colors = ButtonDefaults.buttonColors(
-									backgroundColor = Colors.Danger,
-									contentColor = Color.White
-								)
-							) {
-								Row(verticalAlignment = Alignment.CenterVertically) {
-									Icon(
-										Icons.Rounded.Delete,
-										"",
-										modifier = Modifier.absolutePadding(right = 4.dp)
+											Database.transaction {
+												it.delete()
+											}
+										}
+
+										logger.info { "Updating global state..." }
+
+										GlobalState.binders.remove(binder)
+
+										logger.info { "Done, closing dialog" }
+
+										close()
+									},
+									colors = ButtonDefaults.buttonColors(
+										backgroundColor = Colors.get().Danger,
+										contentColor = Color.White
 									)
+								) {
+									Row(verticalAlignment = Alignment.CenterVertically) {
+										Icon(
+											Icons.Rounded.Delete,
+											"",
+											modifier = Modifier.absolutePadding(right = 4.dp)
+										)
 
-									Text("Delete Binder")
+										Text("Delete Binder")
+									}
 								}
 							}
 						}

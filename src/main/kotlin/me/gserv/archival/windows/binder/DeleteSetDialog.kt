@@ -157,7 +157,7 @@ class DeleteSetDialog(
 									close()
 								},
 								colors = ButtonDefaults.buttonColors(
-									backgroundColor = Colors.Danger,
+									backgroundColor = Colors.get().Danger,
 									contentColor = Color.White
 								),
 							) {

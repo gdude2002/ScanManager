@@ -31,6 +31,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.window.FrameWindowScope
 import io.github.oshai.kotlinlogging.KotlinLogging
+import me.gserv.archival.Colors
 import me.gserv.archival.config.AppConfig
 import me.gserv.archival.data.Database
 import me.gserv.archival.data.Filesystem
@@ -69,107 +70,109 @@ class CreateBinderDialog(
 	fun create() {
 		if (isOpen) {
 			Dialog({}, DialogProperties(false, false, true)) {
-				Card(backgroundColor = Color.White, shape = RoundedCornerShape(15.dp)) {
-					Column(modifier = Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(20.dp)) {
-						Row(verticalAlignment = Alignment.CenterVertically) {
-							Icon(
-								Icons.Rounded.Book,
-								"Create binder",
-								modifier = Modifier
-									.absolutePadding(right = 8.dp, top = 1.dp)
-									.size(30.dp)
-							)
+				Colors.Theme {
+					Card(backgroundColor = Colors.get().SectionBackground, shape = RoundedCornerShape(15.dp)) {
+						Column(modifier = Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(20.dp)) {
+							Row(verticalAlignment = Alignment.CenterVertically) {
+								Icon(
+									Icons.Rounded.Book,
+									"Create binder",
+									modifier = Modifier
+										.absolutePadding(right = 8.dp, top = 1.dp)
+										.size(30.dp)
+								)
 
-							Text(
-								"Create Binder",
-								fontSize = TextUnit(1.5F, TextUnitType.Em)
-							)
-						}
-
-						Text(
-							"Please enter a name for the new binder. If the binder has a label with an " +
-								"identifying code, we recommend using that code.\n\n" +
-								"Binder names must be unique."
-						)
-
-						Row {
-							TextField(
-								binderName,
-
-								{
-									binderName = it
-
-									Database.transaction {
-										isError = Binder.findById(binderName) != null
-									}
-								},
-
-								label = { Text("Name") },
-								modifier = Modifier.fillMaxWidth()
-							)
-						}
-
-						if (isError) {
-							Row {
 								Text(
-									"A binder named $binderName already exists. Please pick another name.",
-
-									color = Color.Red,
-									textAlign = TextAlign.Center
+									"Create Binder",
+									fontSize = TextUnit(1.5F, TextUnitType.Em)
 								)
 							}
-						}
 
-						Row {
-							Button(
-								{
-									logger.info { "Closing dialog without creating binder" }
+							Text(
+								"Please enter a name for the new binder. If the binder has a label with an " +
+									"identifying code, we recommend using that code.\n\n" +
+									"Binder names must be unique."
+							)
 
-									close()
-								}
-							) {
-								Row(verticalAlignment = Alignment.CenterVertically) {
-									Icon(
-										Icons.Rounded.Cancel,
-										"",
-										modifier = Modifier.absolutePadding(right = 4.dp)
+							Row {
+								TextField(
+									binderName,
+
+									{
+										binderName = it
+
+										Database.transaction {
+											isError = Binder.findById(binderName) != null
+										}
+									},
+
+									label = { Text("Name") },
+									modifier = Modifier.fillMaxWidth()
+								)
+							}
+
+							if (isError) {
+								Row {
+									Text(
+										"A binder named $binderName already exists. Please pick another name.",
+
+										color = Color.Red,
+										textAlign = TextAlign.Center
 									)
-
-									Text("Cancel")
 								}
 							}
 
-							Spacer(Modifier.weight(1f, true))
+							Row {
+								Button(
+									{
+										logger.info { "Closing dialog without creating binder" }
 
-							Button(
-								onClick = {
-									logger.info { "Creating binder $binderName" }
-
-									val binder = Database.transaction {
-										Binder.create(binderName)
+										close()
 									}
+								) {
+									Row(verticalAlignment = Alignment.CenterVertically) {
+										Icon(
+											Icons.Rounded.Cancel,
+											"",
+											modifier = Modifier.absolutePadding(right = 4.dp)
+										)
 
-									Filesystem.ensureBinder(binder.slug)
+										Text("Cancel")
+									}
+								}
 
-									logger.info { "Reloading global state..." }
+								Spacer(Modifier.weight(1f, true))
 
-									GlobalState.loadBinders()
+								Button(
+									onClick = {
+										logger.info { "Creating binder $binderName" }
 
-									logger.info { "Done, closing dialog" }
+										val binder = Database.transaction {
+											Binder.create(binderName)
+										}
 
-									close()
-								},
+										Filesystem.ensureBinder(binder.slug)
 
-								enabled = binderName.isNotEmpty() && !isError
-							) {
-								Row(verticalAlignment = Alignment.CenterVertically) {
-									Icon(
-										Icons.Rounded.Check,
-										"",
-										modifier = Modifier.absolutePadding(right = 4.dp)
-									)
+										logger.info { "Reloading global state..." }
 
-									Text("Okay")
+										GlobalState.loadBinders()
+
+										logger.info { "Done, closing dialog" }
+
+										close()
+									},
+
+									enabled = binderName.isNotEmpty() && !isError
+								) {
+									Row(verticalAlignment = Alignment.CenterVertically) {
+										Icon(
+											Icons.Rounded.Check,
+											"",
+											modifier = Modifier.absolutePadding(right = 4.dp)
+										)
+
+										Text("Okay")
+									}
 								}
 							}
 						}
