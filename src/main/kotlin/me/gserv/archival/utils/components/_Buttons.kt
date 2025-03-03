@@ -17,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.compositeOver
+import androidx.compose.ui.text.TextStyle
 import me.gserv.archival.Colors
 import me.gserv.archival.Colors.IColors
 
@@ -35,6 +36,12 @@ fun PrimaryButton(
 	val material = Colors.getMaterial()
 	val theme = Colors.get()
 
+	val textColor = if (enabled) {
+		theme.Text
+	} else {
+		theme.Text.copy(alpha = ContentAlpha.disabled)
+	}
+
 	Button(
 		onClick = onClick,
 		modifier = modifier,
@@ -46,14 +53,16 @@ fun PrimaryButton(
 
 		colors = ButtonDefaults.buttonColors(
 			backgroundColor = material.primary,
-			contentColor = theme.PrimaryVariant,
+			contentColor = theme.Text,
 			disabledBackgroundColor = theme.Text.copy(alpha = 0.12f).compositeOver(theme.SectionBackground),
-			disabledContentColor = theme.PrimaryVariant.copy(alpha = ContentAlpha.disabled),
+			disabledContentColor = theme.Text.copy(alpha = ContentAlpha.disabled),
 		),
 
 		contentPadding = contentPadding
 	) {
-		content(theme)
+		ProvideTextStyle(TextStyle(color = textColor)) {
+			content(theme)
+		}
 	}
 }
 
@@ -72,6 +81,12 @@ fun SecondaryButton(
 	val material = Colors.getMaterial()
 	val theme = Colors.get()
 
+	val textColor = if (enabled) {
+		theme.Text
+	} else {
+		theme.Text.copy(alpha = ContentAlpha.disabled)
+	}
+
 	Button(
 		onClick = onClick,
 		modifier = modifier,
@@ -83,14 +98,16 @@ fun SecondaryButton(
 
 		colors = ButtonDefaults.buttonColors(
 			backgroundColor = material.secondary,
-			contentColor = theme.SecondaryVariant,
+			contentColor = theme.Text,
 			disabledBackgroundColor = theme.Text.copy(alpha = 0.12f).compositeOver(theme.SectionBackground),
-			disabledContentColor = theme.SecondaryVariant.copy(alpha = ContentAlpha.disabled),
+			disabledContentColor = theme.Text.copy(alpha = ContentAlpha.disabled),
 		),
 
 		contentPadding = contentPadding
 	) {
-		content(theme)
+		ProvideTextStyle(TextStyle(color = textColor)) {
+			content(theme)
+		}
 	}
 }
 
@@ -108,6 +125,12 @@ fun DangerButton(
 ) {
 	val theme = Colors.get()
 
+	val textColor = if (enabled) {
+		theme.Text
+	} else {
+		theme.Text.copy(alpha = ContentAlpha.disabled)
+	}
+
 	Button(
 		onClick = onClick,
 		modifier = modifier,
@@ -119,14 +142,16 @@ fun DangerButton(
 
 		colors = ButtonDefaults.buttonColors(
 			backgroundColor = theme.DangerBackground,
-			contentColor = theme.DangerForeground,
+			contentColor = theme.Text,
 
 			disabledBackgroundColor = theme.DangerForeground.copy(alpha = 0.12f).compositeOver(theme.DangerBackground),
-			disabledContentColor = theme.DangerForeground.copy(alpha = ContentAlpha.disabled),
+			disabledContentColor = theme.Text.copy(alpha = ContentAlpha.disabled),
 		),
 
 		contentPadding = contentPadding
 	) {
-		content(theme)
+		ProvideTextStyle(TextStyle(color = textColor)) {
+			content(theme)
+		}
 	}
 }
