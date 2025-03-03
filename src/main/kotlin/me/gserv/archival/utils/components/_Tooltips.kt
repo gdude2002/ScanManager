@@ -13,6 +13,8 @@ import androidx.compose.foundation.TooltipArea
 import androidx.compose.foundation.TooltipPlacement
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.LocalTextStyle
+import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -22,34 +24,40 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
+import javafx.scene.paint.Color.color
+import me.gserv.archival.Colors
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun Tooltip(
-	tooltip: @Composable () -> Unit,
+	tooltip: @Composable (colors: Colors.IColors) -> Unit,
 	modifier: Modifier = Modifier,
 	delayMillis: Int = 500,
 	tooltipPlacement: TooltipPlacement = TooltipPlacement.CursorPoint(
 		DpOffset(0.dp, (-10).dp),
 		Alignment.TopCenter
 	),
-	content: @Composable () -> Unit
+	content: @Composable (colors: Colors.IColors) -> Unit
 ) {
-	TooltipArea(
-		tooltip = {
-			Surface(
-				modifier = Modifier.shadow(4.dp),
-				color = Color(255, 255, 210),
-				shape = RoundedCornerShape(4.dp)
-			) {
-				tooltip()
-			}
-		},
-		modifier = modifier,
-		delayMillis = delayMillis,
-		tooltipPlacement = tooltipPlacement,
-		content = content,
-	)
+	Colors.Theme { colors ->
+		TooltipArea(
+			tooltip = {
+				Surface(
+					modifier = Modifier.shadow(4.dp),
+					color = colors.TooltipBackground,
+					shape = RoundedCornerShape(4.dp)
+				) {
+					ProvideTextStyle(LocalTextStyle.current.copy(color = colors.TooltipText)) {
+						tooltip(colors)
+					}
+				}
+			},
+			modifier = modifier,
+			delayMillis = delayMillis,
+			tooltipPlacement = tooltipPlacement,
+			content = { content(colors) },
+		)
+	}
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -62,7 +70,7 @@ fun StringTooltip(
 		DpOffset(0.dp, (-10).dp),
 		Alignment.TopCenter
 	),
-	content: @Composable () -> Unit
+	content: @Composable (colors: Colors.IColors) -> Unit
 ) {
 	Tooltip(
 		tooltip = {

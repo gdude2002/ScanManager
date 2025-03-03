@@ -46,9 +46,9 @@ fun PrimaryButton(
 
 		colors = ButtonDefaults.buttonColors(
 			backgroundColor = material.primary,
-			contentColor = theme.Text,
+			contentColor = theme.PrimaryVariant,
 			disabledBackgroundColor = theme.Text.copy(alpha = 0.12f).compositeOver(theme.SectionBackground),
-			disabledContentColor = theme.Text.copy(alpha = ContentAlpha.disabled),
+			disabledContentColor = theme.PrimaryVariant.copy(alpha = ContentAlpha.disabled),
 		),
 
 		contentPadding = contentPadding
@@ -83,9 +83,9 @@ fun SecondaryButton(
 
 		colors = ButtonDefaults.buttonColors(
 			backgroundColor = material.secondary,
-			contentColor = theme.Text,
+			contentColor = theme.SecondaryVariant,
 			disabledBackgroundColor = theme.Text.copy(alpha = 0.12f).compositeOver(theme.SectionBackground),
-			disabledContentColor = theme.Text.copy(alpha = ContentAlpha.disabled),
+			disabledContentColor = theme.SecondaryVariant.copy(alpha = ContentAlpha.disabled),
 		),
 
 		contentPadding = contentPadding

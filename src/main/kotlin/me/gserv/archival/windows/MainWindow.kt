@@ -150,7 +150,6 @@ class MainWindow(val applicationScope: ApplicationScope) {
 									Icon(
 										Icons.AutoMirrored.Rounded.Help,
 										"Help",
-										tint = colors.Text
 									)
 
 									Text("Help", fontSize = TextUnit(0.65F, TextUnitType.Em))
