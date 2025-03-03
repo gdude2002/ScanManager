@@ -13,7 +13,6 @@ import androidx.compose.foundation.TooltipArea
 import androidx.compose.foundation.TooltipPlacement
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -21,10 +20,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
-import javafx.scene.paint.Color.color
 import me.gserv.archival.Colors
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -47,7 +45,7 @@ fun Tooltip(
 					color = colors.TooltipBackground,
 					shape = RoundedCornerShape(4.dp)
 				) {
-					ProvideTextStyle(LocalTextStyle.current.copy(color = colors.TooltipText)) {
+					ProvideTextStyle(TextStyle(color = colors.TooltipText)) {
 						tooltip(colors)
 					}
 				}

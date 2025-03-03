@@ -53,7 +53,7 @@ object Colors {
 	@Composable
 	fun Theme(content: @Composable ((theme: IColors) -> Unit)) {
 		MaterialTheme(colors = getMaterial()) {
-			ProvideTextStyle(value = TextStyle.Default.copy(color = get().Text)) {
+			ProvideTextStyle(TextStyle(color = get().Text)) {
 				content(get())
 			}
 		}
