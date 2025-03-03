@@ -126,9 +126,9 @@ fun DangerButton(
 	val theme = Colors.get()
 
 	val textColor = if (enabled) {
-		theme.Text
+		theme.DangerForeground
 	} else {
-		theme.Text.copy(alpha = ContentAlpha.disabled)
+		theme.DangerForeground.copy(alpha = ContentAlpha.disabled)
 	}
 
 	Button(
@@ -142,10 +142,10 @@ fun DangerButton(
 
 		colors = ButtonDefaults.buttonColors(
 			backgroundColor = theme.DangerBackground,
-			contentColor = theme.Text,
+			contentColor = theme.DangerForeground,
 
 			disabledBackgroundColor = theme.DangerForeground.copy(alpha = 0.12f).compositeOver(theme.DangerBackground),
-			disabledContentColor = theme.Text.copy(alpha = ContentAlpha.disabled),
+			disabledContentColor = theme.DangerForeground.copy(alpha = ContentAlpha.disabled),
 		),
 
 		contentPadding = contentPadding
