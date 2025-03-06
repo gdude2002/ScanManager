@@ -296,7 +296,7 @@ class BinderWindow(val parent: MainWindow) {
 											Text(
 												"Set ${set.id.value}",
 												fontSize = 2.em,
-												modifier = Modifier.absolutePadding(left = 10.dp)
+												modifier = Modifier.absolutePadding(left = 10.dp, bottom = 5.dp)
 											)
 
 											StringTooltip("Number of scans") {
