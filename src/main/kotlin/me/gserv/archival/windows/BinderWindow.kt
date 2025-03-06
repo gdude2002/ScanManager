@@ -12,16 +12,15 @@
 package me.gserv.archival.windows
 
 import androidx.compose.desktop.ui.tooling.preview.Preview
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.QuestionMark
-import androidx.compose.material.icons.rounded.Delete
-import androidx.compose.material.icons.rounded.FolderOpen
+import androidx.compose.material.icons.rounded.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
@@ -29,14 +28,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.em
 import androidx.compose.ui.window.FrameWindowScope
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowState
 import com.seanproctor.datatable.DataColumn
 import com.seanproctor.datatable.TableColumnWidth
 import com.seanproctor.datatable.TableRowScope
-import com.seanproctor.datatable.material3.DataTable
 import io.github.oshai.kotlinlogging.KotlinLogging
+import kotlinx.coroutines.delay
 import me.gserv.archival.Colors
 import me.gserv.archival.data.Database
 import me.gserv.archival.data.GlobalState
@@ -45,13 +45,16 @@ import me.gserv.archival.data.entities.Set
 import me.gserv.archival.data.tables.SetTable
 import me.gserv.archival.dropTarget
 import me.gserv.archival.utils.StringTooltip
+import me.gserv.archival.utils.components.DangerButton
 import me.gserv.archival.utils.components.PrimaryButton
+import me.gserv.archival.utils.components.SecondaryButton
 import me.gserv.archival.utils.format
 import me.gserv.archival.windows.binder.CreateSetDialog
 import me.gserv.archival.windows.binder.DeleteSetDialog
 import me.gserv.archival.windows.binder.FilterState
 import org.jetbrains.exposed.sql.SortOrder
 import java.awt.Dimension
+import kotlin.time.Duration.Companion.seconds
 
 class BinderWindow(val parent: MainWindow) {
 	val logger = KotlinLogging.logger { }
@@ -104,6 +107,7 @@ class BinderWindow(val parent: MainWindow) {
 		isOpen = true
 	}
 
+	@OptIn(ExperimentalMaterialApi::class)
 	@Composable
 	@Preview
 	fun create() {
@@ -155,6 +159,7 @@ class BinderWindow(val parent: MainWindow) {
 				Colors.Theme { colors ->
 					Column(
 						modifier = Modifier.fillMaxSize()
+							.background(colors.WindowBackground)
 					) {
 						Row(
 							horizontalArrangement = Arrangement.spacedBy(10.dp),
@@ -248,110 +253,283 @@ class BinderWindow(val parent: MainWindow) {
 							)
 						}
 
+						Divider(
+							color = colors.Primary,
+							modifier = Modifier
+								.height(1.dp)
+								.fillMaxWidth()
+						)
+
+						Spacer(Modifier.height(10.dp))
+
 						Box(
 							modifier = Modifier
 								.background(colors.WindowBackground)
 								.fillMaxWidth()
 								.weight(1f)
 						) {
-							DataTable(
-								modifier = Modifier.fillMaxSize(),
-								sortColumnIndex = 0,
-								sortAscending = true,
+							val scrollState = rememberScrollState(0)
+							val scrollAdapter = rememberScrollbarAdapter(scrollState)
 
-								columns = listOf(
-									HeaderColumn("Set"),
-									HeaderColumn("Scans"),
-									HeaderColumn("Set Date"),
-									HeaderColumn("State"),
-									HeaderColumn("Created"),
-									HeaderColumn("Finished"),
-									HeaderColumn("Description"),
-									HeaderColumn("", TableColumnWidth.MinIntrinsic),
-								)
+							Column(
+								Modifier
+									.verticalScroll(scrollState)
+									.fillMaxSize()
+									.absolutePadding(left = 10.dp, right = 17.dp)
 							) {
 								GlobalState.sets.forEachIndexed { index, set ->
-									row {
-										onClick = {
-											dropTarget.currentSet = index
-										}
+									Column(
+										verticalArrangement = Arrangement.spacedBy(10.dp),
+										modifier = Modifier
+											.background(
+												if (index == dropTarget.currentSet) {
+													colors.RowHovered
+												} else {
+													colors.SectionBackground
+												},
+												RoundedCornerShape(15.dp))
+											.fillMaxWidth()
+											.padding(10.dp)
+									) {
+										Row(
+											verticalAlignment = Alignment.CenterVertically,
+											horizontalArrangement = Arrangement.spacedBy(10.dp),
+											modifier = Modifier.height(IntrinsicSize.Min)
+										) {
+											Text(
+												"Set ${set.id.value}",
+												fontSize = 2.em,
+												modifier = Modifier.absolutePadding(left = 10.dp)
+											)
 
-										this.backgroundColor = if (index % 2 == 0) {
-											if (index == dropTarget.currentSet) {
-												colors.RowHovered
-											} else {
-												colors.RowEven
+											StringTooltip("Number of scans") {
+												Chip(
+													{},
+													colors = colors.defaultChipColors(),
+													leadingIcon = {
+														Icon(
+															Icons.Rounded.Image,
+															"",
+															modifier = Modifier.absolutePadding(left = 5.dp)
+														)
+													}
+												) {
+													Text(set.totalScans.toString())
+												}
 											}
-										} else {
-											if (index == dropTarget.currentSet) {
-												colors.RowHovered
-											} else {
-												colors.RowOdd
+
+											StringTooltip("Set completion state") {
+												Chip(
+													{},
+													colors = if (set.finishedAt != null) {
+														colors.successChipColors()
+													} else {
+														colors.dangerChipColors()
+													},
+													leadingIcon = {
+														Icon(
+															if (set.finishedAt != null) {
+																Icons.Rounded.AssignmentTurnedIn
+															} else {
+																Icons.Rounded.AssignmentLate
+															},
+															"",
+															modifier = Modifier.absolutePadding(left = 5.dp)
+														)
+													}
+												) {
+													if (set.finishedAt != null) {
+														Text("Complete")
+													} else {
+														Text("Incomplete")
+													}
+												}
+											}
+
+											Spacer(Modifier.weight(1f, true))
+
+											Row(verticalAlignment = Alignment.CenterVertically) {
+												Text("Select:", modifier= Modifier.absolutePadding(bottom = 5.dp))
+
+												Checkbox(
+													dropTarget.currentSet == index,
+													{ dropTarget.currentSet = index },
+													enabled = dropTarget.currentSet != index,
+													colors = CheckboxDefaults.colors(
+														checkedColor = colors.PrimaryVariant,
+														disabledColor = colors.PrimaryVariant,
+														checkmarkColor = colors.WindowBackground.copy(alpha = 0.6f)
+													)
+												)
 											}
 										}
 
-										text(set.id.value.toString())
-										text(set.totalScans.toString())
-										text(set.date?.format())
 
-										if (set.finishedAt != null) {
-											text("Complete")
-										} else {
-											text("Incomplete")
-										}
 
-										text(set.createdAt.format())
-										text(set.finishedAt?.format())
-										text(set.description, true)
+										Row(
+											horizontalArrangement = Arrangement.spacedBy(10.dp)
+										) {
+											var setText by remember(index) {
+												mutableStateOf(set.description ?: "")
+											}
 
-										cell {
-											Row(horizontalArrangement = Arrangement.End) {
-												StringTooltip("Delete set") {
-													TextButton(
-														{
-															deleteSetDialog.open(set)
-														},
-														modifier = Modifier.padding(horizontal = 0.dp).width(40.dp),
-														contentPadding = PaddingValues(0.dp)
-													) {
-														Row(
-															verticalAlignment = Alignment.CenterVertically,
-															modifier = Modifier.padding(0.dp)
-														) {
-															Icon(
-																Icons.Rounded.Delete,
-																"Delete set",
-																tint = colors.DangerBackground
-															)
-														}
+											TextField(
+												setText,
+												{ setText = it },
+												label = { Text("Description") },
+												modifier = Modifier.weight(1f)
+											)
+
+											StringTooltip("Save") {
+												var saveIcon by remember(index) {
+													mutableStateOf(Icons.Rounded.Save)
+												}
+
+												LaunchedEffect(saveIcon) {
+													if (saveIcon != Icons.Rounded.Save) {
+														delay(5.seconds)
+
+														saveIcon = Icons.Rounded.Save
 													}
 												}
 
-												StringTooltip("Open set") {
-													TextButton(
-														{
-															// TODO: Open action
-														},
-														modifier = Modifier.padding(horizontal = 0.dp).width(40.dp),
-														contentPadding = PaddingValues(0.dp)
-													) {
-														Row(
-															verticalAlignment = Alignment.CenterVertically,
-															modifier = Modifier.padding(0.dp)
-														) {
+												PrimaryButton(
+													{
+														Database.transaction {
+															set.description = if (setText.isEmpty()) {
+																null
+															} else {
+																setText
+															}
+														}
+
+														saveIcon = Icons.Rounded.Check
+													},
+													enabled = (set.description ?: "") != setText,
+													modifier = Modifier.height(56.dp)
+												) {
+													Icon(
+														saveIcon,
+														"Save"
+													)
+												}
+											}
+										}
+
+										Row(
+											verticalAlignment = Alignment.CenterVertically,
+											horizontalArrangement = Arrangement.spacedBy(10.dp)
+										) {
+											if (set.date != null) {
+												StringTooltip("Photography date") {
+													Chip(
+														{},
+														colors = colors.primaryChipColors(),
+														leadingIcon = {
 															Icon(
-																Icons.Rounded.FolderOpen,
-																"Open set"
+																Icons.Rounded.CameraRoll,
+																"",
+																modifier = Modifier.absolutePadding(left = 5.dp)
 															)
 														}
+													) {
+														Text(set.date!!.format())
 													}
+												}
+											}
+
+											StringTooltip("Set creation date") {
+												Chip(
+													{},
+													colors = colors.secondaryChipColors(),
+													leadingIcon = {
+														Icon(
+															Icons.Rounded.AutoAwesome,
+															"",
+															modifier = Modifier.absolutePadding(left = 5.dp)
+														)
+													}
+												) {
+													Text(set.createdAt.format())
+												}
+											}
+
+											if (set.finishedAt != null) {
+												StringTooltip("Set completion date") {
+													Chip(
+														{},
+														colors = colors.successChipColors(),
+														leadingIcon = {
+															Icon(
+																Icons.Rounded.EventAvailable,
+																"",
+																modifier = Modifier.absolutePadding(left = 5.dp)
+															)
+														}
+													) {
+														Text(set.createdAt.format())
+													}
+												}
+											}
+
+											Spacer(Modifier.weight(1f, true))
+
+											DangerButton({ deleteSetDialog.open(set) }) {
+												Row(
+													verticalAlignment = Alignment.CenterVertically,
+													horizontalArrangement = Arrangement.spacedBy(10.dp),
+												) {
+													Icon(
+														Icons.Rounded.Delete,
+														"",
+														tint = colors.Text.copy(alpha = 0.5f)
+													)
+
+													Text("Delete")
+												}
+											}
+
+											SecondaryButton(
+												{
+													// TODO: Open action
+												}
+											) {
+												Row(
+													verticalAlignment = Alignment.CenterVertically,
+													horizontalArrangement = Arrangement.spacedBy(10.dp),
+												) {
+													Icon(
+														Icons.Rounded.FolderOpen,
+														"Open"
+													)
+
+													Text("Open")
 												}
 											}
 										}
 									}
+
+									if (index != GlobalState.sets.lastIndex) {
+										Spacer(Modifier.height(10.dp))
+									}
 								}
 							}
+
+							VerticalScrollbar(
+								scrollAdapter,
+								Modifier.align(Alignment.CenterEnd)
+									.height(state.size.height)
+							)
 						}
+
+						Spacer(Modifier.height(10.dp))
+
+						Divider(
+							color = colors.Primary,
+							modifier = Modifier
+								.height(1.dp)
+								.fillMaxWidth()
+						)
 
 						Row(
 							modifier = Modifier

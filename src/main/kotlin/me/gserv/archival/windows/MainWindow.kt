@@ -355,7 +355,7 @@ class MainWindow(val applicationScope: ApplicationScope) {
 										)
 
 										Text(
-											"Back Up Binders",
+											"Back Up & Restore",
 											modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
 											textAlign = TextAlign.Left
 										)

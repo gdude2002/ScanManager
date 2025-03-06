@@ -21,6 +21,9 @@ import androidx.compose.ui.text.TextStyle
 import me.gserv.archival.Colors
 import me.gserv.archival.Colors.IColors
 
+// TODO: OK button, delete button, cancel button
+// TODO: Icon component types
+
 @Composable
 fun PrimaryButton(
 	onClick: () -> Unit,

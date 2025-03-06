@@ -6,12 +6,11 @@
  * Any redistribution must include the specific provision above.
  */
 
+@file:OptIn(ExperimentalMaterialApi::class)
+
 package me.gserv.archival
 
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.ProvideTextStyle
-import androidx.compose.material.darkColors
-import androidx.compose.material.lightColors
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
@@ -59,14 +58,19 @@ object Colors {
 		}
 	}
 
-	object Dark : IColors {
+	object Dark : IColors() {
 		override val Primary: Color = Color(0xFF552BB3)
 		override val PrimaryVariant: Color = Color(0xFFBB86FC)
 		override val Secondary: Color = Color(0xFF018786)
 		override val SecondaryVariant: Color = Color(0xFF03DAC6)
 
 		override val DangerBackground: Color = Color(0xFFEE0000)
+		override val DangerIcon: Color = Color(0xFFFC6E6E)
 		override val DangerForeground = Color.White
+
+		override val SuccessBackground: Color = Color(0xFF2CEE00)
+		override val SuccessIcon: Color = Color(0xFF81FC6E)
+		override val SuccessForeground: Color = Color.Black
 
 		override val Text = Color.White
 
@@ -76,19 +80,22 @@ object Colors {
 		override val SectionBackground: Color = Color(0xFF222222)
 		override val WindowBackground: Color = Color.Black
 
-		override val RowHovered: Color = Color(0xFF552BB3)
-		override val RowEven: Color = SectionBackground
-		override val RowOdd: Color = WindowBackground
+		override val RowHovered: Color = Color(0xff3f3a42)
 	}
 
-	object Light : IColors {
+	object Light : IColors() {
 		override val Primary: Color = Color(0xFFBB86FC)
 		override val PrimaryVariant: Color = Color(0xFF552BB3)
 		override val Secondary: Color = Color(0xFF03DAC6)
 		override val SecondaryVariant: Color = Color(0xFF018786)
 
 		override val DangerBackground: Color = Color(0xFFFC6E6E)
+		override val DangerIcon: Color = Color(0xFFEE0000)
 		override val DangerForeground = Color.Black
+
+		override val SuccessBackground: Color = Color(0xFF81FC6E)
+		override val SuccessIcon: Color = Color(0xFF2CEE00)
+		override val SuccessForeground: Color = Color.Black
 
 		override val Text = Color.Black
 
@@ -98,30 +105,71 @@ object Colors {
 		override val SectionBackground: Color = Color(0xFFEEEEEE)
 		override val WindowBackground: Color = Color.White
 
-		override val RowHovered: Color = Color(0xFFBB86FC)
-		override val RowEven: Color = SectionBackground
-		override val RowOdd: Color = WindowBackground
+		override val RowHovered: Color = Color(0xffecdfee)
 	}
 
-	interface IColors {
-		val Primary: Color
-		val PrimaryVariant: Color
-		val Secondary: Color
-		val SecondaryVariant: Color
+	abstract class IColors {
+		abstract val Primary: Color
+		abstract val PrimaryVariant: Color
+		abstract val Secondary: Color
+		abstract val SecondaryVariant: Color
 
-		val DangerBackground: Color
-		val DangerForeground: Color
+		abstract val DangerBackground: Color
+		abstract val DangerForeground: Color
+		abstract val DangerIcon: Color
 
-		val Text: Color
+		abstract val SuccessBackground: Color
+		abstract val SuccessForeground: Color
+		abstract val SuccessIcon: Color
 
-		val TooltipBackground: Color
-		val TooltipText: Color
+		abstract val Text: Color
 
-		val SectionBackground: Color
-		val WindowBackground: Color
+		abstract val TooltipBackground: Color
+		abstract val TooltipText: Color
 
-		val RowHovered: Color
-		val RowEven: Color
-		val RowOdd: Color
+		abstract val SectionBackground: Color
+		abstract val WindowBackground: Color
+
+		abstract val RowHovered: Color
+
+		@Composable
+		fun defaultChipColors(): ChipColors =
+			ChipDefaults.chipColors(
+				backgroundColor = WindowBackground,
+				contentColor = Text,
+				leadingIconContentColor = Text.copy(alpha = 0.5f)
+			)
+
+		@Composable
+		fun primaryChipColors(): ChipColors =
+			ChipDefaults.chipColors(
+				backgroundColor = Primary,
+				contentColor = Text,
+				leadingIconContentColor = Text.copy(alpha = 0.5f)
+			)
+
+		@Composable
+		fun secondaryChipColors(): ChipColors =
+			ChipDefaults.chipColors(
+				backgroundColor = Secondary,
+				contentColor = Text,
+				leadingIconContentColor = Text.copy(alpha = 0.5f)
+			)
+
+		@Composable
+		fun successChipColors(): ChipColors =
+			ChipDefaults.chipColors(
+				backgroundColor = SuccessBackground,
+				contentColor = SuccessForeground,
+				leadingIconContentColor = Text.copy(alpha = 0.5f)
+			)
+
+		@Composable
+		fun dangerChipColors(): ChipColors =
+			ChipDefaults.chipColors(
+				backgroundColor = DangerBackground,
+				contentColor = DangerForeground,
+				leadingIconContentColor = Text.copy(alpha = 0.5f)
+			)
 	}
 }
