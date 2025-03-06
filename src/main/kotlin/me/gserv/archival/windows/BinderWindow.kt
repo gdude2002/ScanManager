@@ -25,16 +25,12 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.window.FrameWindowScope
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowState
-import com.seanproctor.datatable.DataColumn
-import com.seanproctor.datatable.TableColumnWidth
-import com.seanproctor.datatable.TableRowScope
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.delay
 import me.gserv.archival.Colors
@@ -287,7 +283,8 @@ class BinderWindow(val parent: MainWindow) {
 												} else {
 													colors.SectionBackground
 												},
-												RoundedCornerShape(15.dp))
+												RoundedCornerShape(15.dp)
+											)
 											.fillMaxWidth()
 											.padding(10.dp)
 									) {
@@ -349,7 +346,7 @@ class BinderWindow(val parent: MainWindow) {
 											Spacer(Modifier.weight(1f, true))
 
 											Row(verticalAlignment = Alignment.CenterVertically) {
-												Text("Select:", modifier= Modifier.absolutePadding(bottom = 5.dp))
+												Text("Select:", modifier = Modifier.absolutePadding(bottom = 5.dp))
 
 												Checkbox(
 													dropTarget.currentSet == index,
@@ -363,8 +360,6 @@ class BinderWindow(val parent: MainWindow) {
 												)
 											}
 										}
-
-
 
 										Row(
 											horizontalArrangement = Arrangement.spacedBy(10.dp)
@@ -555,49 +550,5 @@ class BinderWindow(val parent: MainWindow) {
 				}
 			}
 		}
-	}
-
-	@Composable
-	fun HeaderColumn(
-		content: String,
-		width: TableColumnWidth = TableColumnWidth.MaxIntrinsic,
-		fillTextWidth: Boolean = false
-	) = DataColumn(
-		width = width
-	) { HeaderText(content, fillTextWidth) }
-
-	@Composable
-	fun HeaderText(content: String, fillWidth: Boolean = false) {
-		var modifier = Modifier.padding(horizontal = 16.dp)
-
-		if (fillWidth) {
-			modifier = modifier.fillMaxWidth()
-		}
-
-		Text(
-			content,
-			softWrap = false,
-			modifier = modifier,
-			textAlign = TextAlign.Start
-		)
-	}
-
-	fun TableRowScope.text(content: String?, fillWidth: Boolean = false) = cell {
-		var modifier = Modifier.padding(horizontal = 16.dp)
-
-		if (fillWidth) {
-			modifier = modifier.fillMaxWidth()
-		}
-
-		Text(
-			content ?: "",
-			softWrap = false,
-			modifier = modifier,
-			textAlign = TextAlign.Start
-		)
-	}
-
-	fun TableRowScope.checkbox(checked: Boolean, onCheckedChange: ((Boolean) -> Unit)?) = cell {
-		Checkbox(checked, onCheckedChange)
 	}
 }
