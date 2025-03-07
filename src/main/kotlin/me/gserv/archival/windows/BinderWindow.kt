@@ -364,7 +364,7 @@ class BinderWindow(val parent: MainWindow) {
 										Row(
 											horizontalArrangement = Arrangement.spacedBy(10.dp)
 										) {
-											var setText by remember(index) {
+											var setText by remember(GlobalState.binder?.id, set.id, "description") {
 												mutableStateOf(set.description ?: "")
 											}
 
@@ -376,7 +376,7 @@ class BinderWindow(val parent: MainWindow) {
 											)
 
 											StringTooltip("Save") {
-												var saveIcon by remember(index) {
+												var saveIcon by remember(GlobalState.binder?.id, set.id, "save-icon") {
 													mutableStateOf(Icons.Rounded.Save)
 												}
 
