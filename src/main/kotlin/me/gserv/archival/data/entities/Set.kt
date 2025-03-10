@@ -8,6 +8,7 @@
 
 package me.gserv.archival.data.entities
 
+import io.github.oshai.kotlinlogging.KotlinLogging
 import me.gserv.archival.data.Database
 import me.gserv.archival.data.Filesystem
 import me.gserv.archival.data.tables.SetTable
@@ -36,6 +37,8 @@ class Set(id: EntityID<Long>) : LongEntity(id) {
 				}.any()
 			}
 	}
+
+	val logger = KotlinLogging.logger { }
 
 	var binder by Binder referencedOn SetTable.binder
 	var description by SetTable.description
@@ -67,6 +70,16 @@ class Set(id: EntityID<Long>) : LongEntity(id) {
 		val editDir = File(binderDir, Filesystem.EDIT_FOLDER_NAME)
 		val editRegex = Filesystem.fileName(binder.id.value, id.value.toString(), extension = "psd").toRegex()
 
+		logger.info {
+			buildString {
+				appendLine("Searching for files - set ${id.value}, binder ${binder.id.value}")
+				appendLine("-> Originals dir: $originalDir")
+				appendLine("-> Originals regex: $originalRegex")
+				appendLine("-> Edits dir: $editDir")
+				appendLine("-> Edits regex: $editRegex")
+			}
+		}
+
 		val containers = mutableMapOf<Long, MutableFileContainer>()
 
 		for (file in originalDir.listFiles()) {
@@ -89,7 +102,7 @@ class Set(id: EntityID<Long>) : LongEntity(id) {
 				.edit = file
 		}
 
-		return containers.values.map { it.toContainer() }
+		return containers.values.map { it.toContainer() }.sortedBy { it.index }
 	}
 
 	data class MutableFileContainer(

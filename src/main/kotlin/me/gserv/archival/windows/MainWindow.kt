@@ -71,9 +71,9 @@ class MainWindow(val applicationScope: ApplicationScope) {
 	}
 
 	fun show() {
-		isVisible = true
 		scope.window.isVisible = true
 		scope.window.requestFocus()
+		isVisible = true
 	}
 
 	@Composable
@@ -101,6 +101,8 @@ class MainWindow(val applicationScope: ApplicationScope) {
 		) {
 			scope = this
 
+			window.setWindowsAdaptiveTitleBar()
+
 			val dataDirectoryDialog = DataDirectoryDialog(this)
 			dataDirectoryDialog.create()
 
@@ -121,8 +123,6 @@ class MainWindow(val applicationScope: ApplicationScope) {
 					}
 				}
 			}
-
-			window.setWindowsAdaptiveTitleBar()
 
 			Colors.Theme { colors ->
 				Box(Modifier.background(colors.WindowBackground)) {

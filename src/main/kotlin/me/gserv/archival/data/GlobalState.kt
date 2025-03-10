@@ -19,6 +19,7 @@ import me.gserv.archival.data.entities.Set
 object GlobalState {
 	val binders = mutableStateListOf<Binder>()
 	var binder by mutableStateOf<Binder?>(null)
+	var set by mutableStateOf<Set?>(null)
 
 	var sets: SnapshotStateList<Set> = mutableStateListOf()
 

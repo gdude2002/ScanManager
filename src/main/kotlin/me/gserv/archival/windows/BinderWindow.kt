@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.em
 import androidx.compose.ui.window.FrameWindowScope
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowState
+import io.github.kdroidfilter.platformtools.darkmodedetector.windows.setWindowsAdaptiveTitleBar
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.delay
 import me.gserv.archival.Colors
@@ -48,6 +49,7 @@ import me.gserv.archival.utils.format
 import me.gserv.archival.windows.binder.CreateSetDialog
 import me.gserv.archival.windows.binder.DeleteSetDialog
 import me.gserv.archival.windows.binder.FilterState
+import me.gserv.archival.windows.binder.SetWindow
 import org.jetbrains.exposed.sql.SortOrder
 import java.awt.Dimension
 import kotlin.time.Duration.Companion.seconds
@@ -56,6 +58,8 @@ class BinderWindow(val parent: MainWindow) {
 	val logger = KotlinLogging.logger { }
 
 	var isOpen by mutableStateOf(false)
+	var isVisible by mutableStateOf(true)
+
 	var isDropdownOpen by mutableStateOf(false)
 
 	var filterState by mutableStateOf<FilterState>(FilterState.All)
@@ -68,6 +72,27 @@ class BinderWindow(val parent: MainWindow) {
 	)
 
 	lateinit var scope: FrameWindowScope
+
+	fun hide() {
+		isVisible = false
+		scope.window.isVisible = false
+	}
+
+	fun show() {
+		scope.window.isVisible = true
+		scope.window.requestFocus()
+		isVisible = true
+
+		dropTarget.state {
+			if (GlobalState.sets.isEmpty()) {
+				icon = Icons.Default.QuestionMark
+				smallText = "No sets\nvisible"
+			} else {
+				smallText = "Set"
+				bigText = GlobalState.sets[dropTarget.currentSet].id.value.toString()
+			}
+		}
+	}
 
 	fun close() {
 		GlobalState.binder = null
@@ -108,49 +133,56 @@ class BinderWindow(val parent: MainWindow) {
 	@Preview
 	fun create() {
 		if (isOpen) {
-			LaunchedEffect(GlobalState.sets, dropTarget.currentSet) {
-				if (dropTarget.currentSet >= GlobalState.sets.size) {
-					dropTarget.currentSet = 0
-				}
+			if (isVisible) {
+				LaunchedEffect(GlobalState.sets, dropTarget.currentSet) {
+					if (dropTarget.currentSet >= GlobalState.sets.size) {
+						dropTarget.currentSet = 0
+					}
 
-				dropTarget.state {
-					if (GlobalState.sets.isEmpty()) {
-						icon = Icons.Default.QuestionMark
-						smallText = "No sets\nvisible"
-					} else {
-						smallText = "Set"
-						bigText = GlobalState.sets[dropTarget.currentSet].id.value.toString()
+					dropTarget.state {
+						if (GlobalState.sets.isEmpty()) {
+							icon = Icons.Default.QuestionMark
+							smallText = "No sets\nvisible"
+						} else {
+							smallText = "Set"
+							bigText = GlobalState.sets[dropTarget.currentSet].id.value.toString()
+						}
 					}
 				}
-			}
 
-			LaunchedEffect(filterState, filterText) {
-				var filtered = allSets.toList()
+				LaunchedEffect(filterState, filterText) {
+					var filtered = allSets.toList()
 
-				when (filterState) {
-					FilterState.Incomplete -> filtered = filtered.filter { it.finishedAt == null }
-					FilterState.Complete -> filtered = filtered.filter { it.finishedAt != null }
+					when (filterState) {
+						FilterState.Incomplete -> filtered = filtered.filter { it.finishedAt == null }
+						FilterState.Complete -> filtered = filtered.filter { it.finishedAt != null }
 
-					FilterState.All -> {}
+						FilterState.All -> {}
+					}
+
+					if (filterText.isNotBlank()) {
+						filtered = filtered.filter { it.description?.contains(filterText, true) == true }
+					}
+
+					GlobalState.sets.clear()
+					GlobalState.sets = filtered.toMutableStateList()
 				}
-
-				if (filterText.isNotBlank()) {
-					filtered = filtered.filter { it.description?.contains(filterText, true) == true }
-				}
-
-				GlobalState.sets.clear()
-				GlobalState.sets = filtered.toMutableStateList()
 			}
 
 			Window(::close, state = state, title = "Binder ${GlobalState.binder?.id}") {
 				scope = this
+
 				window.minimumSize = Dimension(1000, 700)
+				window.setWindowsAdaptiveTitleBar()
 
 				val createSetDialog = CreateSetDialog(this@BinderWindow, GlobalState.binder!!)
 				createSetDialog.create()
 
 				val deleteSetDialog = DeleteSetDialog(this@BinderWindow)
 				deleteSetDialog.create()
+
+				val setWindow = SetWindow(this@BinderWindow)
+				setWindow.create()
 
 				Colors.Theme { colors ->
 					Column(
@@ -484,11 +516,7 @@ class BinderWindow(val parent: MainWindow) {
 												}
 											}
 
-											SecondaryButton(
-												{
-													// TODO: Open action
-												}
-											) {
+											SecondaryButton({ setWindow.open(set) }) {
 												Row(
 													verticalAlignment = Alignment.CenterVertically,
 													horizontalArrangement = Arrangement.spacedBy(10.dp),
