@@ -178,8 +178,8 @@ class SetWindow(val parent: BinderWindow) {
 												var secondImageModifier: Modifier
 
 												if (testingImage.height > testingImage.width) {
-													firstImageModifier = Modifier.fillMaxWidth(0.5f)
-													secondImageModifier = Modifier.fillMaxWidth()
+													firstImageModifier = Modifier.weight(1f)
+													secondImageModifier = firstImageModifier
 
 													container = @Composable {
 														Row(
@@ -189,7 +189,7 @@ class SetWindow(val parent: BinderWindow) {
 													}
 												} else {
 													firstImageModifier = Modifier.fillMaxWidth()
-													secondImageModifier = Modifier.fillMaxWidth()
+													secondImageModifier = firstImageModifier
 
 													container = @Composable {
 														Column(
