@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
@@ -146,7 +147,7 @@ class SetWindow(val parent: BinderWindow) {
 									verticalArrangement = Arrangement.spacedBy(10.dp)
 								) {
 									items(setFiles) { files ->
-										Box(Modifier.fillMaxWidth()) {
+										Column(Modifier.fillMaxWidth()) {
 											Row(
 												horizontalArrangement = Arrangement.spacedBy(10.dp)
 											) {
@@ -155,72 +156,86 @@ class SetWindow(val parent: BinderWindow) {
 													modifier = Modifier
 														.background(colors.SectionBackground, RoundedCornerShape(15.dp))
 														.padding(vertical = 10.dp, horizontal = 15.dp)
-														.height(itemHeight)
 														.width(100.dp)
 														.wrapContentHeight(Alignment.CenterVertically),
 													textAlign = TextAlign.Center,
 													fontSize = 1.5.em,
 												)
 
-												Box(
-													Modifier
-														.background(colors.SectionBackground, RoundedCornerShape(15.dp))
-														.align(Alignment.CenterVertically)
-														.padding(vertical = 10.dp)
-														.height(itemHeight)
-														.fillMaxWidth(0.5f)
-												) {
-													if (files.original != null) {
+												val originalImage = files.original?.let {
+													ImageIO.read(it)
+												}
+
+												val editedImage = files.edit?.let {
+													ImageIO.read(it)
+												}
+
+												val testingImage = originalImage ?: editedImage!!
+
+												val container: @Composable (@Composable () -> Unit) -> Unit
+
+												var firstImageModifier: Modifier
+												var secondImageModifier: Modifier
+
+												if (testingImage.height > testingImage.width) {
+													firstImageModifier = Modifier.fillMaxWidth(0.5f)
+													secondImageModifier = Modifier.fillMaxWidth()
+
+													container = @Composable {
+														Row(
+															Modifier.fillMaxWidth(),
+															horizontalArrangement = Arrangement.spacedBy(10.dp)
+														) { it() }
+													}
+												} else {
+													firstImageModifier = Modifier.fillMaxWidth()
+													secondImageModifier = Modifier.fillMaxWidth()
+
+													container = @Composable {
+														Column(
+															Modifier.fillMaxWidth(),
+															verticalArrangement = Arrangement.spacedBy(10.dp)
+														) { it() }
+													}
+												}
+
+												container {
+													if (originalImage != null) {
 														Image(
-															ImageIO.read(files.original).toPainter(),
+															originalImage.toPainter(),
 															"Original scan",
-															modifier = Modifier
-																.height(itemHeight)
-																.fillMaxWidth()
-																.padding(horizontal = 15.dp),
+															modifier = firstImageModifier,
 														)
 													} else {
 														Text(
 															"Original Scan Missing",
-															modifier = Modifier
-																.fillMaxHeight()
-																.fillMaxWidth()
+															modifier = firstImageModifier
 																.wrapContentHeight(Alignment.CenterVertically),
 															textAlign = TextAlign.Center,
 															fontSize = 1.5.em,
 														)
 													}
-												}
 
-												Box(
-													Modifier
-														.background(colors.SectionBackground, RoundedCornerShape(15.dp))
-														.align(Alignment.CenterVertically)
-														.padding(vertical = 10.dp)
-														.height(itemHeight)
-														.fillMaxWidth()
-												) {
-													if (files.edit != null) {
+													if (editedImage != null) {
 														Image(
-															ImageIO.read(files.edit).toPainter(),
+															editedImage.toPainter(),
 															"Edited scan",
-															modifier = Modifier
-																.height(itemHeight)
-																.fillMaxWidth()
-																.padding(horizontal = 15.dp),
+															modifier = secondImageModifier,
 														)
 													} else {
 														Text(
 															"Edited Scan Missing",
-															modifier = Modifier
-																.fillMaxHeight()
-																.fillMaxWidth()
+															modifier = secondImageModifier
 																.wrapContentHeight(Alignment.CenterVertically),
 															textAlign = TextAlign.Center,
 															fontSize = 1.5.em,
 														)
 													}
 												}
+											}
+
+											if (files.index != setFiles.last().index) {
+												Divider(Modifier.fillMaxWidth().absolutePadding(top = 10.dp), color = colors.PrimaryVariant)
 											}
 										}
 									}
