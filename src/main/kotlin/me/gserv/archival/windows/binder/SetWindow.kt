@@ -19,6 +19,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.rounded.Image
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
@@ -151,16 +152,38 @@ class SetWindow(val parent: BinderWindow) {
 											Row(
 												horizontalArrangement = Arrangement.spacedBy(10.dp)
 											) {
-												Text(
-													files.index.toString().padStart(3, '0'),
-													modifier = Modifier
-														.background(colors.SectionBackground, RoundedCornerShape(15.dp))
-														.padding(vertical = 10.dp, horizontal = 15.dp)
-														.width(100.dp)
-														.wrapContentHeight(Alignment.CenterVertically),
-													textAlign = TextAlign.Center,
-													fontSize = 1.5.em,
-												)
+												Column(
+													Modifier.width(150.dp),
+													verticalArrangement = Arrangement.spacedBy(5.dp)
+												) {
+													Text(
+														files.index.toString().padStart(3, '0'),
+														modifier = Modifier
+															.background(colors.SectionBackground, RoundedCornerShape(15.dp))
+															.padding(vertical = 10.dp)
+															.fillMaxWidth()
+															.wrapContentHeight(Alignment.CenterVertically),
+														textAlign = TextAlign.Center,
+														fontSize = 1.5.em,
+													)
+
+													PrimaryButton(
+														{},
+														Modifier.fillMaxWidth()
+													) {
+														Row(
+															horizontalArrangement = Arrangement.spacedBy(10.dp),
+															verticalAlignment = Alignment.CenterVertically,
+														) {
+															Icon(
+																Icons.Rounded.Image,
+																""
+															)
+
+															Text("Compare")
+														}
+													}
+												}
 
 												val originalImage = files.original?.let {
 													ImageIO.read(it)
