@@ -14,12 +14,12 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Divider
-import androidx.compose.material.Icon
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Image
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
@@ -100,44 +100,52 @@ class SetWindow(val parent: BinderWindow) {
 				window.minimumSize = Dimension(1000, 700)
 				window.setWindowsAdaptiveTitleBar()
 
-				val itemHeight = 200.dp
+				200.dp
 
 				Colors.Theme { colors ->
 					Box(Modifier.background(colors.WindowBackground).fillMaxSize()) {
 						Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
 							Box(
 								Modifier
-									.background(colors.SectionBackground, RoundedCornerShape(0.dp, 0.dp, 15.dp, 15.dp))
+									.background(colors.SectionBackground)
 									.fillMaxWidth()
 							) {
-								Row(
-									Modifier.padding(15.dp),
-									verticalAlignment = Alignment.CenterVertically
-								) {
-									Text(
-										"Set ${GlobalState.set?.id?.value} (${setFiles.size} scans)",
-										fontSize = 1.5.em,
+								Column {
+									Row(
+										Modifier.padding(15.dp),
+										verticalAlignment = Alignment.CenterVertically
+									) {
+										Text(
+											"Set ${GlobalState.set?.id?.value} (${setFiles.size} scans)",
+											fontSize = 1.5.em,
 
-										modifier = Modifier
-											.height(50.dp)
-											.wrapContentHeight(Alignment.CenterVertically),
-									)
+											modifier = Modifier
+												.height(50.dp)
+												.wrapContentHeight(Alignment.CenterVertically),
+										)
 
-									Spacer(Modifier.weight(1f, true))
+										Spacer(Modifier.weight(1f, true))
 
-									PrimaryButton({}) {
-										Row(
-											horizontalArrangement = Arrangement.spacedBy(10.dp),
-											verticalAlignment = Alignment.CenterVertically,
-										) {
-											Icon(
-												Icons.Rounded.Add,
-												""
-											)
+										PrimaryButton({}) {
+											Row(
+												horizontalArrangement = Arrangement.spacedBy(10.dp),
+												verticalAlignment = Alignment.CenterVertically,
+											) {
+												Icon(
+													Icons.Rounded.Add,
+													""
+												)
 
-											Text("Add Scan")
+												Text("Add Scan")
+											}
 										}
 									}
+
+									HorizontalDivider(
+										color = colors.Material.primary,
+										thickness = 1.dp,
+										modifier = Modifier.fillMaxWidth()
+									)
 								}
 							}
 
@@ -159,7 +167,10 @@ class SetWindow(val parent: BinderWindow) {
 													Text(
 														files.index.toString().padStart(3, '0'),
 														modifier = Modifier
-															.background(colors.SectionBackground, RoundedCornerShape(15.dp))
+															.background(
+																colors.SectionBackground,
+																RoundedCornerShape(15.dp)
+															)
 															.padding(vertical = 10.dp)
 															.fillMaxWidth()
 															.wrapContentHeight(Alignment.CenterVertically),
@@ -258,7 +269,10 @@ class SetWindow(val parent: BinderWindow) {
 											}
 
 											if (files.index != setFiles.last().index) {
-												Divider(Modifier.fillMaxWidth().absolutePadding(top = 10.dp), color = colors.PrimaryVariant)
+												HorizontalDivider(
+													Modifier.fillMaxWidth().absolutePadding(top = 10.dp),
+													color = colors.Material.primary
+												)
 											}
 										}
 									}

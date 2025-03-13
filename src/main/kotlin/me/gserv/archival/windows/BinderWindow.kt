@@ -15,12 +15,13 @@ import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.QuestionMark
 import androidx.compose.material.icons.rounded.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
@@ -33,7 +34,6 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowState
 import io.github.kdroidfilter.platformtools.darkmodedetector.windows.setWindowsAdaptiveTitleBar
 import io.github.oshai.kotlinlogging.KotlinLogging
-import kotlinx.coroutines.delay
 import me.gserv.archival.Colors
 import me.gserv.archival.data.Database
 import me.gserv.archival.data.GlobalState
@@ -42,17 +42,13 @@ import me.gserv.archival.data.entities.Set
 import me.gserv.archival.data.tables.SetTable
 import me.gserv.archival.dropTarget
 import me.gserv.archival.utils.StringTooltip
-import me.gserv.archival.utils.components.DangerButton
 import me.gserv.archival.utils.components.PrimaryButton
 import me.gserv.archival.utils.components.SecondaryButton
+import me.gserv.archival.utils.components.TertiaryButton
 import me.gserv.archival.utils.format
-import me.gserv.archival.windows.binder.CreateSetDialog
-import me.gserv.archival.windows.binder.DeleteSetDialog
-import me.gserv.archival.windows.binder.FilterState
-import me.gserv.archival.windows.binder.SetWindow
+import me.gserv.archival.windows.binder.*
 import org.jetbrains.exposed.sql.SortOrder
 import java.awt.Dimension
-import kotlin.time.Duration.Companion.seconds
 
 class BinderWindow(val parent: MainWindow) {
 	val logger = KotlinLogging.logger { }
@@ -181,6 +177,9 @@ class BinderWindow(val parent: MainWindow) {
 				val deleteSetDialog = DeleteSetDialog(this@BinderWindow)
 				deleteSetDialog.create()
 
+				val editSetDialog = EditSetDialog(this@BinderWindow, GlobalState.binder!!)
+				editSetDialog.create()
+
 				val setWindow = SetWindow(this@BinderWindow)
 				setWindow.create()
 
@@ -196,7 +195,8 @@ class BinderWindow(val parent: MainWindow) {
 									colors.SectionBackground
 								)
 								.padding(vertical = 10.dp, horizontal = 15.dp)
-								.height(55.dp)
+								.height(50.dp)
+//								.height(66.dp)
 								.fillMaxWidth()
 						) {
 							PrimaryButton(
@@ -233,59 +233,64 @@ class BinderWindow(val parent: MainWindow) {
 								}
 
 								DropdownMenu(isDropdownOpen, { isDropdownOpen = false }) {
-									DropdownMenuItem({
-										logger.info { "Updating completion filter: All sets" }
+									DropdownMenuItem(
+										onClick = {
+											logger.info { "Updating completion filter: All sets" }
 
-										filterState = FilterState.All
-										isDropdownOpen = false
-									}) {
-										Text("All Sets")
-									}
+											filterState = FilterState.All
+											isDropdownOpen = false
+										},
 
-									Divider()
+										text = { Text("All Sets") }
+									)
 
-									DropdownMenuItem({
-										logger.info { "Updating completion filter: Incomplete sets only" }
+									HorizontalDivider()
 
-										filterState = FilterState.Incomplete
-										isDropdownOpen = false
-										dropTarget.currentSet = 0
-									}) {
-										Text("Incomplete Sets")
-									}
+									DropdownMenuItem(
+										onClick = {
+											logger.info { "Updating completion filter: Incomplete sets only" }
 
-									DropdownMenuItem({
-										logger.info { "Updating completion filter: Complete sets only" }
+											filterState = FilterState.Incomplete
+											isDropdownOpen = false
+											dropTarget.currentSet = 0
+										},
 
-										filterState = FilterState.Complete
-										isDropdownOpen = false
-										dropTarget.currentSet = 0
-									}) {
-										Text("Complete Sets")
-									}
+										text = { Text("Incomplete Sets") }
+									)
+
+									DropdownMenuItem(
+										onClick = {
+											logger.info { "Updating completion filter: Complete sets only" }
+
+											filterState = FilterState.Complete
+											isDropdownOpen = false
+											dropTarget.currentSet = 0
+										},
+
+										text = { Text("Complete Sets") }
+									)
 								}
 							}
 
 							TextField(
 								value = filterText,
+
 								onValueChange = {
 									logger.info { "Updating description filter: \"$it\"" }
 
 									filterText = it
 									dropTarget.currentSet = 0
 								},
-								label = {
-									Text("Description", modifier = Modifier.absolutePadding(bottom = 10.dp))
-								},
+
+								label = { Text("Description") },
 								modifier = Modifier.fillMaxHeight()
 							)
 						}
 
-						Divider(
-							color = colors.Primary,
-							modifier = Modifier
-								.height(1.dp)
-								.fillMaxWidth()
+						HorizontalDivider(
+							color = colors.Material.primary,
+							thickness = 1.dp,
+							modifier = Modifier.fillMaxWidth()
 						)
 
 						Spacer(Modifier.height(10.dp))
@@ -323,39 +328,41 @@ class BinderWindow(val parent: MainWindow) {
 										Row(
 											verticalAlignment = Alignment.CenterVertically,
 											horizontalArrangement = Arrangement.spacedBy(10.dp),
-											modifier = Modifier.height(IntrinsicSize.Min)
 										) {
 											Text(
 												"Set ${set.id.value}",
 												fontSize = 2.em,
-												modifier = Modifier.absolutePadding(left = 10.dp, bottom = 5.dp)
 											)
 
 											StringTooltip("Number of scans") {
-												Chip(
+												SuggestionChip(
 													{},
+
 													colors = colors.defaultChipColors(),
-													leadingIcon = {
+
+													icon = {
 														Icon(
 															Icons.Rounded.Image,
 															"",
 															modifier = Modifier.absolutePadding(left = 5.dp)
 														)
-													}
-												) {
-													Text(set.totalScans.toString())
-												}
+													},
+
+													label = { Text(set.totalScans.toString()) }
+												)
 											}
 
 											StringTooltip("Set completion state") {
-												Chip(
+												SuggestionChip(
 													{},
+
 													colors = if (set.finishedAt != null) {
 														colors.successChipColors()
 													} else {
-														colors.dangerChipColors()
+														colors.tertiaryChipColors()
 													},
-													leadingIcon = {
+
+													icon = {
 														Icon(
 															if (set.finishedAt != null) {
 																Icons.Rounded.AssignmentTurnedIn
@@ -365,14 +372,16 @@ class BinderWindow(val parent: MainWindow) {
 															"",
 															modifier = Modifier.absolutePadding(left = 5.dp)
 														)
+													},
+
+													label = {
+														if (set.finishedAt != null) {
+															Text("Complete")
+														} else {
+															Text("Incomplete")
+														}
 													}
-												) {
-													if (set.finishedAt != null) {
-														Text("Complete")
-													} else {
-														Text("Incomplete")
-													}
-												}
+												)
 											}
 
 											Spacer(Modifier.weight(1f, true))
@@ -384,63 +393,20 @@ class BinderWindow(val parent: MainWindow) {
 													dropTarget.currentSet == index,
 													{ dropTarget.currentSet = index },
 													enabled = dropTarget.currentSet != index,
-													colors = CheckboxDefaults.colors(
-														checkedColor = colors.PrimaryVariant,
-														disabledColor = colors.PrimaryVariant,
-														checkmarkColor = colors.WindowBackground.copy(alpha = 0.6f)
-													)
 												)
 											}
 										}
 
-										Row(
-											horizontalArrangement = Arrangement.spacedBy(10.dp)
-										) {
-											var setText by remember(GlobalState.binder?.id, set.id, "description") {
-												mutableStateOf(set.description ?: "")
-											}
-
-											TextField(
-												setText,
-												{ setText = it },
-												label = { Text("Description") },
-												modifier = Modifier.weight(1f)
+										if (set.description != null) {
+											Text(
+												"Description: ${set.description}",
+												modifier = Modifier.absolutePadding(left = 10.dp)
 											)
-
-											StringTooltip("Save") {
-												var saveIcon by remember(GlobalState.binder?.id, set.id, "save-icon") {
-													mutableStateOf(Icons.Rounded.Save)
-												}
-
-												LaunchedEffect(saveIcon) {
-													if (saveIcon != Icons.Rounded.Save) {
-														delay(5.seconds)
-
-														saveIcon = Icons.Rounded.Save
-													}
-												}
-
-												PrimaryButton(
-													{
-														Database.transaction {
-															set.description = if (setText.isEmpty()) {
-																null
-															} else {
-																setText
-															}
-														}
-
-														saveIcon = Icons.Rounded.Check
-													},
-													enabled = (set.description ?: "") != setText,
-													modifier = Modifier.height(56.dp)
-												) {
-													Icon(
-														saveIcon,
-														"Save"
-													)
-												}
-											}
+										} else {
+											Text(
+												"No description set",
+												modifier = Modifier.absolutePadding(left = 10.dp)
+											)
 										}
 
 										Row(
@@ -449,59 +415,65 @@ class BinderWindow(val parent: MainWindow) {
 										) {
 											if (set.date != null) {
 												StringTooltip("Photography date") {
-													Chip(
+													SuggestionChip(
 														{},
+
 														colors = colors.primaryChipColors(),
-														leadingIcon = {
+
+														icon = {
 															Icon(
 																Icons.Rounded.CameraRoll,
 																"",
 																modifier = Modifier.absolutePadding(left = 5.dp)
 															)
-														}
-													) {
-														Text(set.date!!.format())
-													}
+														},
+
+														label = { Text(set.date!!.format()) }
+													)
 												}
 											}
 
 											StringTooltip("Set creation date") {
-												Chip(
+												SuggestionChip(
 													{},
+
 													colors = colors.secondaryChipColors(),
-													leadingIcon = {
+
+													icon = {
 														Icon(
 															Icons.Rounded.AutoAwesome,
 															"",
 															modifier = Modifier.absolutePadding(left = 5.dp)
 														)
-													}
-												) {
-													Text(set.createdAt.format())
-												}
+													},
+
+													label = { Text(set.createdAt.format()) }
+												)
 											}
 
 											if (set.finishedAt != null) {
 												StringTooltip("Set completion date") {
-													Chip(
+													SuggestionChip(
 														{},
+
 														colors = colors.successChipColors(),
-														leadingIcon = {
+
+														icon = {
 															Icon(
 																Icons.Rounded.EventAvailable,
 																"",
 																modifier = Modifier.absolutePadding(left = 5.dp)
 															)
-														}
-													) {
-														Text(set.createdAt.format())
-													}
+														},
+
+														label = { Text(set.createdAt.format()) }
+													)
 												}
 											}
 
 											Spacer(Modifier.weight(1f, true))
 
-											DangerButton({ deleteSetDialog.open(set) }) {
+											TertiaryButton({ deleteSetDialog.open(set) }) {
 												Row(
 													verticalAlignment = Alignment.CenterVertically,
 													horizontalArrangement = Arrangement.spacedBy(10.dp),
@@ -516,7 +488,21 @@ class BinderWindow(val parent: MainWindow) {
 												}
 											}
 
-											SecondaryButton({ setWindow.open(set) }) {
+											SecondaryButton({ editSetDialog.open(set) }) {
+												Row(
+													verticalAlignment = Alignment.CenterVertically,
+													horizontalArrangement = Arrangement.spacedBy(10.dp),
+												) {
+													Icon(
+														Icons.Rounded.Edit,
+														"Edit"
+													)
+
+													Text("Edit")
+												}
+											}
+
+											PrimaryButton({ setWindow.open(set) }) {
 												Row(
 													verticalAlignment = Alignment.CenterVertically,
 													horizontalArrangement = Arrangement.spacedBy(10.dp),
@@ -547,11 +533,10 @@ class BinderWindow(val parent: MainWindow) {
 
 						Spacer(Modifier.height(10.dp))
 
-						Divider(
-							color = colors.Primary,
-							modifier = Modifier
-								.height(1.dp)
-								.fillMaxWidth()
+						HorizontalDivider(
+							color = colors.Material.primary,
+							thickness = 1.dp,
+							modifier = Modifier.fillMaxWidth()
 						)
 
 						Row(

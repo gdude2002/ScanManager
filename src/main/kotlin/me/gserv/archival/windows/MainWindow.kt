@@ -14,15 +14,14 @@ import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Icon
-import androidx.compose.material.OutlinedButton
-import androidx.compose.material.Text
-import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.Help
 import androidx.compose.material.icons.filled.FolderOff
 import androidx.compose.material.icons.filled.WavingHand
 import androidx.compose.material.icons.rounded.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -47,6 +46,9 @@ import me.gserv.archival.data.GlobalState
 import me.gserv.archival.dropTarget
 import me.gserv.archival.utils.StringTooltip
 import me.gserv.archival.utils.components.PrimaryButton
+import me.gserv.archival.utils.components.PrimaryIconButton
+import me.gserv.archival.utils.components.PrimaryOutlinedButton
+import me.gserv.archival.utils.components.SecondaryOutlinedButton
 import me.gserv.archival.windows.main.CreateBinderDialog
 import me.gserv.archival.windows.main.DataDirectoryDialog
 import me.gserv.archival.windows.main.DeleteBinderDialog
@@ -140,19 +142,18 @@ class MainWindow(val applicationScope: ApplicationScope) {
 
 							Spacer(Modifier.weight(1f))
 
-							PrimaryButton(
-								modifier = Modifier.size(60.dp),
-								onClick = {
-									Desktop.getDesktop().browse(URI("https://github.com/gdude2002/ScanManager/wiki"))
-								},
-							) {
-								Column {
+							StringTooltip("Help") {
+								PrimaryIconButton(
+									modifier = Modifier.size(60.dp),
+									onClick = {
+										Desktop.getDesktop()
+											.browse(URI("https://github.com/gdude2002/ScanManager/wiki"))
+									},
+								) {
 									Icon(
 										Icons.AutoMirrored.Rounded.Help,
 										"Help",
 									)
-
-									Text("Help", fontSize = TextUnit(0.65F, TextUnitType.Em))
 								}
 							}
 						}
@@ -199,7 +200,7 @@ class MainWindow(val applicationScope: ApplicationScope) {
 									for (binder in GlobalState.binders) {
 										if (!binder.archived || showArchived) {
 											Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-												OutlinedButton(
+												PrimaryOutlinedButton(
 													modifier = Modifier.weight(1f),
 													onClick = {
 														binderWindow.open(binder)
@@ -260,7 +261,7 @@ class MainWindow(val applicationScope: ApplicationScope) {
 																Icon(
 																	Icons.Rounded.Delete,
 																	"Delete binder",
-																	tint = colors.DangerBackground
+																	tint = colors.Material.tertiary
 																)
 															}
 														}
@@ -306,12 +307,14 @@ class MainWindow(val applicationScope: ApplicationScope) {
 															if (binder.archived) {
 																Icon(
 																	Icons.Rounded.LockOpen,
-																	"Un-archive binder"
+																	"Un-archive binder",
+																	tint = colors.Material.primary
 																)
 															} else {
 																Icon(
 																	Icons.Rounded.Lock,
-																	"Archive binder"
+																	"Archive binder",
+																	tint = colors.Material.primary
 																)
 															}
 														}
@@ -343,7 +346,7 @@ class MainWindow(val applicationScope: ApplicationScope) {
 									modifier = Modifier.padding(vertical = 5.dp)
 								)
 
-								PrimaryButton(
+								SecondaryOutlinedButton(
 									modifier = Modifier.fillMaxWidth().align(Alignment.Start),
 									onClick = {},
 									enabled = false
@@ -362,7 +365,7 @@ class MainWindow(val applicationScope: ApplicationScope) {
 									}
 								}
 
-								OutlinedButton(
+								SecondaryOutlinedButton(
 									modifier = Modifier.fillMaxWidth().align(Alignment.Start),
 									onClick = { compareWindow.open() },
 								) {
@@ -380,7 +383,7 @@ class MainWindow(val applicationScope: ApplicationScope) {
 									}
 								}
 
-								PrimaryButton(
+								SecondaryOutlinedButton(
 									modifier = Modifier.fillMaxWidth().align(Alignment.Start),
 									onClick = {},
 									enabled = false
@@ -399,7 +402,7 @@ class MainWindow(val applicationScope: ApplicationScope) {
 									}
 								}
 
-								PrimaryButton(
+								SecondaryOutlinedButton(
 									modifier = Modifier.fillMaxWidth().align(Alignment.Start),
 									onClick = {},
 									enabled = false
@@ -418,7 +421,7 @@ class MainWindow(val applicationScope: ApplicationScope) {
 									}
 								}
 
-								PrimaryButton(
+								SecondaryOutlinedButton(
 									modifier = Modifier.fillMaxWidth().align(Alignment.Start),
 									onClick = {},
 									enabled = false
@@ -444,7 +447,8 @@ class MainWindow(val applicationScope: ApplicationScope) {
 										Icon(
 											Icons.Rounded.Folder,
 											"Data folder",
-											modifier = Modifier.absolutePadding(right = 4.dp)
+											modifier = Modifier.absolutePadding(right = 4.dp),
+											tint = colors.Material.primary,
 										)
 
 										Text(
@@ -472,7 +476,7 @@ class MainWindow(val applicationScope: ApplicationScope) {
 									.align(Alignment.CenterVertically)
 							) {
 								Row {
-									OutlinedButton(onClick = { showArchived = !showArchived }) {
+									PrimaryOutlinedButton(onClick = { showArchived = !showArchived }) {
 										if (showArchived) {
 											Text("Hide Archived")
 										} else {

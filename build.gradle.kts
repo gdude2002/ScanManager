@@ -19,6 +19,7 @@ repositories {
 dependencies {
 	implementation(compose.desktop.currentOs)
 	implementation(compose.foundation)
+	implementation(compose.material3)
 	implementation(compose.materialIconsExtended)
 
 	implementation("org.slf4j", "slf4j-simple", "2.0.16")

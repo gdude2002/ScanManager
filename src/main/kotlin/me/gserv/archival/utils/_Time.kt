@@ -21,6 +21,21 @@ fun LocalDateTime.Companion.now() =
 fun LocalDate.Companion.now() =
 	LocalDateTime.now().date
 
+val Instant.Companion.ZERO: Instant
+	get() = fromEpochMilliseconds(0)
+
+val LocalDateTime.Companion.ZERO: LocalDateTime
+	get() = Instant.ZERO.toLocalDateTime(TimeZone.UTC)
+
+val LocalDate.Companion.ZERO: LocalDate
+	get() = LocalDateTime.ZERO.date
+
+fun LocalDateTime.Companion.fromEpochMilliseconds(millis: Long) =
+	Instant.fromEpochMilliseconds(millis).toLocalDateTime(TimeZone.UTC)
+
+fun LocalDate.Companion.fromEpochMilliseconds(millis: Long) =
+	LocalDateTime.fromEpochMilliseconds(millis).date
+
 fun LocalDateTime.format(): String =
 	dateTimeFormatter.format(toJavaLocalDateTime())
 

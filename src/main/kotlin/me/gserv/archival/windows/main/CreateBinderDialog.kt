@@ -11,14 +11,15 @@ package me.gserv.archival.windows.main
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Card
-import androidx.compose.material.Icon
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Book
 import androidx.compose.material.icons.rounded.Cancel
 import androidx.compose.material.icons.rounded.Check
+import androidx.compose.material.icons.rounded.Warning
+import androidx.compose.material3.Card
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -75,7 +76,7 @@ class CreateBinderDialog(
 		if (isOpen) {
 			Dialog({}, DialogProperties(false, false, true)) {
 				Colors.Theme { colors ->
-					Card(backgroundColor = colors.SectionBackground, shape = RoundedCornerShape(15.dp)) {
+					Card(shape = RoundedCornerShape(15.dp)) {
 						Column(modifier = Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(20.dp)) {
 							Row(verticalAlignment = Alignment.CenterVertically) {
 								Icon(
@@ -111,16 +112,27 @@ class CreateBinderDialog(
 									},
 
 									label = { Text("Name") },
-									modifier = Modifier.fillMaxWidth()
+
+									isError = isError,
+									trailingIcon = {
+										if (isError) {
+											Icon(
+												Icons.Rounded.Warning,
+												"Error"
+											)
+										}
+									},
+
+									modifier = Modifier.fillMaxWidth(),
 								)
 							}
 
 							if (isError) {
 								Row {
 									Text(
-										"A binder named $binderName already exists. Please pick another name.",
+										"A binder named \"$binderName\" already exists. Please pick another name.",
 
-										color = colors.DangerBackground,
+										color = colors.Material.error,
 										textAlign = TextAlign.Center
 									)
 								}

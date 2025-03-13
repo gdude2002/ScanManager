@@ -21,10 +21,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.window.WindowDraggableArea
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.BiasAlignment
@@ -44,6 +43,7 @@ import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.window.rememberWindowState
 import io.github.oshai.kotlinlogging.KotlinLogging
+import me.gserv.archival.Colors
 import me.gserv.archival.data.GlobalState
 import me.gserv.archival.utils.isInteger
 import java.awt.geom.RoundRectangle2D
@@ -106,129 +106,131 @@ class DropTargetWindow(val parent: MainWindow) {
 			transparent = true,
 			state = state
 		) {
-			val size = with(LocalDensity.current) {
-				100.dp.toPx()
-			}
+			Colors.Theme { colors ->
+				val size = with(LocalDensity.current) {
+					100.dp.toPx()
+				}
 
-			window.shape = RoundRectangle2D.Float(0f, 0f, size, size, size, size)
+				window.shape = RoundRectangle2D.Float(0f, 0f, size, size, size, size)
 
-			var backgroundColor = MaterialTheme.colors.primary
-			var borderColor = Color.White
+				var backgroundColor = colors.Material.onPrimary
+				var borderColor = colors.Material.primary
 
-			if (isHovered) {
-				backgroundColor = backgroundColor.copy(alpha = 0.8f)
-				borderColor = borderColor.copy(alpha = 0.5f)
-			}
+				if (isHovered) {
+					backgroundColor = backgroundColor.copy(alpha = 0.8f)
+					borderColor = borderColor.copy(alpha = 0.5f)
+				}
 
-			WindowDraggableArea(
-				Modifier.fillMaxSize()
-					.background(Color.Transparent, CircleShape)
-					.clip(CircleShape)
-			) {
-				Box(
+				WindowDraggableArea(
 					Modifier.fillMaxSize()
-						.background(backgroundColor, CircleShape)
+						.background(Color.Transparent, CircleShape)
 						.clip(CircleShape)
-						.pointerInput(Unit) {
-							awaitPointerEventScope {
-								while (true) {
-									val event = awaitPointerEvent()
+				) {
+					Box(
+						Modifier.fillMaxSize()
+							.background(backgroundColor, CircleShape)
+							.clip(CircleShape)
+							.pointerInput(Unit) {
+								awaitPointerEventScope {
+									while (true) {
+										val event = awaitPointerEvent()
 
-									when (event.type) {
-										PointerEventType.Press -> {
-											if (event.buttons.isPrimaryPressed) {
-												onLeftClick(event)
+										when (event.type) {
+											PointerEventType.Press -> {
+												if (event.buttons.isPrimaryPressed) {
+													onLeftClick(event)
+												}
+
+												if (event.buttons.isSecondaryPressed) {
+													onRightClick(event)
+												}
+
+												if (event.buttons.isTertiaryPressed) {
+													onMiddleClick(event)
+												}
+
+												if (event.buttons.isBackPressed) {
+													onBackClick(event)
+												}
+
+												if (event.buttons.isForwardPressed) {
+													onForwardClick(event)
+												}
 											}
 
-											if (event.buttons.isSecondaryPressed) {
-												onRightClick(event)
+											PointerEventType.Scroll -> {
+												if (event.changes.any { it.scrollDelta.y > 0 }) {
+													onScrollUp(event)
+												}
+
+												if (event.changes.any { it.scrollDelta.y < 0 }) {
+													onScrollDown(event)
+												}
 											}
 
-											if (event.buttons.isTertiaryPressed) {
-												onMiddleClick(event)
-											}
-
-											if (event.buttons.isBackPressed) {
-												onBackClick(event)
-											}
-
-											if (event.buttons.isForwardPressed) {
-												onForwardClick(event)
-											}
+											PointerEventType.Enter -> onMouseEnter(event)
+											PointerEventType.Exit -> onMouseExit(event)
 										}
-
-										PointerEventType.Scroll -> {
-											if (event.changes.any { it.scrollDelta.y > 0 }) {
-												onScrollUp(event)
-											}
-
-											if (event.changes.any { it.scrollDelta.y < 0 }) {
-												onScrollDown(event)
-											}
-										}
-
-										PointerEventType.Enter -> onMouseEnter(event)
-										PointerEventType.Exit -> onMouseExit(event)
 									}
 								}
 							}
+					) {
+						if (loadingProgress != null) {
+							CircularProgressIndicator(
+								color = borderColor,
+								trackColor = backgroundColor,
+								progress = { loadingProgress ?: 0f },
+								modifier = Modifier.fillMaxSize()
+							)
+						} else {
+							CircularProgressIndicator(
+								color = borderColor,
+								trackColor = backgroundColor,
+								modifier = Modifier.fillMaxSize()
+							)
 						}
-				) {
-					if (loadingProgress != null) {
-						CircularProgressIndicator(
-							color = borderColor,
-							backgroundColor = backgroundColor,
-							progress = loadingProgress!!,
-							modifier = Modifier.fillMaxSize()
-						)
-					} else {
-						CircularProgressIndicator(
-							color = borderColor,
-							backgroundColor = backgroundColor,
-							modifier = Modifier.fillMaxSize()
-						)
-					}
 
-					Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxSize()) {
-						Spacer(Modifier.weight(1f, true))
+						Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxSize()) {
+							Spacer(Modifier.weight(1f, true))
 
-						AnimatedContent(icon) {
-							if (it != null) {
-								Icon(it, iconDescription, tint = borderColor)
+							AnimatedContent(icon) {
+								if (it != null) {
+									Icon(it, iconDescription, tint = borderColor)
+								}
 							}
-						}
 
-						AnimatedContent(
-							smallText,
-							transitionSpec = { slideTransition() }
-						) {
-							if (it != null) {
-								Text(
-									it,
-									fontSize = 0.75.em,
-									color = borderColor,
-									textAlign = TextAlign.Center
-								)
+							AnimatedContent(
+								smallText,
+								transitionSpec = { slideTransition() }
+							) {
+								if (it != null) {
+									Text(
+										it,
+										fontSize = 0.75.em,
+										color = borderColor,
+										textAlign = TextAlign.Center
+									)
+								}
 							}
-						}
 
-						AnimatedContent(
-							bigText,
-							transitionSpec = { slideTransition() }
-						) {
-							if (it != null) {
-								Text(
-									it,
-									fontSize = 1.25.em,
-									color = borderColor,
-									textAlign = TextAlign.Center
-								)
+							AnimatedContent(
+								bigText,
+								transitionSpec = { slideTransition() }
+							) {
+								if (it != null) {
+									Text(
+										it,
+										fontSize = 1.25.em,
+										color = borderColor,
+										textAlign = TextAlign.Center
+									)
+								}
 							}
+
+							composableBody?.invoke(this@DropTargetWindow)
+
+							Spacer(Modifier.weight(1f, true))
 						}
-
-						composableBody?.invoke(this@DropTargetWindow)
-
-						Spacer(Modifier.weight(1f, true))
 					}
 				}
 			}

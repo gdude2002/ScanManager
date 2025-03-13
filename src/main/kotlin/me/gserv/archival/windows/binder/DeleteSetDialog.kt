@@ -11,13 +11,13 @@ package me.gserv.archival.windows.binder
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Card
-import androidx.compose.material.Icon
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Cancel
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.Warning
+import androidx.compose.material3.Card
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -34,8 +34,8 @@ import me.gserv.archival.Colors
 import me.gserv.archival.data.Database
 import me.gserv.archival.data.GlobalState
 import me.gserv.archival.data.entities.Set
-import me.gserv.archival.utils.components.DangerButton
 import me.gserv.archival.utils.components.SecondaryButton
+import me.gserv.archival.utils.components.TertiaryButton
 import me.gserv.archival.windows.BinderWindow
 
 class DeleteSetDialog(
@@ -79,7 +79,7 @@ class DeleteSetDialog(
 		if (isOpen) {
 			Dialog({}, DialogProperties(false, false, true)) {
 				Colors.Theme { colors ->
-					Card(backgroundColor = colors.SectionBackground, shape = RoundedCornerShape(15.dp)) {
+					Card(shape = RoundedCornerShape(15.dp)) {
 						Column(modifier = Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(20.dp)) {
 							Row(verticalAlignment = Alignment.CenterVertically) {
 								Icon(
@@ -127,7 +127,7 @@ class DeleteSetDialog(
 
 								Spacer(Modifier.weight(1f, true))
 
-								DangerButton(
+								TertiaryButton(
 									onClick = {
 										logger.info { "Deleting set ${set?.id?.value}" }
 

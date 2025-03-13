@@ -12,21 +12,21 @@ import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.Card
-import androidx.compose.material.Icon
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.CameraRoll
 import androidx.compose.material.icons.rounded.Cancel
 import androidx.compose.material.icons.rounded.Check
-import androidx.compose.material.icons.rounded.VideoFile
+import androidx.compose.material.icons.rounded.Warning
+import androidx.compose.material3.Card
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.TextUnit
@@ -36,6 +36,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.datetime.LocalDate
+import me.gserv.archival.Colors
 import me.gserv.archival.data.Database
 import me.gserv.archival.data.GlobalState
 import me.gserv.archival.data.entities.Binder
@@ -78,140 +79,154 @@ class CreateSetDialog(
 	fun create() {
 		if (isOpen) {
 			Dialog({}, DialogProperties(false, false, true)) {
-				Card(backgroundColor = Color.White, shape = RoundedCornerShape(15.dp)) {
-					Column(modifier = Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(20.dp)) {
-						Row(verticalAlignment = Alignment.CenterVertically) {
-							Icon(
-								Icons.Rounded.VideoFile,
-								"",
-								modifier = Modifier
-									.absolutePadding(right = 8.dp, top = 1.dp)
-									.size(30.dp)
-							)
+				Colors.Theme { colors ->
+					Card(shape = RoundedCornerShape(15.dp)) {
+						Column(modifier = Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(20.dp)) {
+							Row(verticalAlignment = Alignment.CenterVertically) {
+								Icon(
+									Icons.Rounded.CameraRoll,
+									"",
+									modifier = Modifier
+										.absolutePadding(right = 8.dp, top = 1.dp)
+										.size(30.dp)
+								)
 
-							Text(
-								"Create Set",
-								fontSize = TextUnit(1.5F, TextUnitType.Em)
-							)
-						}
-
-						Text(
-							"Please enter a numeric identifier for the new set. If the set has a label with an " +
-								"identifying code, we recommend using that code. " +
-								"Don't include the binder name.\n\n" +
-								"Set identifiers must be unique within the binder."
-						)
-
-						Row {
-							TextField(
-								setIdentifier,
-
-								{
-									if (!it.all { c -> c.isDigit() }) {
-										return@TextField
-									}
-
-									if (it.isEmpty()) {
-										setIdentifier = it
-
-										return@TextField
-									}
-
-									setIdentifier = it.trimStart('0').padStart(1, '0')
-
-									Database.transaction {
-										isError = Set.exists(setIdentifier.toLong(), binder)
-									}
-								},
-
-								keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-								label = { Text("Identifier") },
-								modifier = Modifier.fillMaxWidth()
-							)
-						}
-
-						Row {
-							TextField(
-								setDescription,
-								{ setDescription = it },
-
-								label = { Text("Description") },
-								modifier = Modifier.fillMaxWidth()
-							)
-						}
-
-						if (isError) {
-							Row {
 								Text(
-									"Identifier $setIdentifier is invalid, or a set with that identifier already " +
-										"exists. Please pick another identifier.",
-
-									color = Color.Red,
-									textAlign = TextAlign.Center
+									"Create Set",
+									fontSize = TextUnit(1.5F, TextUnitType.Em)
 								)
 							}
-						}
 
-						Row {
-							SecondaryButton(
-								{
-									logger.info { "Closing dialog without creating set." }
-									close()
-								}
-							) {
-								Row(verticalAlignment = Alignment.CenterVertically) {
-									Icon(
-										Icons.Rounded.Cancel,
-										"",
-										modifier = Modifier.absolutePadding(right = 4.dp)
+							Text(
+								"Please enter a numeric identifier for the new set. If the set has a label with an " +
+									"identifying code, we recommend using that code. " +
+									"Don't include the binder name.\n\n" +
+									"Set identifiers must be unique within the binder."
+							)
+
+							Row {
+								TextField(
+									setIdentifier,
+
+									{
+										if (!it.all { c -> c.isDigit() }) {
+											return@TextField
+										}
+
+										if (it.isEmpty()) {
+											setIdentifier = it
+											isError = false
+
+											return@TextField
+										}
+
+										setIdentifier = it.trimStart('0').padStart(1, '0')
+
+										Database.transaction {
+											isError = Set.exists(setIdentifier.toLong(), binder)
+										}
+									},
+
+									keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+									label = { Text("Identifier") },
+
+									isError = isError,
+									trailingIcon = {
+										if (isError) {
+											Icon(
+												Icons.Rounded.Warning,
+												"Error"
+											)
+										}
+									},
+
+									modifier = Modifier.fillMaxWidth()
+								)
+							}
+
+							Row {
+								TextField(
+									setDescription,
+									{ setDescription = it },
+
+									label = { Text("Description") },
+									modifier = Modifier.fillMaxWidth()
+								)
+							}
+
+							if (isError) {
+								Row {
+									Text(
+										"Identifier \"$setIdentifier\" is invalid, or a set with that identifier " +
+											"already exists. Please pick another identifier.",
+
+										color = colors.Material.error,
+										textAlign = TextAlign.Center
 									)
-
-									Text("Cancel")
 								}
 							}
 
-							Spacer(Modifier.weight(1f, true))
-
-							PrimaryButton(
-								enabled = setIdentifier.isNotEmpty() && !isError,
-
-								onClick = {
-									logger.info { "Creating set $setIdentifier in binder ${binder.id.value}" }
-									logger.info { "Description: $setDescription" }
-
-									val set = Database.transaction {
-										Set.create(setIdentifier.toLong(), binder) {
-											date = LocalDate.now()
-
-											if (setDescription.isNotEmpty()) {
-												description = setDescription
-											}
-
-											totalScans = binder.countSetScans(setIdentifier.toLong()).toLong()
-										}
+							Row {
+								SecondaryButton(
+									{
+										logger.info { "Closing dialog without creating set." }
+										close()
 									}
+								) {
+									Row(verticalAlignment = Alignment.CenterVertically) {
+										Icon(
+											Icons.Rounded.Cancel,
+											"",
+											modifier = Modifier.absolutePadding(right = 4.dp)
+										)
 
-									logger.info { "Set created, updating global and window states..." }
+										Text("Cancel")
+									}
+								}
 
-									GlobalState.sets.add(set)
-									GlobalState.sets.sortByDescending { it.id.value.toLong() }
+								Spacer(Modifier.weight(1f, true))
 
-									parent.allSets.add(set)
-									parent.allSets.sortByDescending { it.id.value.toLong() }
+								PrimaryButton(
+									enabled = setIdentifier.isNotEmpty() && !isError,
 
-									logger.info { "Done, closing dialog" }
+									onClick = {
+										logger.info { "Creating set $setIdentifier in binder ${binder.id.value}" }
+										logger.info { "Description: $setDescription" }
 
-									close()
-								},
-							) {
-								Row(verticalAlignment = Alignment.CenterVertically) {
-									Icon(
-										Icons.Rounded.Check,
-										"",
-										modifier = Modifier.absolutePadding(right = 4.dp)
-									)
+										val set = Database.transaction {
+											Set.create(setIdentifier.toLong(), binder) {
+												date = LocalDate.now()
 
-									Text("Okay")
+												if (setDescription.isNotEmpty()) {
+													description = setDescription
+												}
+
+												totalScans = binder.countSetScans(setIdentifier.toLong()).toLong()
+											}
+										}
+
+										logger.info { "Set created, updating global and window states..." }
+
+										GlobalState.sets.add(set)
+										GlobalState.sets.sortByDescending { it.id.value.toLong() }
+
+										parent.allSets.add(set)
+										parent.allSets.sortByDescending { it.id.value.toLong() }
+
+										logger.info { "Done, closing dialog" }
+
+										close()
+									},
+								) {
+									Row(verticalAlignment = Alignment.CenterVertically) {
+										Icon(
+											Icons.Rounded.Check,
+											"",
+											modifier = Modifier.absolutePadding(right = 4.dp)
+										)
+
+										Text("Okay")
+									}
 								}
 							}
 						}

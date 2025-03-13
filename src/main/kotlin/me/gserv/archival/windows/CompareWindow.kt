@@ -13,14 +13,15 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.LinearProgressIndicator
-import androidx.compose.material.Text
-import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.FormatSize
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toPainter
@@ -282,9 +283,11 @@ class CompareWindow(val parent: MainWindow) {
 										softWrap = false,
 									)
 
-									TextButton(
+									OutlinedButton(
 										{ pickFile(firstImageFileState, firstImageState) },
-										modifier = Modifier.fillMaxWidth()
+										modifier = Modifier.fillMaxWidth(),
+										shape = MaterialTheme.shapes.small,
+										contentPadding = PaddingValues(0.dp),
 									) {
 										Image(
 											firstImage!!.toPainter(),
@@ -309,9 +312,11 @@ class CompareWindow(val parent: MainWindow) {
 										softWrap = false,
 									)
 
-									TextButton(
+									OutlinedButton(
 										{ pickFile(secondImageFileState, secondImageState) },
-										modifier = Modifier.fillMaxWidth()
+										modifier = Modifier.fillMaxWidth(),
+										shape = MaterialTheme.shapes.small,
+										contentPadding = PaddingValues(0.dp),
 									) {
 										Image(
 											secondImage!!.toPainter(),
@@ -329,7 +334,7 @@ class CompareWindow(val parent: MainWindow) {
 								}
 
 								if (progress != null) {
-									LinearProgressIndicator(progress!!, Modifier.fillMaxWidth())
+									LinearProgressIndicator(progress = { progress ?: 0f }, Modifier.fillMaxWidth())
 								} else {
 									LinearProgressIndicator(Modifier.fillMaxWidth())
 								}

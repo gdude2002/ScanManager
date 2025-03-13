@@ -8,34 +8,25 @@
 
 package me.gserv.archival.utils.components
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.RowScope
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ButtonElevation
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.dp
 import me.gserv.archival.Colors
 import me.gserv.archival.Colors.IColors
 
-// TODO: OK button, delete button, cancel button
-
 @Composable
-fun PrimaryButton(
+fun PrimaryIconButton(
 	onClick: () -> Unit,
 	modifier: Modifier = Modifier,
 	enabled: Boolean = true,
 	interactionSource: MutableInteractionSource? = null,
-	elevation: ButtonElevation? = ButtonDefaults.buttonElevation(),
-	shape: Shape = ButtonDefaults.shape,
-	border: BorderStroke? = null,
-	contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
-	content: @Composable (RowScope.(theme: IColors) -> Unit)
+	content: @Composable ((theme: IColors) -> Unit)
 ) {
 	val theme = Colors.get()
 
@@ -45,21 +36,16 @@ fun PrimaryButton(
 		theme.Material.onSurface.copy(alpha = 0.38f)
 	}
 
-	Button(
+	IconButton(
 		onClick = onClick,
 		modifier = modifier,
 		enabled = enabled,
 		interactionSource = interactionSource,
-		elevation = elevation,
-		shape = shape,
-		border = border,
 
-		colors = ButtonDefaults.buttonColors(
+		colors = IconButtonDefaults.iconButtonColors(
 			containerColor = theme.Material.primaryContainer,
 			contentColor = theme.Material.onPrimaryContainer,
 		),
-
-		contentPadding = contentPadding
 	) {
 		ProvideTextStyle(TextStyle(color = textColor)) {
 			content(theme)
@@ -68,16 +54,12 @@ fun PrimaryButton(
 }
 
 @Composable
-fun SecondaryButton(
+fun SecondaryIconButton(
 	onClick: () -> Unit,
 	modifier: Modifier = Modifier,
 	enabled: Boolean = true,
 	interactionSource: MutableInteractionSource? = null,
-	elevation: ButtonElevation? = ButtonDefaults.buttonElevation(),
-	shape: Shape = ButtonDefaults.shape,
-	border: BorderStroke? = null,
-	contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
-	content: @Composable (RowScope.(theme: IColors) -> Unit)
+	content: @Composable ((theme: IColors) -> Unit)
 ) {
 	val theme = Colors.get()
 
@@ -87,21 +69,16 @@ fun SecondaryButton(
 		theme.Material.onSurface.copy(alpha = 0.38f)
 	}
 
-	Button(
+	IconButton(
 		onClick = onClick,
 		modifier = modifier,
 		enabled = enabled,
 		interactionSource = interactionSource,
-		elevation = elevation,
-		shape = shape,
-		border = border,
 
-		colors = ButtonDefaults.buttonColors(
+		colors = IconButtonDefaults.iconButtonColors(
 			containerColor = theme.Material.secondaryContainer,
 			contentColor = theme.Material.onSecondaryContainer,
 		),
-
-		contentPadding = contentPadding
 	) {
 		ProvideTextStyle(TextStyle(color = textColor)) {
 			content(theme)
@@ -110,16 +87,12 @@ fun SecondaryButton(
 }
 
 @Composable
-fun TertiaryButton(
+fun TertiaryIconButton(
 	onClick: () -> Unit,
 	modifier: Modifier = Modifier,
 	enabled: Boolean = true,
 	interactionSource: MutableInteractionSource? = null,
-	elevation: ButtonElevation? = ButtonDefaults.buttonElevation(),
-	shape: Shape = ButtonDefaults.shape,
-	border: BorderStroke? = null,
-	contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
-	content: @Composable (RowScope.(theme: IColors) -> Unit)
+	content: @Composable ((theme: IColors) -> Unit)
 ) {
 	val theme = Colors.get()
 
@@ -129,21 +102,16 @@ fun TertiaryButton(
 		theme.Material.onSurface.copy(alpha = 0.38f)
 	}
 
-	Button(
+	IconButton(
 		onClick = onClick,
 		modifier = modifier,
 		enabled = enabled,
 		interactionSource = interactionSource,
-		elevation = elevation,
-		shape = shape,
-		border = border,
 
-		colors = ButtonDefaults.buttonColors(
+		colors = IconButtonDefaults.iconButtonColors(
 			containerColor = theme.Material.tertiaryContainer,
 			contentColor = theme.Material.onTertiaryContainer,
 		),
-
-		contentPadding = contentPadding
 	) {
 		ProvideTextStyle(TextStyle(color = textColor)) {
 			content(theme)
