@@ -38,17 +38,19 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import io.github.vinceglb.filekit.compose.rememberFilePickerLauncher
 import io.github.vinceglb.filekit.core.FileKitPlatformSettings
 import io.github.vinceglb.filekit.core.PickerType
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import me.gserv.archival.Colors
 import me.gserv.archival.dropTarget
+import me.gserv.archival.types.VisibilityTogglingWindow
 import me.gserv.archival.utils.components.PrimaryButton
 import java.awt.image.BufferedImage
 import java.io.File
 import javax.imageio.ImageIO
 import kotlin.math.floor
 
-class CompareWindow(val parent: MainWindow) {
+class CompareWindow(val parent: VisibilityTogglingWindow) {
 	val logger = KotlinLogging.logger { }
 
 	var isOpen by mutableStateOf(false)
@@ -96,6 +98,7 @@ class CompareWindow(val parent: MainWindow) {
 	)
 
 	lateinit var scope: FrameWindowScope
+	lateinit var processingScope: CoroutineScope
 
 	fun close() {
 		dropTarget.clearState()
@@ -119,14 +122,26 @@ class CompareWindow(val parent: MainWindow) {
 	}
 
 	fun open() {
-		parent.hide()
-
 		isOpen = true
 
 		dropTarget.clearState()
 
 		dropTarget.smallText = "Waiting..."
 		dropTarget.icon = Icons.Default.Image
+	}
+
+	fun open(firstImage: File, secondImage: File) {
+		isOpen = true
+
+		dropTarget.clearState()
+
+		dropTarget.smallText = "Waiting..."
+		dropTarget.icon = Icons.Default.Image
+
+		processingScope.launch {
+			filePicked(firstImage, firstImageFileState, firstImageState)
+			filePicked(secondImage, secondImageFileState, secondImageState)
+		}
 	}
 
 	fun pickFile(fileTarget: MutableState<File?>, imageTarget: MutableState<BufferedImage?>) {
@@ -136,12 +151,103 @@ class CompareWindow(val parent: MainWindow) {
 		isPickerOpen = true
 	}
 
+	fun filePicked(file: File, fileTarget: MutableState<File?>, imageTarget: MutableState<BufferedImage?>) {
+		logger.info { "Loading image: ${file.absolutePath}" }
+
+		statusText = "Loading image..."
+		dropTarget.smallText = "Loading..."
+
+		progress = null
+		dropTarget.loadingProgress = null
+
+		fileTarget.value = file
+		imageTarget.value = ImageIO.read(file)
+
+		if (firstImage != null && secondImage != null) {
+			statusText = "Resizing images..."
+			dropTarget.smallText = "Resizing..."
+			dropTarget.icon = Icons.Default.FormatSize
+
+			progress = 0f
+			dropTarget.loadingProgress = 0f
+
+			var maxWidth = maxOf(firstImage!!.width, secondImage!!.width)
+			var maxHeight = maxOf(firstImage!!.height, secondImage!!.height)
+
+			val widthRatio = 1000f / maxWidth
+			val heightRatio = 1000f / maxHeight
+			val scaleRatio = minOf(widthRatio, heightRatio)
+
+			maxWidth = floor(maxWidth * scaleRatio).toInt()
+			maxHeight = floor(maxHeight * scaleRatio).toInt()
+
+			val resampler = ResampleOp(maxWidth, maxHeight)
+
+			val firstImageResized =
+				if (firstImage!!.width != maxWidth || firstImage!!.height != maxHeight) {
+					logger.info { "Resizing first image..." }
+
+					resampler.filter(firstImage, null)
+				} else {
+					firstImage!!
+				}
+
+			progress = 0.33f
+			dropTarget.loadingProgress = 0.33f
+
+			val secondImageResized =
+				if (secondImage!!.width != maxWidth || secondImage!!.height != maxHeight) {
+					logger.info { "Resizing second image..." }
+
+					resampler.filter(secondImage, null)
+				} else {
+					secondImage!!
+				}
+
+			logger.info { "Visually comparing images..." }
+
+			statusText = "Comparing images..."
+			dropTarget.smallText = "Comparing..."
+			dropTarget.icon = Icons.Default.Visibility
+
+			progress = 0.66f
+			dropTarget.loadingProgress = 0.66f
+
+			comparisonImage = ImageComparison(firstImageResized, secondImageResized)
+				.setRectangleLineWidth(5)
+				.compareImages()
+				.result
+
+			logger.info { "Comparison finished successfully" }
+
+			statusText = "Comparison done."
+			dropTarget.smallText = "Done."
+			dropTarget.icon = Icons.Default.Check
+
+			progress = 1f
+			dropTarget.loadingProgress = 1f
+		} else {
+			logger.info { "Image loaded successfully" }
+
+			statusText = "Image loaded."
+			dropTarget.smallText = "Done."
+			dropTarget.icon = Icons.Default.Check
+
+			progress = 1f
+			dropTarget.loadingProgress = 1f
+		}
+	}
+
 	@Composable
 	@Preview
 	fun create() {
-		val processingScope = rememberCoroutineScope { Dispatchers.IO }
+		if (!::processingScope.isInitialized) {
+			processingScope = rememberCoroutineScope { Dispatchers.IO }
+		}
 
 		if (isOpen) {
+			parent.hide()
+
 			Window(::close, state = state, resizable = false, title = "Compare Images") {
 				scope = this
 
@@ -158,92 +264,7 @@ class CompareWindow(val parent: MainWindow) {
 						}
 					) { file ->
 						if (file != null) {
-							processingScope.launch {
-								logger.info { "Loading image: ${file.file.absolutePath}" }
-
-								statusText = "Loading image..."
-								dropTarget.smallText = "Loading..."
-
-								progress = null
-								dropTarget.loadingProgress = null
-
-								pickerFileTarget.value = file.file
-								pickerImageTarget.value = ImageIO.read(file.file)
-
-								if (firstImage != null && secondImage != null) {
-									statusText = "Resizing images..."
-									dropTarget.smallText = "Resizing..."
-									dropTarget.icon = Icons.Default.FormatSize
-
-									progress = 0f
-									dropTarget.loadingProgress = 0f
-
-									var maxWidth = maxOf(firstImage!!.width, secondImage!!.width)
-									var maxHeight = maxOf(firstImage!!.height, secondImage!!.height)
-
-									val widthRatio = 1000f / maxWidth
-									val heightRatio = 1000f / maxHeight
-									val scaleRatio = minOf(widthRatio, heightRatio)
-
-									maxWidth = floor(maxWidth * scaleRatio).toInt()
-									maxHeight = floor(maxHeight * scaleRatio).toInt()
-
-									val resampler = ResampleOp(maxWidth, maxHeight)
-
-									val firstImageResized =
-										if (firstImage!!.width != maxWidth || firstImage!!.height != maxHeight) {
-											logger.info { "Resizing first image..." }
-
-											resampler.filter(firstImage, null)
-										} else {
-											firstImage!!
-										}
-
-									progress = 0.33f
-									dropTarget.loadingProgress = 0.33f
-
-									val secondImageResized =
-										if (secondImage!!.width != maxWidth || secondImage!!.height != maxHeight) {
-											logger.info { "Resizing second image..." }
-
-											resampler.filter(secondImage, null)
-										} else {
-											secondImage!!
-										}
-
-									logger.info { "Visually comparing images..." }
-
-									statusText = "Comparing images..."
-									dropTarget.smallText = "Comparing..."
-									dropTarget.icon = Icons.Default.Visibility
-
-									progress = 0.66f
-									dropTarget.loadingProgress = 0.66f
-
-									comparisonImage = ImageComparison(firstImageResized, secondImageResized)
-										.setRectangleLineWidth(5)
-										.compareImages()
-										.result
-
-									logger.info { "Comparison finished successfully" }
-
-									statusText = "Comparison done."
-									dropTarget.smallText = "Done."
-									dropTarget.icon = Icons.Default.Check
-
-									progress = 1f
-									dropTarget.loadingProgress = 1f
-								} else {
-									logger.info { "Image loaded successfully" }
-
-									statusText = "Image loaded."
-									dropTarget.smallText = "Done."
-									dropTarget.icon = Icons.Default.Check
-
-									progress = 1f
-									dropTarget.loadingProgress = 1f
-								}
-							}
+							processingScope.launch { filePicked(file.file, pickerFileTarget, pickerImageTarget) }
 
 							isPickerOpen = false
 						}

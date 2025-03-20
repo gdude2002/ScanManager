@@ -33,7 +33,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.*
 import androidx.compose.ui.window.ApplicationScope
-import androidx.compose.ui.window.FrameWindowScope
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.zIndex
@@ -44,6 +43,7 @@ import me.gserv.archival.config.AppConfig
 import me.gserv.archival.data.Database
 import me.gserv.archival.data.GlobalState
 import me.gserv.archival.dropTarget
+import me.gserv.archival.types.VisibilityTogglingWindow
 import me.gserv.archival.utils.StringTooltip
 import me.gserv.archival.utils.components.PrimaryButton
 import me.gserv.archival.utils.components.PrimaryIconButton
@@ -55,33 +55,19 @@ import me.gserv.archival.windows.main.DeleteBinderDialog
 import java.awt.Desktop
 import java.net.URI
 
-class MainWindow(val applicationScope: ApplicationScope) {
+class MainWindow(val applicationScope: ApplicationScope) : VisibilityTogglingWindow() {
 	val logger = KotlinLogging.logger { }
 
-	var isVisible by mutableStateOf(true)
 	var showArchived by mutableStateOf(false)
 
 	val state = WindowState(
 		size = DpSize(1000.dp, Dp.Unspecified)
 	)
 
-	lateinit var scope: FrameWindowScope
-
-	fun hide() {
-		isVisible = false
-		scope.window.isVisible = false
-	}
-
-	fun show() {
-		scope.window.isVisible = true
-		scope.window.requestFocus()
-		isVisible = true
-	}
-
 	@Composable
 	@Preview
 	fun open() {
-		if (::scope.isInitialized) {
+		if (isScopeSet) {
 			return
 		}
 
