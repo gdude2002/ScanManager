@@ -16,7 +16,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.rounded.HelpCenter
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -148,7 +147,9 @@ class SetWindow(val parent: BinderWindow) {
 
 										Spacer(Modifier.weight(1f, true))
 
-										PrimaryButton({}) {
+										PrimaryButton({
+											// TODO: Button Action
+										}) {
 											Row(
 												horizontalArrangement = Arrangement.spacedBy(10.dp),
 												verticalAlignment = Alignment.CenterVertically,
@@ -226,7 +227,7 @@ class SetWindow(val parent: BinderWindow) {
 															verticalAlignment = Alignment.CenterVertically,
 														) {
 															Icon(
-																Icons.AutoMirrored.Rounded.HelpCenter,
+																Icons.Rounded.ImageNotSupported,
 																"File missing",
 																tint = colors.Material.error
 															)
@@ -244,7 +245,7 @@ class SetWindow(val parent: BinderWindow) {
 															verticalAlignment = Alignment.CenterVertically,
 														) {
 															Icon(
-																Icons.AutoMirrored.Rounded.HelpCenter,
+																Icons.Rounded.ImageNotSupported,
 																"File missing",
 																tint = colors.Material.error
 															)
