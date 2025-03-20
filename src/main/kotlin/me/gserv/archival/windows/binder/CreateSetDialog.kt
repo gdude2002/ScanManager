@@ -39,7 +39,6 @@ import kotlinx.datetime.LocalDate
 import me.gserv.archival.Colors
 import me.gserv.archival.data.Database
 import me.gserv.archival.data.GlobalState
-import me.gserv.archival.data.entities.Binder
 import me.gserv.archival.data.entities.Set
 import me.gserv.archival.utils.components.PrimaryButton
 import me.gserv.archival.utils.components.SecondaryButton
@@ -48,7 +47,6 @@ import me.gserv.archival.windows.BinderWindow
 
 class CreateSetDialog(
 	val parent: BinderWindow,
-	val binder: Binder,
 ) {
 	val logger = KotlinLogging.logger { }
 
@@ -123,7 +121,7 @@ class CreateSetDialog(
 										setIdentifier = it.trimStart('0').padStart(1, '0')
 
 										Database.transaction {
-											isError = Set.exists(setIdentifier.toLong(), binder)
+											isError = Set.exists(setIdentifier.toLong(), GlobalState.binder!!)
 										}
 									},
 
@@ -190,11 +188,11 @@ class CreateSetDialog(
 									enabled = setIdentifier.isNotEmpty() && !isError,
 
 									onClick = {
-										logger.info { "Creating set $setIdentifier in binder ${binder.id.value}" }
+										logger.info { "Creating set $setIdentifier in binder ${GlobalState.binder?.id?.value}" }
 										logger.info { "Description: $setDescription" }
 
 										val set = Database.transaction {
-											Set.create(setIdentifier.toLong(), binder) {
+											Set.create(setIdentifier.toLong(), GlobalState.binder!!) {
 												date = LocalDate.now()
 
 												if (setDescription.isNotEmpty()) {

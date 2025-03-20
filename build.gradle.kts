@@ -37,6 +37,10 @@ dependencies {
 	implementation("org.openjfx", "javafx-base", "11.0.2", classifier = "win")
 	implementation("org.openjfx", "javafx-graphics", "11.0.2", classifier = "win")
 
+	implementation("com.github.skydoves:landscapist-animation:2.4.7")
+	implementation("com.github.skydoves:landscapist-coil3:2.4.7")
+	implementation("com.github.skydoves:landscapist-placeholder:2.4.7")
+
 	implementation("com.twelvemonkeys.imageio", "imageio-jpeg", "3.12.0")
 	implementation("com.twelvemonkeys.imageio", "imageio-psd", "3.12.0")
 	implementation("dev.brachtendorf", "JImageHash", "1.0.0")

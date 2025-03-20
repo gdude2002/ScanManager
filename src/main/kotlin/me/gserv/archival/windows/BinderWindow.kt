@@ -171,13 +171,13 @@ class BinderWindow(val parent: MainWindow) {
 				window.minimumSize = Dimension(1000, 700)
 				window.setWindowsAdaptiveTitleBar()
 
-				val createSetDialog = CreateSetDialog(this@BinderWindow, GlobalState.binder!!)
+				val createSetDialog = CreateSetDialog(this@BinderWindow)
 				createSetDialog.create()
 
 				val deleteSetDialog = DeleteSetDialog(this@BinderWindow)
 				deleteSetDialog.create()
 
-				val editSetDialog = EditSetDialog(this@BinderWindow, GlobalState.binder!!)
+				val editSetDialog = EditSetDialog(this@BinderWindow)
 				editSetDialog.create()
 
 				val setWindow = SetWindow(this@BinderWindow)

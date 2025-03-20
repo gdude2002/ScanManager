@@ -36,7 +36,6 @@ import kotlinx.datetime.atStartOfDayIn
 import me.gserv.archival.Colors
 import me.gserv.archival.data.Database
 import me.gserv.archival.data.GlobalState
-import me.gserv.archival.data.entities.Binder
 import me.gserv.archival.data.entities.Set
 import me.gserv.archival.utils.StringTooltip
 import me.gserv.archival.utils.ZERO
@@ -51,7 +50,6 @@ import java.util.*
 
 class EditSetDialog(
 	val parent: BinderWindow,
-	val binder: Binder,
 ) {
 	val logger = KotlinLogging.logger { }
 
@@ -333,7 +331,7 @@ class EditSetDialog(
 
 									PrimaryButton(
 										onClick = {
-											logger.info { "Editing set ${set!!.id.value} in binder ${binder.id.value}" }
+											logger.info { "Editing set ${set!!.id.value} in binder ${GlobalState.binder?.id?.value}" }
 
 											Database.transaction {
 												set!!.description = setDescription

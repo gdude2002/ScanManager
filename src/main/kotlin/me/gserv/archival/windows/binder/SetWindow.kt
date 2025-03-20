@@ -8,30 +8,41 @@
 
 package me.gserv.archival.windows.binder
 
-import androidx.compose.foundation.Image
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Add
-import androidx.compose.material.icons.rounded.Image
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
+import androidx.compose.material.icons.automirrored.rounded.HelpCenter
+import androidx.compose.material.icons.rounded.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.toPainter
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.vector.RenderVectorGroup
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.DpSize
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.window.FrameWindowScope
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowState
+import coil3.ImageLoader
+import coil3.PlatformContext
+import coil3.util.DebugLogger
+import com.skydoves.landscapist.ImageOptions
+import com.skydoves.landscapist.animation.circular.CircularRevealPlugin
+import com.skydoves.landscapist.coil3.CoilImage
+import com.skydoves.landscapist.components.rememberImageComponent
+import com.skydoves.landscapist.placeholder.placeholder.PlaceholderPlugin
 import io.github.kdroidfilter.platformtools.darkmodedetector.windows.setWindowsAdaptiveTitleBar
 import io.github.oshai.kotlinlogging.KotlinLogging
 import me.gserv.archival.Colors
@@ -39,10 +50,11 @@ import me.gserv.archival.data.Database
 import me.gserv.archival.data.GlobalState
 import me.gserv.archival.data.entities.Set
 import me.gserv.archival.dropTarget
+import me.gserv.archival.utils.PsdDecoder
 import me.gserv.archival.utils.components.PrimaryButton
 import me.gserv.archival.windows.BinderWindow
+import java.awt.Desktop
 import java.awt.Dimension
-import javax.imageio.ImageIO
 
 class SetWindow(val parent: BinderWindow) {
 	val logger = KotlinLogging.logger { }
@@ -70,6 +82,14 @@ class SetWindow(val parent: BinderWindow) {
 
 	@Composable
 	fun create() {
+		val imageLoader = ImageLoader
+			.Builder(PlatformContext.INSTANCE)
+			.logger(DebugLogger())
+			.components {
+				add(PsdDecoder.Factory)
+			}
+			.build()
+
 		logger.info { "Creating window..." }
 
 		if (isOpen) {
@@ -158,10 +178,11 @@ class SetWindow(val parent: BinderWindow) {
 									items(setFiles) { files ->
 										Column(Modifier.fillMaxWidth()) {
 											Row(
+												Modifier.height(300.dp),
 												horizontalArrangement = Arrangement.spacedBy(10.dp)
 											) {
 												Column(
-													Modifier.width(150.dp),
+													Modifier.width(150.dp).fillMaxHeight(),
 													verticalArrangement = Arrangement.spacedBy(5.dp)
 												) {
 													Text(
@@ -194,85 +215,170 @@ class SetWindow(val parent: BinderWindow) {
 															Text("Compare")
 														}
 													}
-												}
 
-												val originalImage = files.original?.let {
-													ImageIO.read(it)
-												}
+													Spacer(Modifier.weight(1f))
 
-												val editedImage = files.edit?.let {
-													ImageIO.read(it)
-												}
-
-												val testingImage = originalImage ?: editedImage!!
-
-												val container: @Composable (@Composable () -> Unit) -> Unit
-
-												var firstImageModifier: Modifier
-												var secondImageModifier: Modifier
-
-												if (testingImage.height > testingImage.width) {
-													firstImageModifier = Modifier.weight(1f)
-													secondImageModifier = firstImageModifier
-
-													container = @Composable {
+													if (files.original == null) {
 														Row(
-															Modifier.fillMaxWidth(),
-															horizontalArrangement = Arrangement.spacedBy(10.dp)
-														) { it() }
-													}
-												} else {
-													firstImageModifier = Modifier.fillMaxWidth()
-													secondImageModifier = firstImageModifier
+															horizontalArrangement = Arrangement.spacedBy(10.dp),
+															verticalAlignment = Alignment.CenterVertically,
+														) {
+															Icon(
+																Icons.AutoMirrored.Rounded.HelpCenter,
+																"File missing",
+																tint = colors.Material.error
+															)
 
-													container = @Composable {
-														Column(
-															Modifier.fillMaxWidth(),
-															verticalArrangement = Arrangement.spacedBy(10.dp)
-														) { it() }
+															Text(
+																"Original Scan",
+																color = colors.Material.error
+															)
+														}
+													}
+
+													if (files.edit == null) {
+														Row(
+															horizontalArrangement = Arrangement.spacedBy(10.dp),
+															verticalAlignment = Alignment.CenterVertically,
+														) {
+															Icon(
+																Icons.AutoMirrored.Rounded.HelpCenter,
+																"File missing",
+																tint = colors.Material.error
+															)
+
+															Text(
+																"Edited Scan",
+																color = colors.Material.error
+															)
+														}
+													}
+												}
+
+												val iconTintPainter = @Composable { image: ImageVector, color: Color ->
+													rememberVectorPainter(
+														defaultWidth = image.defaultWidth,
+														defaultHeight = image.defaultHeight,
+														viewportWidth = image.viewportWidth,
+														viewportHeight = image.viewportHeight,
+														name = image.name,
+														tintColor = color,
+														tintBlendMode = image.tintBlendMode,
+														autoMirror = image.autoMirror
+													) { _, _ ->
+														RenderVectorGroup(group = image.root)
 													}
 												}
 
-												container {
-													if (originalImage != null) {
-														Image(
-															originalImage.toPainter(),
-															"Original scan",
-															modifier = firstImageModifier,
+												val imageComponent = rememberImageComponent {
+													add(
+														CircularRevealPlugin(
+															duration = 350
 														)
-													} else {
-														Text(
-															"Original Scan Missing",
-															modifier = firstImageModifier
-																.wrapContentHeight(Alignment.CenterVertically),
-															textAlign = TextAlign.Center,
-															fontSize = 1.5.em,
+													)
+
+													add(
+														PlaceholderPlugin.Loading(
+															iconTintPainter(Icons.Rounded.Cached, colors.Material.primary)
 														)
+													)
+
+													add(
+														PlaceholderPlugin.Failure(
+															iconTintPainter(Icons.Rounded.Error, colors.Material.error)
+														)
+													)
+												}
+
+												Row(
+													Modifier.fillMaxWidth(),
+													horizontalArrangement = Arrangement.spacedBy(10.dp)
+												) {
+													if (files.original != null) {
+														Box {
+															OutlinedButton(
+																{ Desktop.getDesktop().browse(files.original.toURI()) },
+																border = BorderStroke(0.dp, Color.Transparent),
+																modifier = Modifier.size(300.dp),
+																shape = MaterialTheme.shapes.small,
+																contentPadding = PaddingValues(0.dp),
+															) {
+																CoilImage(
+																	component = imageComponent,
+																	imageModel = { files.original },
+																	imageLoader = { imageLoader },
+																	modifier = Modifier.fillMaxSize(),
+
+																	imageOptions = ImageOptions(
+																		contentScale = ContentScale.Crop,
+																		alignment = Alignment.Center,
+																		contentDescription = "Original image",
+																		requestSize = IntSize(1000, 1000),
+																	)
+																)
+															}
+
+															Icon(
+																Icons.Rounded.Image,
+																"Original image",
+																tint = colors.Material.onSecondaryContainer,
+
+																modifier = Modifier.offset(5.dp, 5.dp)
+																	.background(
+																		colors.Material.secondaryContainer.copy(0.5f),
+																		MaterialTheme.shapes.small
+																	)
+																	.padding(5.dp),
+															)
+														}
 													}
 
-													if (editedImage != null) {
-														Image(
-															editedImage.toPainter(),
-															"Edited scan",
-															modifier = secondImageModifier,
-														)
-													} else {
-														Text(
-															"Edited Scan Missing",
-															modifier = secondImageModifier
-																.wrapContentHeight(Alignment.CenterVertically),
-															textAlign = TextAlign.Center,
-															fontSize = 1.5.em,
-														)
+													if (files.edit != null) {
+														Box {
+															OutlinedButton(
+																{ Desktop.getDesktop().browse(files.edit.toURI()) },
+																border = BorderStroke(0.dp, Color.Transparent),
+																modifier = Modifier.size(300.dp),
+																shape = MaterialTheme.shapes.small,
+																contentPadding = PaddingValues(0.dp),
+															) {
+																CoilImage(
+																	component = imageComponent,
+																	imageModel = { files.edit },
+																	imageLoader = { imageLoader },
+																	modifier = Modifier.fillMaxSize(),
+
+																	imageOptions = ImageOptions(
+																		contentScale = ContentScale.Crop,
+																		alignment = Alignment.Center,
+																		contentDescription = "Edited image",
+																		requestSize = IntSize(1000, 1000),
+																	)
+																)
+															}
+
+															Icon(
+																Icons.Rounded.Brush,
+																"Edited image",
+																tint = colors.Material.onSecondaryContainer,
+
+																modifier = Modifier.offset(5.dp, 5.dp)
+																	.background(
+																		colors.Material.secondaryContainer.copy(0.5f),
+																		MaterialTheme.shapes.small
+																	)
+																	.padding(5.dp),
+															)
+														}
 													}
 												}
-											}
 
-											if (files.index != setFiles.last().index) {
-												HorizontalDivider(
-													Modifier.fillMaxWidth().absolutePadding(top = 10.dp),
-													color = colors.Material.primary
-												)
+												if (files.index != setFiles.last().index) {
+													HorizontalDivider(
+														Modifier.fillMaxWidth().absolutePadding(top = 10.dp),
+														color = colors.Material.primary
+													)
+												}
 											}
 										}
 									}
