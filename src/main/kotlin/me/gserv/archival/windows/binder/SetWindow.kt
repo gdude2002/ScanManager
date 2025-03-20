@@ -10,6 +10,7 @@ package me.gserv.archival.windows.binder
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -52,6 +53,8 @@ import me.gserv.archival.data.entities.Set
 import me.gserv.archival.dropTarget
 import me.gserv.archival.utils.PsdDecoder
 import me.gserv.archival.utils.components.PrimaryButton
+import me.gserv.archival.utils.components.SecondaryButton
+import me.gserv.archival.utils.components.SuccessButton
 import me.gserv.archival.windows.BinderWindow
 import java.awt.Desktop
 import java.awt.Dimension
@@ -279,7 +282,10 @@ class SetWindow(val parent: BinderWindow) {
 
 													add(
 														PlaceholderPlugin.Loading(
-															iconTintPainter(Icons.Rounded.Cached, colors.Material.primary)
+															iconTintPainter(
+																Icons.Rounded.Cached,
+																colors.Material.primary
+															)
 														)
 													)
 
@@ -294,12 +300,12 @@ class SetWindow(val parent: BinderWindow) {
 													Modifier.fillMaxWidth(),
 													horizontalArrangement = Arrangement.spacedBy(10.dp)
 												) {
-													if (files.original != null) {
-														Box {
+													Box(Modifier.size(300.dp)) {
+														if (files.original != null) {
 															OutlinedButton(
 																{ Desktop.getDesktop().browse(files.original.toURI()) },
 																border = BorderStroke(0.dp, Color.Transparent),
-																modifier = Modifier.size(300.dp),
+																modifier = Modifier.fillMaxSize(),
 																shape = MaterialTheme.shapes.small,
 																contentPadding = PaddingValues(0.dp),
 															) {
@@ -317,28 +323,59 @@ class SetWindow(val parent: BinderWindow) {
 																	)
 																)
 															}
-
-															Icon(
-																Icons.Rounded.Image,
-																"Original image",
-																tint = colors.Material.onSecondaryContainer,
-
-																modifier = Modifier.offset(5.dp, 5.dp)
-																	.background(
-																		colors.Material.secondaryContainer.copy(0.5f),
+														} else {
+															Row(
+																Modifier.fillMaxSize()
+																	.border(
+																		1.dp,
+																		colors.Material.secondaryContainer,
 																		MaterialTheme.shapes.small
-																	)
-																	.padding(5.dp),
-															)
+																	),
+																horizontalArrangement = Arrangement.spacedBy(10.dp),
+																verticalAlignment = Alignment.CenterVertically,
+															) {
+																Spacer(Modifier.weight(1f))
+
+																SuccessButton({
+																	// TODO: Button Action
+																}) {
+																	Row(
+																		horizontalArrangement = Arrangement.spacedBy(10.dp),
+																		verticalAlignment = Alignment.CenterVertically,
+																	) {
+																		Icon(
+																			Icons.Rounded.Add,
+																			""
+																		)
+
+																		Text("Add Missing Scan")
+																	}
+																}
+
+																Spacer(Modifier.weight(1f))
+															}
 														}
+
+														Icon(
+															Icons.Rounded.Image,
+															"Original image",
+															tint = colors.Material.onSecondaryContainer,
+
+															modifier = Modifier.offset(5.dp, 5.dp)
+																.background(
+																	colors.Material.secondaryContainer.copy(0.5f),
+																	MaterialTheme.shapes.small
+																)
+																.padding(5.dp),
+														)
 													}
 
-													if (files.edit != null) {
-														Box {
+													Box(Modifier.size(300.dp)) {
+														if (files.edit != null) {
 															OutlinedButton(
 																{ Desktop.getDesktop().browse(files.edit.toURI()) },
 																border = BorderStroke(0.dp, Color.Transparent),
-																modifier = Modifier.size(300.dp),
+																modifier = Modifier.fillMaxSize(),
 																shape = MaterialTheme.shapes.small,
 																contentPadding = PaddingValues(0.dp),
 															) {
@@ -356,20 +393,51 @@ class SetWindow(val parent: BinderWindow) {
 																	)
 																)
 															}
-
-															Icon(
-																Icons.Rounded.Brush,
-																"Edited image",
-																tint = colors.Material.onSecondaryContainer,
-
-																modifier = Modifier.offset(5.dp, 5.dp)
-																	.background(
-																		colors.Material.secondaryContainer.copy(0.5f),
+														} else {
+															Row(
+																Modifier.fillMaxSize()
+																	.border(
+																		1.dp,
+																		colors.Material.secondaryContainer,
 																		MaterialTheme.shapes.small
-																	)
-																	.padding(5.dp),
-															)
+																	),
+																horizontalArrangement = Arrangement.spacedBy(10.dp),
+																verticalAlignment = Alignment.CenterVertically,
+															) {
+																Spacer(Modifier.weight(1f))
+
+																SuccessButton({
+																	// TODO: Button Action
+																}) {
+																	Row(
+																		horizontalArrangement = Arrangement.spacedBy(10.dp),
+																		verticalAlignment = Alignment.CenterVertically,
+																	) {
+																		Icon(
+																			Icons.Rounded.Add,
+																			""
+																		)
+
+																		Text("Add Missing Scan")
+																	}
+																}
+
+																Spacer(Modifier.weight(1f))
+															}
 														}
+
+														Icon(
+															Icons.Rounded.Brush,
+															"Edited image",
+															tint = colors.Material.onSecondaryContainer,
+
+															modifier = Modifier.offset(5.dp, 5.dp)
+																.background(
+																	colors.Material.secondaryContainer.copy(0.5f),
+																	MaterialTheme.shapes.small
+																)
+																.padding(5.dp),
+														)
 													}
 												}
 

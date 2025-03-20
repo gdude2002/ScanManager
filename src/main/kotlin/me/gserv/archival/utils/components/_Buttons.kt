@@ -150,3 +150,46 @@ fun TertiaryButton(
 		}
 	}
 }
+
+
+@Composable
+fun SuccessButton(
+	onClick: () -> Unit,
+	modifier: Modifier = Modifier,
+	enabled: Boolean = true,
+	interactionSource: MutableInteractionSource? = null,
+	elevation: ButtonElevation? = ButtonDefaults.buttonElevation(),
+	shape: Shape = ButtonDefaults.shape,
+	border: BorderStroke? = null,
+	contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
+	content: @Composable (RowScope.(theme: IColors) -> Unit)
+) {
+	val theme = Colors.get()
+
+	val textColor = if (enabled) {
+		theme.MaterialOnSuccessContainer
+	} else {
+		theme.Material.onSurface.copy(alpha = 0.38f)
+	}
+
+	Button(
+		onClick = onClick,
+		modifier = modifier,
+		enabled = enabled,
+		interactionSource = interactionSource,
+		elevation = elevation,
+		shape = shape,
+		border = border,
+
+		colors = ButtonDefaults.buttonColors(
+			containerColor = theme.MaterialSuccessContainer,
+			contentColor = theme.MaterialOnSuccessContainer,
+		),
+
+		contentPadding = contentPadding
+	) {
+		ProvideTextStyle(TextStyle(color = textColor)) {
+			content(theme)
+		}
+	}
+}
