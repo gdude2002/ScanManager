@@ -53,7 +53,6 @@ import me.gserv.archival.data.entities.Set
 import me.gserv.archival.dropTarget
 import me.gserv.archival.utils.PsdDecoder
 import me.gserv.archival.utils.components.PrimaryButton
-import me.gserv.archival.utils.components.SecondaryButton
 import me.gserv.archival.utils.components.SuccessButton
 import me.gserv.archival.windows.BinderWindow
 import java.awt.Desktop
@@ -348,7 +347,7 @@ class SetWindow(val parent: BinderWindow) {
 																			""
 																		)
 
-																		Text("Add Missing Scan")
+																		Text("Add Missing File")
 																	}
 																}
 
@@ -418,7 +417,7 @@ class SetWindow(val parent: BinderWindow) {
 																			""
 																		)
 
-																		Text("Add Missing Scan")
+																		Text("Add Missing File")
 																	}
 																}
 
