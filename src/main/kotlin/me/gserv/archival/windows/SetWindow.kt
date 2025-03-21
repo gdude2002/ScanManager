@@ -6,7 +6,7 @@
  * Any redistribution must include the specific provision above.
  */
 
-package me.gserv.archival.windows.binder
+package me.gserv.archival.windows
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -53,8 +53,6 @@ import me.gserv.archival.types.VisibilityTogglingWindow
 import me.gserv.archival.utils.PsdDecoder
 import me.gserv.archival.utils.components.PrimaryButton
 import me.gserv.archival.utils.components.SuccessButton
-import me.gserv.archival.windows.BinderWindow
-import me.gserv.archival.windows.CompareWindow
 import java.awt.Desktop
 import java.awt.Dimension
 
