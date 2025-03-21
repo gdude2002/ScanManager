@@ -116,3 +116,36 @@ fun TertiaryIconButton(
 		}
 	}
 }
+
+@Composable
+fun SuccessIconButton(
+	onClick: () -> Unit,
+	modifier: Modifier = Modifier,
+	enabled: Boolean = true,
+	interactionSource: MutableInteractionSource? = null,
+	content: @Composable ((theme: IColors) -> Unit)
+) {
+	val theme = Colors.get()
+
+	val textColor = if (enabled) {
+		theme.MaterialOnSuccessContainer
+	} else {
+		theme.Material.onSurface.copy(alpha = 0.38f)
+	}
+
+	IconButton(
+		onClick = onClick,
+		modifier = modifier,
+		enabled = enabled,
+		interactionSource = interactionSource,
+
+		colors = IconButtonDefaults.iconButtonColors(
+			containerColor = theme.MaterialSuccessContainer,
+			contentColor = theme.MaterialOnSuccessContainer,
+		),
+	) {
+		ProvideTextStyle(TextStyle(color = textColor)) {
+			content(theme)
+		}
+	}
+}

@@ -21,7 +21,7 @@ object GlobalState {
 	var binder by mutableStateOf<Binder?>(null)
 	var set by mutableStateOf<Set?>(null)
 
-	var sets: SnapshotStateList<Set> = mutableStateListOf()
+	var sets: SnapshotStateList<Set> by mutableStateOf(mutableStateListOf())
 
 	fun clear() {
 		binders.clear()

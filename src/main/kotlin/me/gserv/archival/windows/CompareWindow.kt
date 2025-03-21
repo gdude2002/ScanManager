@@ -19,11 +19,7 @@ import androidx.compose.material.icons.filled.FormatSize
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.rounded.Cached
-import androidx.compose.material3.Icon
-import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toPainter
@@ -377,7 +373,7 @@ class CompareWindow(val parent: VisibilityTogglingWindow) {
 								Spacer(Modifier.weight(1f, true))
 
 								PrimaryButton(
-									{isViewReversed = !isViewReversed},
+									{ isViewReversed = !isViewReversed },
 									modifier = Modifier.fillMaxWidth(),
 									enabled = comparisonImage != null && reverseComparisonImage != null
 								) {

@@ -17,8 +17,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.ArrowDropUp
+import androidx.compose.material.icons.automirrored.rounded.Article
+import androidx.compose.material.icons.automirrored.rounded.EventNote
 import androidx.compose.material.icons.filled.QuestionMark
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
@@ -48,6 +48,8 @@ import me.gserv.archival.utils.components.TertiaryButton
 import me.gserv.archival.utils.format
 import me.gserv.archival.windows.binder.*
 import org.jetbrains.exposed.sql.SortOrder
+import org.jetbrains.exposed.sql.SqlExpressionBuilder
+import org.jetbrains.exposed.sql.and
 import java.awt.Dimension
 
 class BinderWindow(val parent: MainWindow) {
@@ -56,10 +58,14 @@ class BinderWindow(val parent: MainWindow) {
 	var isOpen by mutableStateOf(false)
 	var isVisible by mutableStateOf(true)
 
-	var isDropdownOpen by mutableStateOf(false)
+	var isFilterDropdownOpen by mutableStateOf(false)
+	var isSortingDropdownOpen by mutableStateOf(false)
 
 	var filterState by mutableStateOf<FilterState>(FilterState.All)
 	var filterText by mutableStateOf("")
+
+	var sortState: SortingField<*> by mutableStateOf(SortingField.Number)
+	var sortAsc: Boolean by mutableStateOf(false)
 
 	var allSets: SnapshotStateList<Set> = mutableStateListOf()
 
@@ -100,10 +106,13 @@ class BinderWindow(val parent: MainWindow) {
 
 		parent.show()
 
-		isDropdownOpen = false
+		isFilterDropdownOpen = false
+
 		filterState = FilterState.All
 		filterText = ""
 
+		sortState = SortingField.Number
+		sortAsc = false
 	}
 
 	fun open(binder: Binder) {
@@ -111,17 +120,42 @@ class BinderWindow(val parent: MainWindow) {
 
 		GlobalState.binder = binder
 
-		val sets = Database.transaction {
-			Set.find {
-				SetTable.binder eq binder.id
-			}.orderBy(SetTable.id to SortOrder.DESC)
-				.toList()
-		}
-
-		GlobalState.sets.addAll(sets)
-		this.allSets.addAll(sets)
+		updateSets(true)
 
 		isOpen = true
+	}
+
+	fun updateSets(replaceFullList: Boolean = false) {
+		val sets = Database.transaction {
+			val op = with(SqlExpressionBuilder) {
+				var current = SetTable.binder eq GlobalState.binder!!.id
+
+				when (filterState) {
+					FilterState.All -> {}
+					FilterState.Complete -> current = current and (SetTable.finishedAt neq null)
+					FilterState.Incomplete -> current = current and (SetTable.finishedAt eq null)
+				}
+
+				current
+			}
+
+			val direction = if (sortAsc) {
+				SortOrder.ASC
+			} else {
+				SortOrder.DESC
+			}
+
+			Set.find(op)
+				.orderBy(sortState.expression to direction)
+				.toList()
+				.toMutableStateList()
+		}
+
+		GlobalState.sets = sets
+
+		if (replaceFullList) {
+			this.allSets = sets
+		}
 	}
 
 	@OptIn(ExperimentalMaterialApi::class)
@@ -146,7 +180,7 @@ class BinderWindow(val parent: MainWindow) {
 					}
 				}
 
-				LaunchedEffect(filterState, filterText) {
+				LaunchedEffect(filterState, filterText, sortState, sortAsc) {
 					var filtered = allSets.toList()
 
 					when (filterState) {
@@ -160,8 +194,7 @@ class BinderWindow(val parent: MainWindow) {
 						filtered = filtered.filter { it.description?.contains(filterText, true) == true }
 					}
 
-					GlobalState.sets.clear()
-					GlobalState.sets = filtered.toMutableStateList()
+					updateSets()
 				}
 			}
 
@@ -210,7 +243,7 @@ class BinderWindow(val parent: MainWindow) {
 
 							Box(Modifier.fillMaxHeight()) {
 								OutlinedButton(
-									{ isDropdownOpen = !isDropdownOpen },
+									{ isFilterDropdownOpen = !isFilterDropdownOpen },
 									enabled = allSets.isNotEmpty(),
 									modifier = Modifier.fillMaxHeight()
 								) {
@@ -219,28 +252,35 @@ class BinderWindow(val parent: MainWindow) {
 										verticalAlignment = Alignment.CenterVertically
 									) {
 										if (allSets.isNotEmpty()) {
-											Text("Filter: ${filterState.readableName} Sets")
-
-											if (isDropdownOpen) {
-												Icon(Icons.Default.ArrowDropUp, "")
+											if (isFilterDropdownOpen) {
+												Icon(Icons.Rounded.KeyboardArrowUp, "")
 											} else {
-												Icon(Icons.Default.ArrowDropDown, "")
+												Icon(Icons.Rounded.KeyboardArrowDown, "")
 											}
+
+											Text("Filter: ${filterState.readableName} Sets")
 										} else {
 											Text("No sets")
 										}
 									}
 								}
 
-								DropdownMenu(isDropdownOpen, { isDropdownOpen = false }) {
+								DropdownMenu(isFilterDropdownOpen, { isFilterDropdownOpen = false }) {
 									DropdownMenuItem(
 										onClick = {
 											logger.info { "Updating completion filter: All sets" }
 
 											filterState = FilterState.All
-											isDropdownOpen = false
+											isFilterDropdownOpen = false
 										},
 
+										colors = if (filterState == FilterState.All) {
+											colors.successMenuItemColors()
+										} else {
+											colors.defaultMenuItemColors()
+										},
+
+										leadingIcon = { Icon(Icons.Rounded.AllInclusive, "") },
 										text = { Text("All Sets") }
 									)
 
@@ -251,10 +291,17 @@ class BinderWindow(val parent: MainWindow) {
 											logger.info { "Updating completion filter: Incomplete sets only" }
 
 											filterState = FilterState.Incomplete
-											isDropdownOpen = false
+											isFilterDropdownOpen = false
 											dropTarget.currentSet = 0
 										},
 
+										colors = if (filterState == FilterState.Incomplete) {
+											colors.successMenuItemColors()
+										} else {
+											colors.defaultMenuItemColors()
+										},
+
+										leadingIcon = { Icon(Icons.Rounded.Close, "") },
 										text = { Text("Incomplete Sets") }
 									)
 
@@ -263,11 +310,189 @@ class BinderWindow(val parent: MainWindow) {
 											logger.info { "Updating completion filter: Complete sets only" }
 
 											filterState = FilterState.Complete
-											isDropdownOpen = false
+											isFilterDropdownOpen = false
 											dropTarget.currentSet = 0
 										},
 
+										colors = if (filterState == FilterState.Complete) {
+											colors.successMenuItemColors()
+										} else {
+											colors.defaultMenuItemColors()
+										},
+
+										leadingIcon = { Icon(Icons.Rounded.Check, "") },
 										text = { Text("Complete Sets") }
+									)
+								}
+							}
+
+							Box(Modifier.fillMaxHeight()) {
+								OutlinedButton(
+									{ isSortingDropdownOpen = !isSortingDropdownOpen },
+									enabled = allSets.isNotEmpty(),
+									modifier = Modifier.fillMaxHeight()
+								) {
+									Row(
+										horizontalArrangement = Arrangement.spacedBy(5.dp),
+										verticalAlignment = Alignment.CenterVertically
+									) {
+										if (allSets.isNotEmpty()) {
+											if (isSortingDropdownOpen) {
+												Icon(Icons.Rounded.KeyboardArrowUp, "")
+											} else {
+												Icon(Icons.Rounded.KeyboardArrowDown, "")
+											}
+
+											Text("Sort: ${sortState.readableName}")
+
+											if (sortAsc) {
+												Icon(Icons.Rounded.North, "")
+											} else {
+												Icon(Icons.Rounded.South, "")
+											}
+										} else {
+											Text("No sets")
+										}
+									}
+								}
+
+								DropdownMenu(isSortingDropdownOpen, { isSortingDropdownOpen = false }) {
+									DropdownMenuItem(
+										onClick = { sortAsc = true },
+										leadingIcon = { Icon(Icons.Rounded.North, "") },
+										text = { Text("Ascending") },
+
+										colors = if (sortAsc) {
+											colors.successMenuItemColors()
+										} else {
+											colors.defaultMenuItemColors()
+										},
+									)
+
+									DropdownMenuItem(
+										onClick = { sortAsc = false },
+										leadingIcon = { Icon(Icons.Rounded.South, "") },
+										text = { Text("Descending") },
+
+										colors = if (sortAsc) {
+											colors.defaultMenuItemColors()
+										} else {
+											colors.successMenuItemColors()
+										},
+									)
+
+									HorizontalDivider()
+
+									DropdownMenuItem(
+										onClick = {
+											logger.info { "Updating sorting field: ID Number" }
+
+											sortState = SortingField.Number
+											isSortingDropdownOpen = false
+										},
+
+										colors = if (sortState == SortingField.Number) {
+											colors.successMenuItemColors()
+										} else {
+											colors.defaultMenuItemColors()
+										},
+
+										leadingIcon = { Icon(Icons.Rounded.LocalOffer, "") },
+										text = { Text("ID Number") }
+									)
+
+									HorizontalDivider()
+
+									DropdownMenuItem(
+										onClick = {
+											logger.info { "Updating sorting field: Completion Date" }
+
+											sortState = SortingField.CompletionDate
+											isSortingDropdownOpen = false
+										},
+
+										colors = if (sortState == SortingField.CompletionDate) {
+											colors.successMenuItemColors()
+										} else {
+											colors.defaultMenuItemColors()
+										},
+
+										leadingIcon = { Icon(Icons.Rounded.EventAvailable, "") },
+										text = { Text("Completion Date") }
+									)
+
+									DropdownMenuItem(
+										onClick = {
+											logger.info { "Updating sorting field: Creation Date" }
+
+											sortState = SortingField.CreationDate
+											isSortingDropdownOpen = false
+										},
+
+										colors = if (sortState == SortingField.CreationDate) {
+											colors.successMenuItemColors()
+										} else {
+											colors.defaultMenuItemColors()
+										},
+
+										leadingIcon = { Icon(Icons.Rounded.Event, "") },
+										text = { Text("Creation Date") }
+									)
+
+									DropdownMenuItem(
+										onClick = {
+											logger.info { "Updating sorting field: Photography Date" }
+
+											sortState = SortingField.PhotographyDate
+											isSortingDropdownOpen = false
+										},
+
+										colors = if (sortState == SortingField.PhotographyDate) {
+											colors.successMenuItemColors()
+										} else {
+											colors.defaultMenuItemColors()
+										},
+
+										leadingIcon = { Icon(Icons.AutoMirrored.Rounded.EventNote, "") },
+										text = { Text("Photography Date") }
+									)
+
+									HorizontalDivider()
+
+									DropdownMenuItem(
+										onClick = {
+											logger.info { "Updating sorting field: Description" }
+
+											sortState = SortingField.Description
+											isSortingDropdownOpen = false
+										},
+
+										colors = if (sortState == SortingField.Description) {
+											colors.successMenuItemColors()
+										} else {
+											colors.defaultMenuItemColors()
+										},
+
+										leadingIcon = { Icon(Icons.AutoMirrored.Rounded.Article, "") },
+										text = { Text("Description") }
+									)
+
+									DropdownMenuItem(
+										onClick = {
+											logger.info { "Updating sorting field: Total Scans" }
+
+											sortState = SortingField.TotalScans
+											isSortingDropdownOpen = false
+										},
+
+										colors = if (sortState == SortingField.TotalScans) {
+											colors.successMenuItemColors()
+										} else {
+											colors.defaultMenuItemColors()
+										},
+
+										leadingIcon = { Icon(Icons.Rounded.CropFree, "") },
+										text = { Text("Total Scans") }
 									)
 								}
 							}

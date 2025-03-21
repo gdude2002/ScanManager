@@ -149,6 +149,18 @@ object Colors {
 				disabledLabelColor = MaterialOnSuccessContainer.copy(alpha = 0.5f),
 				disabledIconContentColor = MaterialOnSuccessContainer.copy(alpha = 0.25f),
 			)
+
+		@Composable
+		fun defaultMenuItemColors(): MenuItemColors =
+			MenuDefaults.itemColors()
+
+		@Composable
+		fun successMenuItemColors(): MenuItemColors =
+			MenuDefaults.itemColors(
+				textColor = MaterialSuccess,
+				leadingIconColor = MaterialSuccess,
+				trailingIconColor = MaterialSuccess,
+			)
 	}
 
 	private object ColorTokens {
