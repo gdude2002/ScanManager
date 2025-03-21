@@ -376,21 +376,20 @@ class CompareWindow(val parent: VisibilityTogglingWindow) {
 
 								Spacer(Modifier.weight(1f, true))
 
-								if (comparisonImage != null && reverseComparisonImage != null) {
-									PrimaryButton(
-										{isViewReversed = !isViewReversed},
-										modifier = Modifier.fillMaxWidth()
+								PrimaryButton(
+									{isViewReversed = !isViewReversed},
+									modifier = Modifier.fillMaxWidth(),
+									enabled = comparisonImage != null && reverseComparisonImage != null
+								) {
+									Row(
+										horizontalArrangement = Arrangement.spacedBy(10.dp),
 									) {
-										Row(
-											horizontalArrangement = Arrangement.spacedBy(10.dp),
-										) {
-											Icon(
-												Icons.Rounded.Cached,
-												""
-											)
+										Icon(
+											Icons.Rounded.Cached,
+											""
+										)
 
-											Text("Swap View")
-										}
+										Text("Swap View")
 									}
 								}
 
