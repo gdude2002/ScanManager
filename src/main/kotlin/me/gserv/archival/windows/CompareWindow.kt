@@ -252,6 +252,8 @@ class CompareWindow(val parent: VisibilityTogglingWindow) {
 				scope = this
 
 				if (isPickerOpen) {
+					val pickerScope = rememberCoroutineScope { Dispatchers.IO }
+
 					val launcher = rememberFilePickerLauncher(
 						type = PickerType.File(listOf("png", "jpg", "jpeg", "gif", "bmp", "psd")),
 						title = "Select an image",
@@ -263,11 +265,17 @@ class CompareWindow(val parent: VisibilityTogglingWindow) {
 							null
 						}
 					) { file ->
-						if (file != null) {
-							processingScope.launch { filePicked(file.file, pickerFileTarget, pickerImageTarget) }
+						logger.info { "File picked: ${file?.path}" }
 
-							isPickerOpen = false
+						if (file != null) {
+							pickerScope.launch {
+								logger.info { "Starting processing..." }
+
+								filePicked(file.file, pickerFileTarget, pickerImageTarget)
+							}
 						}
+
+						isPickerOpen = false
 					}
 
 					launcher.launch()
