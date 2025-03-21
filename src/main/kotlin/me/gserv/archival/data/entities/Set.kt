@@ -110,8 +110,31 @@ class Set(id: EntityID<Long>) : LongEntity(id) {
 		var original: File? = null,
 		var edit: File? = null,
 	) {
+		val originalInDatabase: Boolean? by lazy {
+			if (original == null) {
+				null
+			} else {
+				Database.transaction {
+					Image.findById(original!!.absolutePath) != null
+				}
+			}
+		}
+
+		val editInDatabase: Boolean? by lazy {
+			if (edit == null) {
+				null
+			} else {
+				Database.transaction {
+					Image.findById(edit!!.absolutePath) != null
+				}
+			}
+		}
+
 		fun toContainer(): FileContainer =
 			FileContainer(index, original, edit)
+
+		fun toMutableContainer(): MutableFileContainer =
+			this.copy()
 	}
 
 	data class FileContainer(
@@ -119,6 +142,29 @@ class Set(id: EntityID<Long>) : LongEntity(id) {
 		val original: File? = null,
 		val edit: File? = null,
 	) {
+		val originalInDatabase: Boolean? by lazy {
+			if (original == null) {
+				null
+			} else {
+				Database.transaction {
+					Image.findById(original.absolutePath) != null
+				}
+			}
+		}
+
+		val editInDatabase: Boolean? by lazy {
+			if (edit == null) {
+				null
+			} else {
+				Database.transaction {
+					Image.findById(edit.absolutePath) != null
+				}
+			}
+		}
+
+		fun toContainer(): FileContainer =
+			this
+
 		fun toMutableContainer(): MutableFileContainer =
 			MutableFileContainer(index, original, edit)
 	}

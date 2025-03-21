@@ -6,9 +6,12 @@
  * Any redistribution must include the specific provision above.
  */
 
+@file:OptIn(ExperimentalFoundationApi::class)
+
 package me.gserv.archival.windows
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -16,6 +19,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.Help
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -51,6 +55,7 @@ import me.gserv.archival.data.entities.Set
 import me.gserv.archival.dropTarget
 import me.gserv.archival.types.VisibilityTogglingWindow
 import me.gserv.archival.utils.PsdDecoder
+import me.gserv.archival.utils.StringTooltip
 import me.gserv.archival.utils.components.PrimaryButton
 import me.gserv.archival.utils.components.SuccessButton
 import java.awt.Desktop
@@ -219,44 +224,6 @@ class SetWindow(val parent: BinderWindow) : VisibilityTogglingWindow() {
 																}
 															}
 														}
-
-														Spacer(Modifier.weight(1f))
-
-														if (files.original == null) {
-															Row(
-																horizontalArrangement = Arrangement.spacedBy(10.dp),
-																verticalAlignment = Alignment.CenterVertically,
-															) {
-																Icon(
-																	Icons.Rounded.ImageNotSupported,
-																	"File missing",
-																	tint = colors.Material.error
-																)
-
-																Text(
-																	"Original Scan",
-																	color = colors.Material.error
-																)
-															}
-														}
-
-														if (files.edit == null) {
-															Row(
-																horizontalArrangement = Arrangement.spacedBy(10.dp),
-																verticalAlignment = Alignment.CenterVertically,
-															) {
-																Icon(
-																	Icons.Rounded.ImageNotSupported,
-																	"File missing",
-																	tint = colors.Material.error
-																)
-
-																Text(
-																	"Edited Scan",
-																	color = colors.Material.error
-																)
-															}
-														}
 													}
 
 													val iconTintPainter =
@@ -332,15 +299,15 @@ class SetWindow(val parent: BinderWindow) : VisibilityTogglingWindow() {
 																	)
 																}
 															} else {
-																Row(
+																Column(
 																	Modifier.fillMaxSize()
 																		.border(
 																			1.dp,
 																			colors.Material.secondaryContainer,
 																			MaterialTheme.shapes.small
 																		),
-																	horizontalArrangement = Arrangement.spacedBy(10.dp),
-																	verticalAlignment = Alignment.CenterVertically,
+																	verticalArrangement = Arrangement.spacedBy(10.dp),
+																	horizontalAlignment = Alignment.CenterHorizontally,
 																) {
 																	Spacer(Modifier.weight(1f))
 
@@ -358,7 +325,27 @@ class SetWindow(val parent: BinderWindow) : VisibilityTogglingWindow() {
 																				""
 																			)
 
-																			Text("Add Missing File")
+																			Text("Add missing file")
+																		}
+																	}
+
+																	if (files.edit != null) {
+																		PrimaryButton({
+																			// TODO: Button Action
+																		}) {
+																			Row(
+																				horizontalArrangement = Arrangement.spacedBy(
+																					10.dp
+																				),
+																				verticalAlignment = Alignment.CenterVertically,
+																			) {
+																				Icon(
+																					Icons.Rounded.ContentCopy,
+																					""
+																				)
+
+																				Text("Copy from edit")
+																			}
 																		}
 																	}
 
@@ -366,18 +353,43 @@ class SetWindow(val parent: BinderWindow) : VisibilityTogglingWindow() {
 																}
 															}
 
-															Icon(
-																Icons.Rounded.Image,
-																"Original image",
-																tint = colors.Material.onSecondaryContainer,
-
+															Row(
+																horizontalArrangement = Arrangement.spacedBy(10.dp),
 																modifier = Modifier.offset(5.dp, 5.dp)
 																	.background(
-																		colors.Material.secondaryContainer.copy(0.5f),
+																		colors.Material.secondaryContainer.copy(0.75f),
 																		MaterialTheme.shapes.small
 																	)
 																	.padding(5.dp),
-															)
+															) {
+																StringTooltip("Original scan") {
+																	Icon(
+																		Icons.Rounded.Image,
+																		"Original scan",
+																		tint = colors.Material.primary,
+																	)
+																}
+
+																if (files.original == null) {
+																	StringTooltip("File missing") {
+																		Icon(
+																			Icons.Rounded.ImageNotSupported,
+																			"File missing",
+																			tint = colors.Material.error,
+																		)
+																	}
+																}
+
+																if (files.originalInDatabase == false) {
+																	StringTooltip("Not in database") {
+																		Icon(
+																			Icons.AutoMirrored.Rounded.Help,
+																			"Not in database",
+																			tint = colors.Material.error,
+																		)
+																	}
+																}
+															}
 														}
 
 														Box(Modifier.size(300.dp)) {
@@ -404,15 +416,15 @@ class SetWindow(val parent: BinderWindow) : VisibilityTogglingWindow() {
 																	)
 																}
 															} else {
-																Row(
+																Column(
 																	Modifier.fillMaxSize()
 																		.border(
 																			1.dp,
 																			colors.Material.secondaryContainer,
 																			MaterialTheme.shapes.small
 																		),
-																	horizontalArrangement = Arrangement.spacedBy(10.dp),
-																	verticalAlignment = Alignment.CenterVertically,
+																	verticalArrangement = Arrangement.spacedBy(10.dp),
+																	horizontalAlignment = Alignment.CenterHorizontally,
 																) {
 																	Spacer(Modifier.weight(1f))
 
@@ -430,7 +442,27 @@ class SetWindow(val parent: BinderWindow) : VisibilityTogglingWindow() {
 																				""
 																			)
 
-																			Text("Add Missing File")
+																			Text("Add missing file")
+																		}
+																	}
+
+																	if (files.original != null) {
+																		PrimaryButton({
+																			// TODO: Button Action
+																		}) {
+																			Row(
+																				horizontalArrangement = Arrangement.spacedBy(
+																					10.dp
+																				),
+																				verticalAlignment = Alignment.CenterVertically,
+																			) {
+																				Icon(
+																					Icons.Rounded.ContentCopy,
+																					""
+																				)
+
+																				Text("Copy from original")
+																			}
 																		}
 																	}
 
@@ -438,18 +470,43 @@ class SetWindow(val parent: BinderWindow) : VisibilityTogglingWindow() {
 																}
 															}
 
-															Icon(
-																Icons.Rounded.Brush,
-																"Edited image",
-																tint = colors.Material.onSecondaryContainer,
-
+															Row(
+																horizontalArrangement = Arrangement.spacedBy(10.dp),
 																modifier = Modifier.offset(5.dp, 5.dp)
 																	.background(
-																		colors.Material.secondaryContainer.copy(0.5f),
+																		colors.Material.secondaryContainer.copy(0.75f),
 																		MaterialTheme.shapes.small
 																	)
 																	.padding(5.dp),
-															)
+															) {
+																StringTooltip("Edited scan") {
+																	Icon(
+																		Icons.Rounded.Brush,
+																		"Edited scan",
+																		tint = colors.MaterialSuccess,
+																	)
+																}
+
+																if (files.edit == null) {
+																	StringTooltip("File missing") {
+																		Icon(
+																			Icons.Rounded.ImageNotSupported,
+																			"File missing",
+																			tint = colors.Material.error,
+																		)
+																	}
+																}
+
+																if (files.editInDatabase == false) {
+																	StringTooltip("Not in database") {
+																		Icon(
+																			Icons.AutoMirrored.Rounded.Help,
+																			"Not in database",
+																			tint = colors.Material.error,
+																		)
+																	}
+																}
+															}
 														}
 													}
 
