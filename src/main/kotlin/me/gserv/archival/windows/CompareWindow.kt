@@ -18,6 +18,8 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.FormatSize
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.rounded.Cached
+import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -55,6 +57,7 @@ class CompareWindow(val parent: VisibilityTogglingWindow) {
 
 	var isOpen by mutableStateOf(false)
 	var isPickerOpen by mutableStateOf(false)
+	var isViewReversed by mutableStateOf(false)
 
 	var progress: Float? by mutableStateOf(0f)
 	var statusText by mutableStateOf("Waiting for input...")
@@ -66,6 +69,8 @@ class CompareWindow(val parent: VisibilityTogglingWindow) {
 	val secondImageFileState: MutableState<File?> = mutableStateOf(null)
 
 	var comparisonImage by mutableStateOf<BufferedImage?>(null)
+	var reverseComparisonImage by mutableStateOf<BufferedImage?>(null)
+
 	var pickerFileTarget by mutableStateOf(firstImageFileState)
 	var pickerImageTarget by mutableStateOf(firstImageState)
 
@@ -108,6 +113,7 @@ class CompareWindow(val parent: VisibilityTogglingWindow) {
 		parent.show()
 
 		isPickerOpen = false
+		isViewReversed = false
 
 		firstImageFile = null
 		secondImageFile = null
@@ -116,6 +122,7 @@ class CompareWindow(val parent: VisibilityTogglingWindow) {
 		secondImage = null
 
 		comparisonImage = null
+		reverseComparisonImage = null
 
 		progress = 0f
 		statusText = "Waiting for input..."
@@ -164,68 +171,7 @@ class CompareWindow(val parent: VisibilityTogglingWindow) {
 		imageTarget.value = ImageIO.read(file)
 
 		if (firstImage != null && secondImage != null) {
-			statusText = "Resizing images..."
-			dropTarget.smallText = "Resizing..."
-			dropTarget.icon = Icons.Default.FormatSize
-
-			progress = 0f
-			dropTarget.loadingProgress = 0f
-
-			var maxWidth = maxOf(firstImage!!.width, secondImage!!.width)
-			var maxHeight = maxOf(firstImage!!.height, secondImage!!.height)
-
-			val widthRatio = 1000f / maxWidth
-			val heightRatio = 1000f / maxHeight
-			val scaleRatio = minOf(widthRatio, heightRatio)
-
-			maxWidth = floor(maxWidth * scaleRatio).toInt()
-			maxHeight = floor(maxHeight * scaleRatio).toInt()
-
-			val resampler = ResampleOp(maxWidth, maxHeight)
-
-			val firstImageResized =
-				if (firstImage!!.width != maxWidth || firstImage!!.height != maxHeight) {
-					logger.info { "Resizing first image..." }
-
-					resampler.filter(firstImage, null)
-				} else {
-					firstImage!!
-				}
-
-			progress = 0.33f
-			dropTarget.loadingProgress = 0.33f
-
-			val secondImageResized =
-				if (secondImage!!.width != maxWidth || secondImage!!.height != maxHeight) {
-					logger.info { "Resizing second image..." }
-
-					resampler.filter(secondImage, null)
-				} else {
-					secondImage!!
-				}
-
-			logger.info { "Visually comparing images..." }
-
-			statusText = "Comparing images..."
-			dropTarget.smallText = "Comparing..."
-			dropTarget.icon = Icons.Default.Visibility
-
-			progress = 0.66f
-			dropTarget.loadingProgress = 0.66f
-
-			comparisonImage = ImageComparison(firstImageResized, secondImageResized)
-				.setRectangleLineWidth(5)
-				.compareImages()
-				.result
-
-			logger.info { "Comparison finished successfully" }
-
-			statusText = "Comparison done."
-			dropTarget.smallText = "Done."
-			dropTarget.icon = Icons.Default.Check
-
-			progress = 1f
-			dropTarget.loadingProgress = 1f
+			runComparison(firstImage!!, secondImage!!)
 		} else {
 			logger.info { "Image loaded successfully" }
 
@@ -236,6 +182,78 @@ class CompareWindow(val parent: VisibilityTogglingWindow) {
 			progress = 1f
 			dropTarget.loadingProgress = 1f
 		}
+	}
+
+	fun runComparison(first: BufferedImage, second: BufferedImage) {
+		isViewReversed = false
+
+		statusText = "Resizing images..."
+		dropTarget.smallText = "Resizing..."
+		dropTarget.icon = Icons.Default.FormatSize
+
+		progress = 0f
+		dropTarget.loadingProgress = 0f
+
+		var maxWidth = maxOf(first.width, second.width)
+		var maxHeight = maxOf(first.height, second.height)
+
+		val widthRatio = 1000f / maxWidth
+		val heightRatio = 1000f / maxHeight
+		val scaleRatio = minOf(widthRatio, heightRatio)
+
+		maxWidth = floor(maxWidth * scaleRatio).toInt()
+		maxHeight = floor(maxHeight * scaleRatio).toInt()
+
+		val resampler = ResampleOp(maxWidth, maxHeight)
+
+		val firstImageResized =
+			if (first.width != maxWidth || first.height != maxHeight) {
+				logger.info { "Resizing first image..." }
+
+				resampler.filter(first, null)
+			} else {
+				first
+			}
+
+		progress = 0.33f
+		dropTarget.loadingProgress = 0.33f
+
+		val secondImageResized =
+			if (second.width != maxWidth || second.height != maxHeight) {
+				logger.info { "Resizing second image..." }
+
+				resampler.filter(second, null)
+			} else {
+				second
+			}
+
+		logger.info { "Visually comparing images..." }
+
+		statusText = "Comparing images..."
+		dropTarget.smallText = "Comparing..."
+		dropTarget.icon = Icons.Default.Visibility
+
+		progress = 0.66f
+		dropTarget.loadingProgress = 0.66f
+
+		comparisonImage = ImageComparison(firstImageResized, secondImageResized)
+			.setRectangleLineWidth(5)
+			.compareImages()
+			.result
+
+		reverseComparisonImage = ImageComparison(secondImageResized, firstImageResized)
+			.setRectangleLineWidth(5)
+			.compareImages()
+			.result
+
+		logger.info { "Comparison finished successfully" }
+
+		statusText = "Comparison done."
+		dropTarget.smallText = "Done."
+		dropTarget.icon = Icons.Default.Check
+
+		progress = 1f
+		dropTarget.loadingProgress = 1f
 	}
 
 	@Composable
@@ -358,6 +376,24 @@ class CompareWindow(val parent: VisibilityTogglingWindow) {
 
 								Spacer(Modifier.weight(1f, true))
 
+								if (comparisonImage != null && reverseComparisonImage != null) {
+									PrimaryButton(
+										{isViewReversed = !isViewReversed},
+										modifier = Modifier.fillMaxWidth()
+									) {
+										Row(
+											horizontalArrangement = Arrangement.spacedBy(10.dp),
+										) {
+											Icon(
+												Icons.Rounded.Cached,
+												""
+											)
+
+											Text("Swap View")
+										}
+									}
+								}
+
 								if (statusText.isNotEmpty()) {
 									Text(statusText, modifier = Modifier.fillMaxWidth())
 								}
@@ -376,13 +412,23 @@ class CompareWindow(val parent: VisibilityTogglingWindow) {
 									.fillMaxHeight()
 									.fillMaxWidth()
 							) {
-								if (comparisonImage != null) {
-									Image(
-										comparisonImage!!.toPainter(),
-										"Comparison image",
-										contentScale = ContentScale.Fit,
-										modifier = Modifier.fillMaxSize()
-									)
+								if (comparisonImage != null && reverseComparisonImage != null) {
+									if (!isViewReversed) {
+										Image(
+											comparisonImage!!.toPainter(),
+											"Comparison image",
+											contentScale = ContentScale.Fit,
+											modifier = Modifier.fillMaxSize()
+										)
+									} else {
+										Image(
+											reverseComparisonImage!!.toPainter(),
+											"Comparison image",
+											contentScale = ContentScale.Fit,
+											modifier = Modifier.fillMaxSize()
+										)
+									}
+
 								}
 							}
 						}
