@@ -40,7 +40,6 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowState
 import coil3.ImageLoader
 import coil3.PlatformContext
-import coil3.util.DebugLogger
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.animation.circular.CircularRevealPlugin
 import com.skydoves.landscapist.coil3.CoilImage
@@ -87,7 +86,6 @@ class SetWindow(val parent: BinderWindow) : VisibilityTogglingWindow() {
 	fun create() {
 		val imageLoader = ImageLoader
 			.Builder(PlatformContext.INSTANCE)
-			.logger(DebugLogger())
 			.components {
 				add(PsdDecoder.Factory)
 			}
