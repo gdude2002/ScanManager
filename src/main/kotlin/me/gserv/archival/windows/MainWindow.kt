@@ -41,6 +41,7 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import me.gserv.archival.Colors
 import me.gserv.archival.config.AppConfig
 import me.gserv.archival.data.Database
+import me.gserv.archival.data.Filesystem
 import me.gserv.archival.data.GlobalState
 import me.gserv.archival.dropTarget
 import me.gserv.archival.types.VisibilityTogglingWindow
@@ -48,6 +49,7 @@ import me.gserv.archival.utils.StringTooltip
 import me.gserv.archival.utils.components.PrimaryButton
 import me.gserv.archival.utils.components.PrimaryIconButton
 import me.gserv.archival.utils.components.PrimaryOutlinedButton
+import me.gserv.archival.utils.components.SecondaryButton
 import me.gserv.archival.utils.components.SecondaryOutlinedButton
 import me.gserv.archival.windows.main.CreateBinderDialog
 import me.gserv.archival.windows.main.DataDirectoryDialog
@@ -193,40 +195,38 @@ class MainWindow(val applicationScope: ApplicationScope) : VisibilityTogglingWin
 													},
 													enabled = !binder.archived
 												) {
-													Row(verticalAlignment = Alignment.CenterVertically) {
-														if (binder.archived) {
-															Icon(
-																Icons.Rounded.Lock,
-																"Archived binder",
-																tint = Color.Gray
-															)
-														} else {
-															Icon(
-																Icons.Rounded.FolderOpen,
-																"Binder"
-															)
-														}
+													if (binder.archived) {
+														Icon(
+															Icons.Rounded.Lock,
+															"Archived binder",
+															tint = Color.Gray
+														)
+													} else {
+														Icon(
+															Icons.Rounded.FolderOpen,
+															"Binder"
+														)
+													}
 
-														if (binder.archived) {
-															Text(
-																"Binder ${binder.id.value}",
-																modifier = Modifier.fillMaxWidth()
-																	.padding(horizontal = 8.dp),
-																textAlign = TextAlign.Left,
-																softWrap = false,
-																overflow = TextOverflow.Ellipsis,
-																color = Color.Gray
-															)
-														} else {
-															Text(
-																"Binder ${binder.id.value}",
-																modifier = Modifier.fillMaxWidth()
-																	.padding(horizontal = 8.dp),
-																textAlign = TextAlign.Left,
-																softWrap = false,
-																overflow = TextOverflow.Ellipsis,
-															)
-														}
+													if (binder.archived) {
+														Text(
+															"Binder ${binder.id.value}",
+															modifier = Modifier.fillMaxWidth()
+																.padding(horizontal = 8.dp),
+															textAlign = TextAlign.Left,
+															softWrap = false,
+															overflow = TextOverflow.Ellipsis,
+															color = Color.Gray
+														)
+													} else {
+														Text(
+															"Binder ${binder.id.value}",
+															modifier = Modifier.fillMaxWidth()
+																.padding(horizontal = 8.dp),
+															textAlign = TextAlign.Left,
+															softWrap = false,
+															overflow = TextOverflow.Ellipsis,
+														)
 													}
 												}
 
@@ -337,36 +337,32 @@ class MainWindow(val applicationScope: ApplicationScope) : VisibilityTogglingWin
 									onClick = {},
 									enabled = false
 								) {
-									Row(verticalAlignment = Alignment.CenterVertically) {
-										Icon(
-											Icons.Rounded.SettingsBackupRestore,
-											""
-										)
+									Icon(
+										Icons.Rounded.SettingsBackupRestore,
+										""
+									)
 
-										Text(
-											"Back Up & Restore",
-											modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
-											textAlign = TextAlign.Left
-										)
-									}
+									Text(
+										"Back Up & Restore",
+										modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
+										textAlign = TextAlign.Left
+									)
 								}
 
 								SecondaryOutlinedButton(
 									modifier = Modifier.fillMaxWidth().align(Alignment.Start),
 									onClick = { compareWindow.open() },
 								) {
-									Row(verticalAlignment = Alignment.CenterVertically) {
-										Icon(
-											Icons.Rounded.Image,
-											""
-										)
+									Icon(
+										Icons.Rounded.Image,
+										""
+									)
 
-										Text(
-											"Compare Images",
-											modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
-											textAlign = TextAlign.Left
-										)
-									}
+									Text(
+										"Compare Images",
+										modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
+										textAlign = TextAlign.Left
+									)
 								}
 
 								SecondaryOutlinedButton(
@@ -374,18 +370,16 @@ class MainWindow(val applicationScope: ApplicationScope) : VisibilityTogglingWin
 									onClick = {},
 									enabled = false
 								) {
-									Row(verticalAlignment = Alignment.CenterVertically) {
-										Icon(
-											Icons.Rounded.Healing,
-											""
-										)
+									Icon(
+										Icons.Rounded.Healing,
+										""
+									)
 
-										Text(
-											"Fix Scans",
-											modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
-											textAlign = TextAlign.Left
-										)
-									}
+									Text(
+										"Fix Database",
+										modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
+										textAlign = TextAlign.Left
+									)
 								}
 
 								SecondaryOutlinedButton(
@@ -393,18 +387,16 @@ class MainWindow(val applicationScope: ApplicationScope) : VisibilityTogglingWin
 									onClick = {},
 									enabled = false
 								) {
-									Row(verticalAlignment = Alignment.CenterVertically) {
-										Icon(
-											Icons.Rounded.Download,
-											""
-										)
+									Icon(
+										Icons.Rounded.Download,
+										""
+									)
 
-										Text(
-											"Import Scans",
-											modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
-											textAlign = TextAlign.Left
-										)
-									}
+									Text(
+										"Import Scans",
+										modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
+										textAlign = TextAlign.Left
+									)
 								}
 
 								SecondaryOutlinedButton(
@@ -412,18 +404,16 @@ class MainWindow(val applicationScope: ApplicationScope) : VisibilityTogglingWin
 									onClick = {},
 									enabled = false
 								) {
-									Row(verticalAlignment = Alignment.CenterVertically) {
-										Icon(
-											Icons.Rounded.Search,
-											""
-										)
+									Icon(
+										Icons.Rounded.Search,
+										""
+									)
 
-										Text(
-											"Search Scans",
-											modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
-											textAlign = TextAlign.Left
-										)
-									}
+									Text(
+										"Search Scans",
+										modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
+										textAlign = TextAlign.Left
+									)
 								}
 
 								Spacer(Modifier.weight(1f))
@@ -464,8 +454,18 @@ class MainWindow(val applicationScope: ApplicationScope) : VisibilityTogglingWin
 								Row {
 									PrimaryOutlinedButton(onClick = { showArchived = !showArchived }) {
 										if (showArchived) {
+											Icon(
+												Icons.Rounded.VisibilityOff,
+												""
+											)
+
 											Text("Hide Archived")
 										} else {
+											Icon(
+												Icons.Rounded.Visibility,
+												""
+											)
+
 											Text("Show Archived")
 										}
 									}
@@ -473,6 +473,11 @@ class MainWindow(val applicationScope: ApplicationScope) : VisibilityTogglingWin
 									Spacer(Modifier.weight(1f))
 
 									PrimaryButton(onClick = { createBinderDialog.open() }) {
+										Icon(
+											Icons.Rounded.Add,
+											""
+										)
+
 										Text("Add Binder")
 									}
 								}
@@ -485,11 +490,18 @@ class MainWindow(val applicationScope: ApplicationScope) : VisibilityTogglingWin
 									.padding(vertical = 10.dp, horizontal = 15.dp)
 							) {
 								Row {
-									PrimaryButton(
-										onClick = {},
-										enabled = false
+									SecondaryButton(
+										onClick = {
+											Desktop.getDesktop()
+												.browse(Filesystem.inputFolder!!.toUri())
+										},
 									) {
-										Text("Check Integrity")
+										Icon(
+											Icons.Rounded.FolderOpen,
+											""
+										)
+
+										Text("Open Input Folder")
 									}
 
 									Spacer(Modifier.weight(1f))
@@ -497,6 +509,11 @@ class MainWindow(val applicationScope: ApplicationScope) : VisibilityTogglingWin
 									PrimaryButton(onClick = {
 										dataDirectoryDialog.open()
 									}) {
+										Icon(
+											Icons.Rounded.Settings,
+											""
+										)
+
 										Text("Change Folder")
 									}
 								}

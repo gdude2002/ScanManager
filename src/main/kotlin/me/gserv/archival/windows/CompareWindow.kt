@@ -377,16 +377,12 @@ class CompareWindow(val parent: VisibilityTogglingWindow) {
 									modifier = Modifier.fillMaxWidth(),
 									enabled = comparisonImage != null && reverseComparisonImage != null
 								) {
-									Row(
-										horizontalArrangement = Arrangement.spacedBy(10.dp),
-									) {
-										Icon(
-											Icons.Rounded.Cached,
-											""
-										)
+									Icon(
+										Icons.Rounded.Cached,
+										""
+									)
 
-										Text("Swap View")
-									}
+									Text("Swap View")
 								}
 
 								if (statusText.isNotEmpty()) {

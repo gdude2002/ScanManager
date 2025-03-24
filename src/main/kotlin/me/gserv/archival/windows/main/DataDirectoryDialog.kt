@@ -151,15 +151,13 @@ class DataDirectoryDialog(
 
 									close()
 								}) {
-									Row(verticalAlignment = Alignment.CenterVertically) {
-										Icon(
-											Icons.Rounded.Cancel,
-											"",
-											modifier = Modifier.absolutePadding(right = 4.dp)
-										)
+									Icon(
+										Icons.Rounded.Cancel,
+										"",
+										modifier = Modifier.absolutePadding(right = 4.dp)
+									)
 
-										Text("Cancel")
-									}
+									Text("Cancel")
 								}
 
 								Spacer(Modifier.weight(1f, true))
@@ -180,15 +178,13 @@ class DataDirectoryDialog(
 
 									close()
 								}) {
-									Row(verticalAlignment = Alignment.CenterVertically) {
-										Icon(
-											Icons.Rounded.Check,
-											"",
-											modifier = Modifier.absolutePadding(right = 4.dp)
-										)
+									Icon(
+										Icons.Rounded.Check,
+										"",
+										modifier = Modifier.absolutePadding(right = 4.dp)
+									)
 
-										Text("Okay")
-									}
+									Text("Okay")
 								}
 							}
 						}

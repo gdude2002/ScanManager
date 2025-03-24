@@ -10,11 +10,14 @@ package me.gserv.archival.utils.components
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
@@ -51,7 +54,12 @@ fun PrimaryOutlinedButton(
 		),
 	) {
 		ProvideTextStyle(TextStyle(color = textColor)) {
-			content(theme)
+			Row(
+				horizontalArrangement = Arrangement.spacedBy(10.dp),
+				verticalAlignment = Alignment.CenterVertically,
+			) {
+				content(theme)
+			}
 		}
 	}
 }
@@ -85,7 +93,12 @@ fun SecondaryOutlinedButton(
 		),
 	) {
 		ProvideTextStyle(TextStyle(color = textColor)) {
-			content(theme)
+			Row(
+				horizontalArrangement = Arrangement.spacedBy(10.dp),
+				verticalAlignment = Alignment.CenterVertically,
+			) {
+				content(theme)
+			}
 		}
 	}
 }
@@ -119,7 +132,51 @@ fun TertiaryOutlinedButton(
 		),
 	) {
 		ProvideTextStyle(TextStyle(color = textColor)) {
-			content(theme)
+			Row(
+				horizontalArrangement = Arrangement.spacedBy(10.dp),
+				verticalAlignment = Alignment.CenterVertically,
+			) {
+				content(theme)
+			}
+		}
+	}
+}
+
+@Composable
+fun SuccessOutlinedButton(
+	onClick: () -> Unit,
+	modifier: Modifier = Modifier,
+	enabled: Boolean = true,
+	interactionSource: MutableInteractionSource? = null,
+	content: @Composable ((theme: IColors) -> Unit)
+) {
+	val theme = Colors.get()
+
+	val textColor = if (enabled) {
+		theme.MaterialOnSuccessContainer
+	} else {
+		theme.Material.onSurface.copy(alpha = 0.38f)
+	}
+
+	OutlinedButton(
+		onClick = onClick,
+		modifier = modifier,
+		enabled = enabled,
+		interactionSource = interactionSource,
+
+		border = buttonBorder(enabled, theme.MaterialSuccess),
+
+		colors = ButtonDefaults.outlinedButtonColors(
+			contentColor = theme.MaterialOnSuccessContainer,
+		),
+	) {
+		ProvideTextStyle(TextStyle(color = textColor)) {
+			Row(
+				horizontalArrangement = Arrangement.spacedBy(10.dp),
+				verticalAlignment = Alignment.CenterVertically,
+			) {
+				content(theme)
+			}
 		}
 	}
 }

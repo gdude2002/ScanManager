@@ -57,6 +57,7 @@ import me.gserv.archival.types.VisibilityTogglingWindow
 import me.gserv.archival.utils.PsdDecoder
 import me.gserv.archival.utils.StringTooltip
 import me.gserv.archival.utils.components.PrimaryButton
+import me.gserv.archival.utils.components.SecondaryButton
 import me.gserv.archival.utils.components.SuccessButton
 import java.awt.Desktop
 import java.awt.Dimension
@@ -111,7 +112,6 @@ class SetWindow(val parent: BinderWindow) : VisibilityTogglingWindow() {
 						setFiles = GlobalState.set!!.getFiles().toMutableStateList()
 					}
 				}
-
 			}
 
 			Window(
@@ -138,6 +138,7 @@ class SetWindow(val parent: BinderWindow) : VisibilityTogglingWindow() {
 									Column {
 										Row(
 											Modifier.padding(15.dp),
+											horizontalArrangement = Arrangement.spacedBy(10.dp),
 											verticalAlignment = Alignment.CenterVertically
 										) {
 											Text(
@@ -151,20 +152,26 @@ class SetWindow(val parent: BinderWindow) : VisibilityTogglingWindow() {
 
 											Spacer(Modifier.weight(1f, true))
 
+											SecondaryButton({
+												// TODO: Button Action
+											}) {
+												Icon(
+													Icons.Rounded.UploadFile,
+													""
+												)
+
+												Text("Add Files")
+											}
+
 											PrimaryButton({
 												// TODO: Button Action
 											}) {
-												Row(
-													horizontalArrangement = Arrangement.spacedBy(10.dp),
-													verticalAlignment = Alignment.CenterVertically,
-												) {
-													Icon(
-														Icons.Rounded.Add,
-														""
-													)
+												Icon(
+													Icons.Rounded.Scanner,
+													""
+												)
 
-													Text("Add Scan")
-												}
+												Text("Add Scan")
 											}
 										}
 
@@ -211,17 +218,12 @@ class SetWindow(val parent: BinderWindow) : VisibilityTogglingWindow() {
 																{ compareWindow.open(files.original, files.edit) },
 																Modifier.fillMaxWidth()
 															) {
-																Row(
-																	horizontalArrangement = Arrangement.spacedBy(10.dp),
-																	verticalAlignment = Alignment.CenterVertically,
-																) {
-																	Icon(
-																		Icons.Rounded.Image,
-																		""
-																	)
+																Icon(
+																	Icons.Rounded.Image,
+																	""
+																)
 
-																	Text("Compare")
-																}
+																Text("Compare")
 															}
 														}
 													}
@@ -314,38 +316,24 @@ class SetWindow(val parent: BinderWindow) : VisibilityTogglingWindow() {
 																	SuccessButton({
 																		// TODO: Button Action
 																	}) {
-																		Row(
-																			horizontalArrangement = Arrangement.spacedBy(
-																				10.dp
-																			),
-																			verticalAlignment = Alignment.CenterVertically,
-																		) {
-																			Icon(
-																				Icons.Rounded.Add,
-																				""
-																			)
+																		Icon(
+																			Icons.Rounded.Add,
+																			""
+																		)
 
-																			Text("Add missing file")
-																		}
+																		Text("Add missing file")
 																	}
 
 																	if (files.edit != null) {
 																		PrimaryButton({
 																			// TODO: Button Action
 																		}) {
-																			Row(
-																				horizontalArrangement = Arrangement.spacedBy(
-																					10.dp
-																				),
-																				verticalAlignment = Alignment.CenterVertically,
-																			) {
-																				Icon(
-																					Icons.Rounded.ContentCopy,
-																					""
-																				)
+																			Icon(
+																				Icons.Rounded.ContentCopy,
+																				""
+																			)
 
-																				Text("Copy from edit")
-																			}
+																			Text("Copy from edit")
 																		}
 																	}
 
@@ -431,38 +419,24 @@ class SetWindow(val parent: BinderWindow) : VisibilityTogglingWindow() {
 																	SuccessButton({
 																		// TODO: Button Action
 																	}) {
-																		Row(
-																			horizontalArrangement = Arrangement.spacedBy(
-																				10.dp
-																			),
-																			verticalAlignment = Alignment.CenterVertically,
-																		) {
-																			Icon(
-																				Icons.Rounded.Add,
-																				""
-																			)
+																		Icon(
+																			Icons.Rounded.Add,
+																			""
+																		)
 
-																			Text("Add missing file")
-																		}
+																		Text("Add missing file")
 																	}
 
 																	if (files.original != null) {
 																		PrimaryButton({
 																			// TODO: Button Action
 																		}) {
-																			Row(
-																				horizontalArrangement = Arrangement.spacedBy(
-																					10.dp
-																				),
-																				verticalAlignment = Alignment.CenterVertically,
-																			) {
-																				Icon(
-																					Icons.Rounded.ContentCopy,
-																					""
-																				)
+																			Icon(
+																				Icons.Rounded.ContentCopy,
+																				""
+																			)
 
-																				Text("Copy from original")
-																			}
+																			Text("Copy from original")
 																		}
 																	}
 

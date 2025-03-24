@@ -247,21 +247,16 @@ class BinderWindow(val parent: MainWindow) {
 									enabled = allSets.isNotEmpty(),
 									modifier = Modifier.fillMaxHeight()
 								) {
-									Row(
-										horizontalArrangement = Arrangement.spacedBy(5.dp),
-										verticalAlignment = Alignment.CenterVertically
-									) {
-										if (allSets.isNotEmpty()) {
-											if (isFilterDropdownOpen) {
-												Icon(Icons.Rounded.KeyboardArrowUp, "")
-											} else {
-												Icon(Icons.Rounded.KeyboardArrowDown, "")
-											}
-
-											Text("Filter: ${filterState.readableName} Sets")
+									if (allSets.isNotEmpty()) {
+										if (isFilterDropdownOpen) {
+											Icon(Icons.Rounded.KeyboardArrowUp, "")
 										} else {
-											Text("No sets")
+											Icon(Icons.Rounded.KeyboardArrowDown, "")
 										}
+
+										Text("Filter: ${filterState.readableName} Sets")
+									} else {
+										Text("No sets")
 									}
 								}
 
@@ -332,27 +327,22 @@ class BinderWindow(val parent: MainWindow) {
 									enabled = allSets.isNotEmpty(),
 									modifier = Modifier.fillMaxHeight()
 								) {
-									Row(
-										horizontalArrangement = Arrangement.spacedBy(5.dp),
-										verticalAlignment = Alignment.CenterVertically
-									) {
-										if (allSets.isNotEmpty()) {
-											if (isSortingDropdownOpen) {
-												Icon(Icons.Rounded.KeyboardArrowUp, "")
-											} else {
-												Icon(Icons.Rounded.KeyboardArrowDown, "")
-											}
-
-											Text("Sort: ${sortState.readableName}")
-
-											if (sortAsc) {
-												Icon(Icons.Rounded.North, "")
-											} else {
-												Icon(Icons.Rounded.South, "")
-											}
+									if (allSets.isNotEmpty()) {
+										if (isSortingDropdownOpen) {
+											Icon(Icons.Rounded.KeyboardArrowUp, "")
 										} else {
-											Text("No sets")
+											Icon(Icons.Rounded.KeyboardArrowDown, "")
 										}
+
+										Text("Sort: ${sortState.readableName}")
+
+										if (sortAsc) {
+											Icon(Icons.Rounded.North, "")
+										} else {
+											Icon(Icons.Rounded.South, "")
+										}
+									} else {
+										Text("No sets")
 									}
 								}
 
@@ -699,46 +689,31 @@ class BinderWindow(val parent: MainWindow) {
 											Spacer(Modifier.weight(1f, true))
 
 											TertiaryButton({ deleteSetDialog.open(set) }) {
-												Row(
-													verticalAlignment = Alignment.CenterVertically,
-													horizontalArrangement = Arrangement.spacedBy(10.dp),
-												) {
-													Icon(
-														Icons.Rounded.Delete,
-														"",
-														tint = colors.Text.copy(alpha = 0.5f)
-													)
+												Icon(
+													Icons.Rounded.Delete,
+													"",
+													tint = colors.Text.copy(alpha = 0.5f)
+												)
 
-													Text("Delete")
-												}
+												Text("Delete")
 											}
 
 											SecondaryButton({ editSetDialog.open(set) }) {
-												Row(
-													verticalAlignment = Alignment.CenterVertically,
-													horizontalArrangement = Arrangement.spacedBy(10.dp),
-												) {
-													Icon(
-														Icons.Rounded.Edit,
-														"Edit"
-													)
+												Icon(
+													Icons.Rounded.Edit,
+													"Edit"
+												)
 
-													Text("Edit")
-												}
+												Text("Edit")
 											}
 
 											PrimaryButton({ setWindow.open(set) }) {
-												Row(
-													verticalAlignment = Alignment.CenterVertically,
-													horizontalArrangement = Arrangement.spacedBy(10.dp),
-												) {
-													Icon(
-														Icons.Rounded.FolderOpen,
-														"Open"
-													)
+												Icon(
+													Icons.Rounded.FolderOpen,
+													"Open"
+												)
 
-													Text("Open")
-												}
+												Text("Open")
 											}
 										}
 									}

@@ -316,15 +316,13 @@ class EditSetDialog(
 											close()
 										}
 									) {
-										Row(verticalAlignment = Alignment.CenterVertically) {
-											Icon(
-												Icons.Rounded.Cancel,
-												"",
-												modifier = Modifier.absolutePadding(right = 4.dp)
-											)
+										Icon(
+											Icons.Rounded.Cancel,
+											"",
+											modifier = Modifier.absolutePadding(right = 4.dp)
+										)
 
-											Text("Cancel")
-										}
+										Text("Cancel")
 									}
 
 									Spacer(Modifier.weight(1f, true))
@@ -355,15 +353,13 @@ class EditSetDialog(
 											close()
 										},
 									) {
-										Row(verticalAlignment = Alignment.CenterVertically) {
-											Icon(
-												Icons.Rounded.Save,
-												"",
-												modifier = Modifier.absolutePadding(right = 4.dp)
-											)
+										Icon(
+											Icons.Rounded.Save,
+											"",
+											modifier = Modifier.absolutePadding(right = 4.dp)
+										)
 
-											Text("Save")
-										}
+										Text("Save")
 									}
 								}
 							}

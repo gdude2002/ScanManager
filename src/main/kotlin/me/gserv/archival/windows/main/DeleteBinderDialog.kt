@@ -105,15 +105,13 @@ class DeleteBinderDialog(
 										close()
 									},
 								) {
-									Row(verticalAlignment = Alignment.CenterVertically) {
-										Icon(
-											Icons.Rounded.Cancel,
-											"",
-											modifier = Modifier.absolutePadding(right = 4.dp)
-										)
+									Icon(
+										Icons.Rounded.Cancel,
+										"",
+										modifier = Modifier.absolutePadding(right = 4.dp)
+									)
 
-										Text("Cancel")
-									}
+									Text("Cancel")
 								}
 
 								Spacer(Modifier.weight(1f, true))
@@ -139,15 +137,13 @@ class DeleteBinderDialog(
 										close()
 									},
 								) {
-									Row(verticalAlignment = Alignment.CenterVertically) {
-										Icon(
-											Icons.Rounded.Delete,
-											"",
-											modifier = Modifier.absolutePadding(right = 4.dp)
-										)
+									Icon(
+										Icons.Rounded.Delete,
+										"",
+										modifier = Modifier.absolutePadding(right = 4.dp)
+									)
 
-										Text("Delete Binder")
-									}
+									Text("Delete Binder")
 								}
 							}
 						}

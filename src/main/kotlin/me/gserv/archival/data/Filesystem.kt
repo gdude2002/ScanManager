@@ -23,6 +23,10 @@ object Filesystem {
 		get() =
 			AppConfig.dataFolder?.let { Path(it, "binders").absolute() }
 
+	val inputFolder
+		get() =
+			AppConfig.dataFolder?.let { Path(it, "input").absolute() }
+
 	/* Omitting an argument will return a regex pattern that matches all valid files matching the provided arguments. */
 	fun fileName(
 		binder: String? = null,
@@ -45,10 +49,14 @@ object Filesystem {
 	}
 
 	fun ensureBinders() {
-		val folder = bindersFolder
+		val bindersFolder = bindersFolder
 			?: error("Data folder hasn't been configured yet.")
 
-		folder.toFile().mkdirs()
+		val inputFolder = inputFolder
+			?: error("Data folder hasn't been configured yet.")
+
+		bindersFolder.toFile().mkdirs()
+		inputFolder.toFile().mkdirs()
 	}
 
 	fun binderExists(binder: String): Boolean {

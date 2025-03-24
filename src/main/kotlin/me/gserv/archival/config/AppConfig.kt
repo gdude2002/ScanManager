@@ -42,16 +42,16 @@ object AppConfig {
 		}
 
 	fun load(force: Boolean = true) {
-		logger.info { "Loading configuration..." }
+		logger.debug { "Loading configuration..." }
 
 		if (loaded && !force) {
-			logger.info { "Skipped: Not reloading existing configuration" }
+			logger.debug { "Skipped: Not reloading existing configuration" }
 
 			return
 		}
 
 		if (configFile.exists()) {
-			logger.info { "Loading file: ${configFile.absolutePathString()}" }
+			logger.debug { "Loading file: ${configFile.absolutePathString()}" }
 
 			val props = Properties()
 
@@ -61,18 +61,18 @@ object AppConfig {
 				dataFolder = props.getProperty("dataFolder"),
 			)
 		} else {
-			logger.info { "Saving default configuration to file: ${configFile.absolutePathString()}" }
+			logger.debug { "Saving default configuration to file: ${configFile.absolutePathString()}" }
 
 			current = Config()
 			save(current)
 		}
 
-		logger.info { "Ensuring data folder exists..." }
+		logger.debug { "Ensuring data folder exists..." }
 
 		Filesystem.ensureBinders()
 
 		if (dataFolder != null) {
-			logger.info { "Connecting to database..." }
+			logger.debug { "Connecting to database..." }
 
 			Database.connect(dataFolder!!)
 		}
@@ -89,7 +89,7 @@ object AppConfig {
 
 		props.store(configFile.writer(Charsets.UTF_8), null)
 
-		logger.info { "Configuration saved successfully" }
+		logger.debug { "Configuration saved successfully" }
 	}
 
 	data class Config(

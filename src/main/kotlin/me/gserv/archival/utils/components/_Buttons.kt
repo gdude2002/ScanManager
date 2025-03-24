@@ -10,16 +10,20 @@ package me.gserv.archival.utils.components
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ButtonElevation
 import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.dp
 import me.gserv.archival.Colors
 import me.gserv.archival.Colors.IColors
 
@@ -62,7 +66,12 @@ fun PrimaryButton(
 		contentPadding = contentPadding
 	) {
 		ProvideTextStyle(TextStyle(color = textColor)) {
-			content(theme)
+			Row(
+				horizontalArrangement = Arrangement.spacedBy(10.dp),
+				verticalAlignment = Alignment.CenterVertically,
+			) {
+				content(theme)
+			}
 		}
 	}
 }
@@ -104,7 +113,12 @@ fun SecondaryButton(
 		contentPadding = contentPadding
 	) {
 		ProvideTextStyle(TextStyle(color = textColor)) {
-			content(theme)
+			Row(
+				horizontalArrangement = Arrangement.spacedBy(10.dp),
+				verticalAlignment = Alignment.CenterVertically,
+			) {
+				content(theme)
+			}
 		}
 	}
 }
@@ -146,7 +160,12 @@ fun TertiaryButton(
 		contentPadding = contentPadding
 	) {
 		ProvideTextStyle(TextStyle(color = textColor)) {
-			content(theme)
+			Row(
+				horizontalArrangement = Arrangement.spacedBy(10.dp),
+				verticalAlignment = Alignment.CenterVertically,
+			) {
+				content(theme)
+			}
 		}
 	}
 }
@@ -189,7 +208,12 @@ fun SuccessButton(
 		contentPadding = contentPadding
 	) {
 		ProvideTextStyle(TextStyle(color = textColor)) {
-			content(theme)
+			Row(
+				horizontalArrangement = Arrangement.spacedBy(10.dp),
+				verticalAlignment = Alignment.CenterVertically,
+			) {
+				content(theme)
+			}
 		}
 	}
 }
