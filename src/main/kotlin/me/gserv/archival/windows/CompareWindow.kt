@@ -328,14 +328,14 @@ class CompareWindow(val parent: VisibilityTogglingWindow) {
 
 									OutlinedButton(
 										{ pickFile(firstImageFileState, firstImageState) },
-										modifier = Modifier.fillMaxWidth(),
+										modifier = Modifier.fillMaxWidth().height(200.dp),
 										shape = MaterialTheme.shapes.small,
 										contentPadding = PaddingValues(0.dp),
 									) {
 										Image(
 											firstImage!!.toPainter(),
 											"First comparison image",
-											contentScale = ContentScale.Fit,
+											contentScale = ContentScale.FillWidth,
 											modifier = Modifier.fillMaxWidth()
 										)
 									}
@@ -357,14 +357,14 @@ class CompareWindow(val parent: VisibilityTogglingWindow) {
 
 									OutlinedButton(
 										{ pickFile(secondImageFileState, secondImageState) },
-										modifier = Modifier.fillMaxWidth(),
+										modifier = Modifier.fillMaxWidth().height(200.dp),
 										shape = MaterialTheme.shapes.small,
 										contentPadding = PaddingValues(0.dp),
 									) {
 										Image(
 											secondImage!!.toPainter(),
 											"Second comparison image",
-											contentScale = ContentScale.Fit,
+											contentScale = ContentScale.FillWidth,
 											modifier = Modifier.fillMaxWidth()
 										)
 									}
