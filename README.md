@@ -7,14 +7,14 @@ progress, and can help fix problems caused by poor historical project management
 
 ## Feature List
 
-- [ ] Keep track of scanning progress, including binders, sets, and set data.
+- [x] Keep track of scanning progress, including binders, sets, and set data.
   - Set data includes numbers, batches, and descriptions — everything already kept track of.
 - [ ] Analyze existing scan data, importing, comparing, and reorganising files as needed.
   - Import existing scans, compare original and edited files, and re-export originals as needed.
   - Import existing tracking data from Markdown tracking files.
 - [ ] Store data in a format that users can move between devices easily.
 - [ ] Provide a relatively intuitive user interface.
-- [ ] Potentially show a floating window with the current binder/set/scan status.
+- [ ] Potentially show a floating window with the current binder/set/processing status.
 - [ ] Provide an easily accessed new user tutorial.
 
 ## Research

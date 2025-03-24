@@ -47,7 +47,6 @@ import me.gserv.archival.dropTarget
 import me.gserv.archival.types.VisibilityTogglingWindow
 import me.gserv.archival.utils.StringTooltip
 import me.gserv.archival.utils.components.PrimaryButton
-import me.gserv.archival.utils.components.PrimaryIconButton
 import me.gserv.archival.utils.components.PrimaryOutlinedButton
 import me.gserv.archival.utils.components.SecondaryButton
 import me.gserv.archival.utils.components.SecondaryOutlinedButton
@@ -130,9 +129,24 @@ class MainWindow(val applicationScope: ApplicationScope) : VisibilityTogglingWin
 
 							Spacer(Modifier.weight(1f))
 
+							StringTooltip("About") {
+								TextButton(
+									modifier = Modifier.padding(0.dp).size(60.dp),
+									onClick = {
+										// TODO
+									},
+								) {
+									Icon(
+										Icons.Rounded.Info,
+										"About",
+										modifier = Modifier.size(60.dp),
+									)
+								}
+							}
+
 							StringTooltip("Help") {
-								PrimaryIconButton(
-									modifier = Modifier.size(60.dp),
+								TextButton(
+									modifier = Modifier.padding(0.dp).size(60.dp),
 									onClick = {
 										Desktop.getDesktop()
 											.browse(URI("https://github.com/gdude2002/ScanManager/wiki"))
@@ -141,6 +155,7 @@ class MainWindow(val applicationScope: ApplicationScope) : VisibilityTogglingWin
 									Icon(
 										Icons.AutoMirrored.Rounded.Help,
 										"Help",
+										modifier = Modifier.size(60.dp),
 									)
 								}
 							}
@@ -334,7 +349,9 @@ class MainWindow(val applicationScope: ApplicationScope) : VisibilityTogglingWin
 
 								SecondaryOutlinedButton(
 									modifier = Modifier.fillMaxWidth().align(Alignment.Start),
-									onClick = {},
+									onClick = {
+										// TODO
+									},
 									enabled = false
 								) {
 									Icon(
@@ -367,7 +384,9 @@ class MainWindow(val applicationScope: ApplicationScope) : VisibilityTogglingWin
 
 								SecondaryOutlinedButton(
 									modifier = Modifier.fillMaxWidth().align(Alignment.Start),
-									onClick = {},
+									onClick = {
+										// TODO
+									},
 									enabled = false
 								) {
 									Icon(
@@ -384,7 +403,9 @@ class MainWindow(val applicationScope: ApplicationScope) : VisibilityTogglingWin
 
 								SecondaryOutlinedButton(
 									modifier = Modifier.fillMaxWidth().align(Alignment.Start),
-									onClick = {},
+									onClick = {
+										// TODO
+									},
 									enabled = false
 								) {
 									Icon(
@@ -401,7 +422,9 @@ class MainWindow(val applicationScope: ApplicationScope) : VisibilityTogglingWin
 
 								SecondaryOutlinedButton(
 									modifier = Modifier.fillMaxWidth().align(Alignment.Start),
-									onClick = {},
+									onClick = {
+										// TODO
+									},
 									enabled = false
 								) {
 									Icon(

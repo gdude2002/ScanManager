@@ -57,7 +57,6 @@ import me.gserv.archival.types.VisibilityTogglingWindow
 import me.gserv.archival.utils.PsdDecoder
 import me.gserv.archival.utils.StringTooltip
 import me.gserv.archival.utils.components.PrimaryButton
-import me.gserv.archival.utils.components.SecondaryButton
 import me.gserv.archival.utils.components.SuccessButton
 import java.awt.Desktop
 import java.awt.Dimension
@@ -152,7 +151,7 @@ class SetWindow(val parent: BinderWindow) : VisibilityTogglingWindow() {
 
 											Spacer(Modifier.weight(1f, true))
 
-											SecondaryButton({
+											PrimaryButton({
 												// TODO: Button Action
 											}) {
 												Icon(
@@ -161,17 +160,6 @@ class SetWindow(val parent: BinderWindow) : VisibilityTogglingWindow() {
 												)
 
 												Text("Add Files")
-											}
-
-											PrimaryButton({
-												// TODO: Button Action
-											}) {
-												Icon(
-													Icons.Rounded.Scanner,
-													""
-												)
-
-												Text("Add Scan")
 											}
 										}
 
