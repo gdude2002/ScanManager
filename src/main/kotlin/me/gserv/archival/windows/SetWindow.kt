@@ -49,19 +49,23 @@ import io.github.kdroidfilter.platformtools.darkmodedetector.windows.setWindowsA
 import io.github.oshai.kotlinlogging.KotlinLogging
 import me.gserv.archival.Colors
 import me.gserv.archival.data.Database
+import me.gserv.archival.data.Filesystem
 import me.gserv.archival.data.GlobalState
 import me.gserv.archival.data.entities.Set
 import me.gserv.archival.dropTarget
 import me.gserv.archival.types.VisibilityTogglingWindow
+import me.gserv.archival.utils.DirectoryWatcher
 import me.gserv.archival.utils.PsdDecoder
 import me.gserv.archival.utils.StringTooltip
 import me.gserv.archival.utils.components.PrimaryButton
+import me.gserv.archival.utils.components.SecondaryButton
 import me.gserv.archival.utils.components.SuccessButton
 import java.awt.Desktop
 import java.awt.Dimension
 
 class SetWindow(val parent: BinderWindow) : VisibilityTogglingWindow() {
 	val logger = KotlinLogging.logger { }
+	var watcher: DirectoryWatcher? by mutableStateOf(null)
 
 	var isOpen by mutableStateOf(false)
 	var setFiles by mutableStateOf(SnapshotStateList<Set.FileContainer>())
@@ -74,11 +78,18 @@ class SetWindow(val parent: BinderWindow) : VisibilityTogglingWindow() {
 		isOpen = false
 		GlobalState.set = null
 
+		watcher?.stop()
+		watcher = null
+
 		parent.show()
 	}
 
 	fun open(currentSet: Set) {
 		GlobalState.set = currentSet
+
+		watcher = DirectoryWatcher(Filesystem.inputFolder ?: error("Data directory not configured."))
+		watcher!!.start()
+
 		isOpen = true
 	}
 
@@ -149,15 +160,38 @@ class SetWindow(val parent: BinderWindow) : VisibilityTogglingWindow() {
 
 											Spacer(Modifier.weight(1f, true))
 
-											PrimaryButton({
-												// TODO: Button Action
+											SecondaryButton({
+												if (Filesystem.inputFolder != null) {
+													Desktop.getDesktop()
+														.browse(Filesystem.inputFolder!!.toUri())
+												}
 											}) {
+												Icon(
+													Icons.Rounded.FolderOpen,
+													""
+												)
+
+												Text("Open Import Folder")
+											}
+
+											PrimaryButton(
+												{
+													// TODO: Button Action
+												},
+												enabled = watcher?.files?.isEmpty() == false
+											) {
 												Icon(
 													Icons.Rounded.UploadFile,
 													""
 												)
 
-												Text("Add Files")
+												if (watcher?.files?.isEmpty() == true) {
+													Text("Nothing to import")
+												} else if (watcher?.files?.size == 1) {
+													Text("Import 1 file")
+												} else {
+													Text("Import ${watcher?.files?.size} files")
+												}
 											}
 										}
 

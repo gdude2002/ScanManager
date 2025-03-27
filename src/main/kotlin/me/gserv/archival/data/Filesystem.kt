@@ -25,7 +25,7 @@ object Filesystem {
 
 	val inputFolder
 		get() =
-			AppConfig.dataFolder?.let { Path(it, "input").absolute() }
+			AppConfig.dataFolder?.let { Path(it, "import").absolute() }
 
 	/* Omitting an argument will return a regex pattern that matches all valid files matching the provided arguments. */
 	fun fileName(

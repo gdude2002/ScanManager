@@ -67,11 +67,11 @@ object AppConfig {
 			save(current)
 		}
 
-		logger.debug { "Ensuring data folder exists..." }
-
-		Filesystem.ensureBinders()
-
 		if (dataFolder != null) {
+			logger.debug { "Ensuring data folder exists..." }
+
+			Filesystem.ensureBinders()
+
 			logger.debug { "Connecting to database..." }
 
 			Database.connect(dataFolder!!)
