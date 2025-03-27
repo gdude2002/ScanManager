@@ -147,7 +147,7 @@ class DataDirectoryDialog(
 
 							Row {
 								SecondaryButton(onClick = {
-									logger.info { "Closing without changing data directory" }
+									logger.debug { "Closing without changing data directory" }
 
 									close()
 								}) {
@@ -163,18 +163,18 @@ class DataDirectoryDialog(
 								Spacer(Modifier.weight(1f, true))
 
 								PrimaryButton(onClick = {
-									logger.info { "Changing data directory to $newDirectory" }
+									logger.debug { "Changing data directory to $newDirectory" }
 
 									dataDirectory = newDirectory
 
 									AppConfig.dataFolder = dataDirectory
 									AppConfig.save()
 
-									logger.info { "Ensuring data directory exists..." }
+									logger.debug { "Ensuring data directory exists..." }
 
 									Filesystem.ensureBinders()
 
-									logger.info { "Done, closing dialog" }
+									logger.debug { "Done, closing dialog" }
 
 									close()
 								}) {

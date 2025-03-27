@@ -102,11 +102,7 @@ class SetWindow(val parent: BinderWindow) : VisibilityTogglingWindow() {
 			}
 			.build()
 
-		logger.info { "Creating window..." }
-
 		if (isOpen) {
-			logger.info { "Window is open!" }
-
 			parent.hide()
 
 			LaunchedEffect(GlobalState.set) {

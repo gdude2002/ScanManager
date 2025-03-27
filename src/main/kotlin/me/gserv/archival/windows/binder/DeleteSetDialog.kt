@@ -109,7 +109,7 @@ class DeleteSetDialog(
 							Row {
 								SecondaryButton(
 									onClick = {
-										logger.info { "Closing dialog without deleting set: ${set?.id?.value}" }
+										logger.debug { "Closing dialog without deleting set: ${set?.id?.value}" }
 
 										close()
 									},
@@ -149,12 +149,12 @@ class DeleteSetDialog(
 											}
 										}
 
-										logger.info { "Updating global and window states..." }
+										logger.debug { "Updating global and window states..." }
 
 										parent.allSets.remove(set)
 										GlobalState.sets.remove(set)
 
-										logger.info { "Done, closing dialog" }
+										logger.debug { "Done, closing dialog" }
 
 										close()
 									},

@@ -263,7 +263,7 @@ class BinderWindow(val parent: MainWindow) {
 								DropdownMenu(isFilterDropdownOpen, { isFilterDropdownOpen = false }) {
 									DropdownMenuItem(
 										onClick = {
-											logger.info { "Updating completion filter: All sets" }
+											logger.debug { "Updating completion filter: All sets" }
 
 											filterState = FilterState.All
 											isFilterDropdownOpen = false
@@ -283,7 +283,7 @@ class BinderWindow(val parent: MainWindow) {
 
 									DropdownMenuItem(
 										onClick = {
-											logger.info { "Updating completion filter: Incomplete sets only" }
+											logger.debug { "Updating completion filter: Incomplete sets only" }
 
 											filterState = FilterState.Incomplete
 											isFilterDropdownOpen = false
@@ -302,7 +302,7 @@ class BinderWindow(val parent: MainWindow) {
 
 									DropdownMenuItem(
 										onClick = {
-											logger.info { "Updating completion filter: Complete sets only" }
+											logger.debug { "Updating completion filter: Complete sets only" }
 
 											filterState = FilterState.Complete
 											isFilterDropdownOpen = false
@@ -375,7 +375,7 @@ class BinderWindow(val parent: MainWindow) {
 
 									DropdownMenuItem(
 										onClick = {
-											logger.info { "Updating sorting field: ID Number" }
+											logger.debug { "Updating sorting field: ID Number" }
 
 											sortState = SortingField.Number
 											isSortingDropdownOpen = false
@@ -395,7 +395,7 @@ class BinderWindow(val parent: MainWindow) {
 
 									DropdownMenuItem(
 										onClick = {
-											logger.info { "Updating sorting field: Completion Date" }
+											logger.debug { "Updating sorting field: Completion Date" }
 
 											sortState = SortingField.CompletionDate
 											isSortingDropdownOpen = false
@@ -413,7 +413,7 @@ class BinderWindow(val parent: MainWindow) {
 
 									DropdownMenuItem(
 										onClick = {
-											logger.info { "Updating sorting field: Creation Date" }
+											logger.debug { "Updating sorting field: Creation Date" }
 
 											sortState = SortingField.CreationDate
 											isSortingDropdownOpen = false
@@ -431,7 +431,7 @@ class BinderWindow(val parent: MainWindow) {
 
 									DropdownMenuItem(
 										onClick = {
-											logger.info { "Updating sorting field: Photography Date" }
+											logger.debug { "Updating sorting field: Photography Date" }
 
 											sortState = SortingField.PhotographyDate
 											isSortingDropdownOpen = false
@@ -451,7 +451,7 @@ class BinderWindow(val parent: MainWindow) {
 
 									DropdownMenuItem(
 										onClick = {
-											logger.info { "Updating sorting field: Description" }
+											logger.debug { "Updating sorting field: Description" }
 
 											sortState = SortingField.Description
 											isSortingDropdownOpen = false
@@ -469,7 +469,7 @@ class BinderWindow(val parent: MainWindow) {
 
 									DropdownMenuItem(
 										onClick = {
-											logger.info { "Updating sorting field: Total Scans" }
+											logger.debug { "Updating sorting field: Total Scans" }
 
 											sortState = SortingField.TotalScans
 											isSortingDropdownOpen = false
@@ -491,7 +491,7 @@ class BinderWindow(val parent: MainWindow) {
 								value = filterText,
 
 								onValueChange = {
-									logger.info { "Updating description filter: \"$it\"" }
+									logger.debug { "Updating description filter: \"$it\"" }
 
 									filterText = it
 									dropTarget.currentSet = 0

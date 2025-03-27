@@ -280,7 +280,7 @@ class MainWindow(val applicationScope: ApplicationScope) : VisibilityTogglingWin
 												StringTooltip(tooltipText) {
 													TextButton(
 														onClick = {
-															logger.info {
+															logger.debug {
 																if (binder.archived) {
 																	"Un-archiving binder ${binder.id.value}"
 																} else {
@@ -292,11 +292,11 @@ class MainWindow(val applicationScope: ApplicationScope) : VisibilityTogglingWin
 																binder.archived = !binder.archived
 															}
 
-															logger.info { "Reloading global state..." }
+															logger.debug { "Reloading global state..." }
 
 															GlobalState.loadBinders()
 
-															logger.info { "Done" }
+															logger.debug { "Done" }
 														},
 														modifier = Modifier.padding(horizontal = 0.dp).width(40.dp),
 														contentPadding = PaddingValues(0.dp)

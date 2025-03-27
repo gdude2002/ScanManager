@@ -155,7 +155,7 @@ class CompareWindow(val parent: VisibilityTogglingWindow) {
 	}
 
 	fun filePicked(file: File, fileTarget: MutableState<File?>, imageTarget: MutableState<BufferedImage?>) {
-		logger.info { "Loading image: ${file.absolutePath}" }
+		logger.debug { "Loading image: ${file.absolutePath}" }
 
 		statusText = "Loading image..."
 		dropTarget.smallText = "Loading..."
@@ -169,7 +169,7 @@ class CompareWindow(val parent: VisibilityTogglingWindow) {
 		if (firstImage != null && secondImage != null) {
 			runComparison(firstImage!!, secondImage!!)
 		} else {
-			logger.info { "Image loaded successfully" }
+			logger.debug { "Image loaded successfully" }
 
 			statusText = "Image loaded."
 			dropTarget.smallText = "Done."
@@ -204,7 +204,7 @@ class CompareWindow(val parent: VisibilityTogglingWindow) {
 
 		val firstImageResized =
 			if (first.width != maxWidth || first.height != maxHeight) {
-				logger.info { "Resizing first image..." }
+				logger.debug { "Resizing first image..." }
 
 				resampler.filter(first, null)
 			} else {
@@ -216,14 +216,14 @@ class CompareWindow(val parent: VisibilityTogglingWindow) {
 
 		val secondImageResized =
 			if (second.width != maxWidth || second.height != maxHeight) {
-				logger.info { "Resizing second image..." }
+				logger.debug { "Resizing second image..." }
 
 				resampler.filter(second, null)
 			} else {
 				second
 			}
 
-		logger.info { "Visually comparing images..." }
+		logger.debug { "Visually comparing images..." }
 
 		statusText = "Comparing images..."
 		dropTarget.smallText = "Comparing..."
@@ -242,7 +242,7 @@ class CompareWindow(val parent: VisibilityTogglingWindow) {
 			.compareImages()
 			.result
 
-		logger.info { "Comparison finished successfully" }
+		logger.debug { "Comparison finished successfully" }
 
 		statusText = "Comparison done."
 		dropTarget.smallText = "Done."
@@ -279,11 +279,11 @@ class CompareWindow(val parent: VisibilityTogglingWindow) {
 							null
 						}
 					) { file ->
-						logger.info { "File picked: ${file?.path}" }
+						logger.debug { "File picked: ${file?.path}" }
 
 						if (file != null) {
 							pickerScope.launch {
-								logger.info { "Starting processing..." }
+								logger.debug { "Starting processing..." }
 
 								filePicked(file.file, pickerFileTarget, pickerImageTarget)
 							}

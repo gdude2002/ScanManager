@@ -238,31 +238,31 @@ class DropTargetWindow(val parent: MainWindow) {
 	}
 
 	fun onLeftClick(event: PointerEvent) {
-		logger.info { "Left-click event received" }
+		logger.debug { "Left-click event received" }
 	}
 
 	fun onRightClick(event: PointerEvent) {
-		logger.info { "Right-click event received" }
+		logger.debug { "Right-click event received" }
 	}
 
 	fun onMiddleClick(event: PointerEvent) {
-		logger.info { "Middle-click event received" }
+		logger.debug { "Middle-click event received" }
 	}
 
 	fun onForwardClick(event: PointerEvent) {
-		logger.info { "Forward button press event received" }
+		logger.debug { "Forward button press event received" }
 
 		onScrollDown(event)
 	}
 
 	fun onBackClick(event: PointerEvent) {
-		logger.info { "Back button press event received" }
+		logger.debug { "Back button press event received" }
 
 		onScrollUp(event)
 	}
 
 	fun onScrollUp(event: PointerEvent) {
-		logger.info { "Scroll-up event received" }
+		logger.debug { "Scroll-up event received" }
 
 		if (
 			GlobalState.sets.isEmpty() ||
@@ -275,7 +275,7 @@ class DropTargetWindow(val parent: MainWindow) {
 	}
 
 	fun onScrollDown(event: PointerEvent) {
-		logger.info { "Scroll-down event received" }
+		logger.debug { "Scroll-down event received" }
 
 		if (
 			GlobalState.sets.isEmpty() ||
@@ -288,13 +288,13 @@ class DropTargetWindow(val parent: MainWindow) {
 	}
 
 	fun onMouseEnter(event: PointerEvent) {
-		logger.info { "Mouse cursor entered window" }
+		logger.debug { "Mouse cursor entered window" }
 
 		isHovered = false
 	}
 
 	fun onMouseExit(event: PointerEvent) {
-		logger.info { "Mouse cursor exited window" }
+		logger.debug { "Mouse cursor exited window" }
 
 		isHovered = true
 	}

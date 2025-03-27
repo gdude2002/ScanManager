@@ -312,7 +312,7 @@ class EditSetDialog(
 								Row {
 									SecondaryButton(
 										{
-											logger.info { "Closing dialog without editing set." }
+											logger.debug { "Closing dialog without editing set." }
 											close()
 										}
 									) {
@@ -329,7 +329,7 @@ class EditSetDialog(
 
 									PrimaryButton(
 										onClick = {
-											logger.info { "Editing set ${set!!.id.value} in binder ${GlobalState.binder?.id?.value}" }
+											logger.debug { "Editing set ${set!!.id.value} in binder ${GlobalState.binder?.id?.value}" }
 
 											Database.transaction {
 												set!!.description = setDescription
@@ -338,7 +338,7 @@ class EditSetDialog(
 												set!!.finishedAt = setFinishedAt
 											}
 
-											logger.info { "Set edited, updating global and window states..." }
+											logger.debug { "Set edited, updating global and window states..." }
 
 											GlobalState.sets.removeIf { it.id == set!!.id }
 											GlobalState.sets.add(set!!)
@@ -348,7 +348,7 @@ class EditSetDialog(
 											parent.allSets.add(set!!)
 											parent.allSets.sortByDescending { it.id.value.toLong() }
 
-											logger.info { "Done, closing dialog." }
+											logger.debug { "Done, closing dialog." }
 
 											close()
 										},

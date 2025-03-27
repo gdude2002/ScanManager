@@ -100,7 +100,7 @@ class DeleteBinderDialog(
 							Row {
 								SecondaryButton(
 									onClick = {
-										logger.info { "Closing dialog without deleting binder" }
+										logger.debug { "Closing dialog without deleting binder" }
 
 										close()
 									},
@@ -118,7 +118,7 @@ class DeleteBinderDialog(
 
 								TertiaryButton(
 									onClick = {
-										logger.info { "Deleting binder ${binder?.id?.value}" }
+										logger.debug { "Deleting binder ${binder?.id?.value}" }
 
 										binder?.let {
 											Filesystem.deleteBinder(it.slug)
@@ -128,11 +128,11 @@ class DeleteBinderDialog(
 											}
 										}
 
-										logger.info { "Updating global state..." }
+										logger.debug { "Updating global state..." }
 
 										GlobalState.binders.remove(binder)
 
-										logger.info { "Done, closing dialog" }
+										logger.debug { "Done, closing dialog" }
 
 										close()
 									},

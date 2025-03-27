@@ -141,7 +141,7 @@ class CreateBinderDialog(
 							Row {
 								SecondaryButton(
 									{
-										logger.info { "Closing dialog without creating binder" }
+										logger.debug { "Closing dialog without creating binder" }
 
 										close()
 									}
@@ -159,7 +159,7 @@ class CreateBinderDialog(
 
 								PrimaryButton(
 									onClick = {
-										logger.info { "Creating binder $binderName" }
+										logger.debug { "Creating binder $binderName" }
 
 										val binder = Database.transaction {
 											Binder.create(binderName)
@@ -167,11 +167,11 @@ class CreateBinderDialog(
 
 										Filesystem.ensureBinder(binder.slug)
 
-										logger.info { "Reloading global state..." }
+										logger.debug { "Reloading global state..." }
 
 										GlobalState.loadBinders()
 
-										logger.info { "Done, closing dialog" }
+										logger.debug { "Done, closing dialog" }
 
 										close()
 									},

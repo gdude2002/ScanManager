@@ -44,7 +44,7 @@ class DirectoryWatcher(val path: Path) : CoroutineScope {
 					val key: WatchKey? = service.poll(100L, TimeUnit.MILLISECONDS)
 
 					if (shouldStop) {
-						logger.info { "Stop requested, closing service." }
+						logger.debug { "Stop requested, closing service." }
 
 						service.close()
 						break

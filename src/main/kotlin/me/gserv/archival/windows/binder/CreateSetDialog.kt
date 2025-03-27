@@ -167,7 +167,7 @@ class CreateSetDialog(
 							Row {
 								SecondaryButton(
 									{
-										logger.info { "Closing dialog without creating set." }
+										logger.debug { "Closing dialog without creating set." }
 										close()
 									}
 								) {
@@ -186,8 +186,8 @@ class CreateSetDialog(
 									enabled = setIdentifier.isNotEmpty() && !isError,
 
 									onClick = {
-										logger.info { "Creating set $setIdentifier in binder ${GlobalState.binder?.id?.value}" }
-										logger.info { "Description: $setDescription" }
+										logger.debug { "Creating set $setIdentifier in binder ${GlobalState.binder?.id?.value}" }
+										logger.debug { "Description: $setDescription" }
 
 										val set = Database.transaction {
 											Set.create(setIdentifier.toLong(), GlobalState.binder!!) {
@@ -201,7 +201,7 @@ class CreateSetDialog(
 											}
 										}
 
-										logger.info { "Set created, updating global and window states..." }
+										logger.debug { "Set created, updating global and window states..." }
 
 										GlobalState.sets.add(set)
 										GlobalState.sets.sortByDescending { it.id.value.toLong() }
@@ -209,7 +209,7 @@ class CreateSetDialog(
 										parent.allSets.add(set)
 										parent.allSets.sortByDescending { it.id.value.toLong() }
 
-										logger.info { "Done, closing dialog" }
+										logger.debug { "Done, closing dialog" }
 
 										close()
 									},
