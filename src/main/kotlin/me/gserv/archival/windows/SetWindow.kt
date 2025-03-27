@@ -60,6 +60,7 @@ import me.gserv.archival.utils.StringTooltip
 import me.gserv.archival.utils.components.PrimaryButton
 import me.gserv.archival.utils.components.SecondaryButton
 import me.gserv.archival.utils.components.SuccessButton
+import me.gserv.archival.windows.set.ImportFilesDialog
 import java.awt.Desktop
 import java.awt.Dimension
 
@@ -130,6 +131,9 @@ class SetWindow(val parent: BinderWindow) : VisibilityTogglingWindow() {
 				val compareWindow = CompareWindow(this@SetWindow)
 				compareWindow.create()
 
+				val importFilesDialog = ImportFilesDialog(this)
+				importFilesDialog.create()
+
 				if (isVisible) {
 					Colors.Theme { colors ->
 						Box(Modifier.background(colors.WindowBackground).fillMaxSize()) {
@@ -172,7 +176,7 @@ class SetWindow(val parent: BinderWindow) : VisibilityTogglingWindow() {
 
 											PrimaryButton(
 												{
-													// TODO: Button Action
+													importFilesDialog.open(watcher!!) { }
 												},
 												enabled = watcher?.files?.isEmpty() == false
 											) {

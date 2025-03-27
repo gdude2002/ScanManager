@@ -16,7 +16,7 @@ fun String.toSlug(): String =
 	slugify.slugify(this)!!
 
 fun String.isInteger() =
-	all { it.isDigit() }
+	isNotEmpty() && all { it.isDigit() }
 
 fun String.isFloat() =
-	all { it.isDigit() || it == '.' }
+	isNotEmpty() && all { it.isDigit() || it == '.' }

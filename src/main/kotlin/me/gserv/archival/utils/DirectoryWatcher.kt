@@ -16,6 +16,8 @@ import java.nio.file.*
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.CoroutineContext
 
+typealias FileCallback = (URI) -> Unit
+
 class DirectoryWatcher(val path: Path) : CoroutineScope {
 	override val coroutineContext: CoroutineContext = Dispatchers.IO
 
@@ -27,12 +29,37 @@ class DirectoryWatcher(val path: Path) : CoroutineScope {
 	val service: WatchService = FileSystems.getDefault().newWatchService()
 	var job: Job? = null
 
+	val addedCallbacks = mutableMapOf<Any, FileCallback>()
+	val deletedCallbacks = mutableMapOf<Any, FileCallback>()
+
 	init {
 		path.register(
 			service,
 			StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_DELETE,
 			StandardWatchEventKinds.OVERFLOW,
 		)
+
+		path.toFile().listFiles()?.forEach {
+			files.add(it.absoluteFile.toURI())
+		}
+	}
+
+	fun onAdded(owner: Any, callback: FileCallback) {
+		addedCallbacks[owner] = callback
+	}
+
+	fun onDeleted(owner: Any, callback: FileCallback) {
+		deletedCallbacks[owner] = callback
+	}
+
+	fun clearCallbacks(owner: Any) {
+		addedCallbacks.remove(owner)
+		deletedCallbacks.remove(owner)
+	}
+
+	fun clearAllCallbacks() {
+		addedCallbacks.clear()
+		deletedCallbacks.clear()
 	}
 
 	fun start() {
@@ -63,6 +90,8 @@ class DirectoryWatcher(val path: Path) : CoroutineScope {
 
 										logger.debug { "File created: $filePath"}
 										files.add(filePath.toUri())
+
+										addedCallbacks.forEach { it.value(filePath.toUri()) }
 									}
 
 									StandardWatchEventKinds.ENTRY_DELETE -> {
@@ -70,6 +99,8 @@ class DirectoryWatcher(val path: Path) : CoroutineScope {
 
 										logger.debug { "File deleted: $filePath"}
 										files.remove(filePath.toUri())
+
+										deletedCallbacks.forEach { it.value(filePath.toUri()) }
 									}
 
 									StandardWatchEventKinds.OVERFLOW -> logger.warn {
@@ -91,6 +122,8 @@ class DirectoryWatcher(val path: Path) : CoroutineScope {
 	}
 
 	fun stop() {
+		clearAllCallbacks()
+
 		shouldStop = true
 	}
 }
