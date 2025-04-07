@@ -143,6 +143,8 @@ class ImportProgressDialog {
 
 				logger.info { "" }
 			}
+
+			GlobalState.set!!.totalScans += files.size
 		}
 
 		progressFilename = ""
