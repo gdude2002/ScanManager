@@ -4,27 +4,14 @@ import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Cached
-import androidx.compose.material.icons.rounded.Error
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.Text
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.graphics.vector.RenderVectorGroup
-import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import coil3.ImageLoader
-import coil3.PlatformContext
-import com.skydoves.landscapist.animation.circular.CircularRevealPlugin
-import com.skydoves.landscapist.components.rememberImageComponent
-import com.skydoves.landscapist.placeholder.placeholder.PlaceholderPlugin
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -32,9 +19,11 @@ import kotlinx.coroutines.launch
 import me.gserv.archival.Colors
 import me.gserv.archival.data.Database
 import me.gserv.archival.data.GlobalState
+import me.gserv.archival.data.entities.Image
 import me.gserv.archival.dropTarget
-import me.gserv.archival.utils.PsdDecoder
 import me.gserv.archival.utils.components.DialogContainer
+import me.gserv.archival.utils.forEach
+import me.gserv.archival.utils.getHashes
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
@@ -77,63 +66,82 @@ class ImportProgressDialog {
 		}
 	}
 
-	suspend fun doImport() {
-		val binder = GlobalState.binder!!
-		val set = GlobalState.set!!
-		val progressFraction = 1.0f / files.size
+	fun doImport() {
+		Database.transaction {
+			val binder = GlobalState.binder!!
+			val set = GlobalState.set!!
+			val progressFraction = 1.0f / files.size
 
-		var currentFileIndex = set.getHighestIndex()
+			var currentFileIndex = set.getHighestIndex()
 
-		files.forEachIndexed { index, (uri, quality) ->
-			currentFileIndex += 1
+			files.forEachIndexed { index, (uri, quality) ->
+				currentFileIndex += 1
 
-			val currentProgress  = progressFraction * index
-			val path = uri.toPath()
-			val fileName = path.fileName.toString()
+				val currentProgress = progressFraction * index
+				val path = uri.toPath()
+				val fileName = path.fileName.toString()
 
-			val psdFile = File(
-				binder.editsDirectory,
-				set.editFileName(currentFileIndex.toString())
-			)
+				val psdFile = File(
+					binder.editsDirectory,
+					set.editFileName(currentFileIndex.toString())
+				).absoluteFile
 
-			val jpegFile = File(
-				binder.originalsDirectory,
-				set.originalFileName(currentFileIndex.toString())
-			)
+				val jpegFile = File(
+					binder.originalsDirectory,
+					set.originalFileName(currentFileIndex.toString())
+				).absoluteFile
 
-			dropTarget.loadingProgress = currentProgress
-			progress = currentProgress
+				dropTarget.loadingProgress = currentProgress
+				progress = currentProgress
 
-			progressFilename = fileName
-			progressText = "Loading file..."
+				progressFilename = fileName
+				progressText = "Loading file..."
 
-			val image = ImageIO.read(uri.toURL())
+				logger.info { "Loading file: $fileName" }
 
-			progressText = "Calculating hashes..."
-			// TODO: Calculate hashes
+				val image = ImageIO.read(uri.toURL())
 
-			val averageHash = ""
-			val differenceHash = ""
-			val medianHash = ""
-			val perceptiveHash = ""
-			val rotationalHash = ""
+				progressText = "Calculating hashes..."
 
-			progressText = "Saving PSD..."
+				logger.info { "Calculating hashes..." }
 
-			Files.copy(
-				path,
-				psdFile.toPath(),
-				StandardCopyOption.COPY_ATTRIBUTES,
-			)
+				val hashes = getHashes(image)
 
-			progressText = "Saving JPEG..."
+				progressText = "Saving PSD..."
 
-			ImageIO.write(image, "jpeg", jpegFile)
+				logger.info { "Saving PSD: $psdFile" }
 
-			progressText = "Saving to database..."
+				Files.copy(
+					path,
+					psdFile.toPath(),
+					StandardCopyOption.COPY_ATTRIBUTES,
+				)
 
-			Database.transaction {
-				// TODO: Store data into database
+				progressText = "Saving JPEG..."
+
+				logger.info { "Saving JPEG: $jpegFile" }
+
+				ImageIO.write(image, "jpeg", jpegFile)
+
+				progressText = "Saving to database..."
+
+				logger.info { "Saving to database..." }
+
+				// Delete existing image data.
+				Image.findById(psdFile.toString())?.delete()
+				Image.findById(jpegFile.toString())?.delete()
+
+				forEach(psdFile, jpegFile) {
+					Image.create(it) {
+						addHashes(hashes)
+
+						this.binder = binder
+						this.set = set
+						this.quality = quality
+					}
+				}
+
+				logger.info { "" }
 			}
 		}
 
@@ -144,12 +152,14 @@ class ImportProgressDialog {
 		progress = 1.0f
 
 		files.forEach { (uri, _) ->
+			logger.info { "Deleting file: $uri" }
+
 			uri.toPath().deleteExisting()
 		}
 
 		progressText = "Done!"
 
-		dropTarget.loadingProgress = null
+		logger.info { "Done!" }
 
 		callback()
 		close()
@@ -158,29 +168,6 @@ class ImportProgressDialog {
 	@Composable
 	@Preview
 	fun create() {
-		val imageLoader = ImageLoader
-			.Builder(PlatformContext.Companion.INSTANCE)
-			.components {
-				add(PsdDecoder.Factory)
-			}
-			.build()
-
-		val iconTintPainter =
-			@Composable { image: ImageVector, color: Color ->
-				rememberVectorPainter(
-					defaultWidth = image.defaultWidth,
-					defaultHeight = image.defaultHeight,
-					viewportWidth = image.viewportWidth,
-					viewportHeight = image.viewportHeight,
-					name = image.name,
-					tintColor = color,
-					tintBlendMode = image.tintBlendMode,
-					autoMirror = image.autoMirror
-				) { _, _ ->
-					RenderVectorGroup(group = image.root)
-				}
-			}
-
 		if (!::processingScope.isInitialized) {
 			processingScope = rememberCoroutineScope { Dispatchers.IO }
 		}
@@ -188,37 +175,24 @@ class ImportProgressDialog {
 		if (isOpen) {
 			Dialog({}, DialogProperties(false, false, true)) {
 				Colors.Theme { colors ->
-					val imageComponent = rememberImageComponent {
-						add(
-							CircularRevealPlugin(
-								duration = 350
-							)
-						)
-
-						add(
-							PlaceholderPlugin.Loading(
-								iconTintPainter(
-									Icons.Rounded.Cached,
-									colors.Material.primary
-								)
-							)
-						)
-
-						add(
-							PlaceholderPlugin.Failure(
-								iconTintPainter(
-									Icons.Rounded.Error,
-									colors.Material.error
-								)
-							)
-						)
-					}
-
 					DialogContainer {
 						Column(
 							modifier = Modifier.Companion.padding(10.dp),
-							verticalArrangement = Arrangement.spacedBy(5.dp)
-						) {}
+							verticalArrangement = Arrangement.spacedBy(5.dp),
+							horizontalAlignment = Alignment.CenterHorizontally,
+						) {
+							Text("Importing files..")
+
+							if (progressFilename.isNotEmpty()) {
+								Text("Current file: $progressFilename")
+							} else {
+								Text("")
+							}
+
+							Text(progressText)
+
+							LinearProgressIndicator({ progress })
+						}
 					}
 				}
 			}

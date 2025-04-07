@@ -176,7 +176,11 @@ class SetWindow(val parent: BinderWindow) : VisibilityTogglingWindow() {
 
 											PrimaryButton(
 												{
-													importFilesDialog.open(watcher!!) { }
+													importFilesDialog.open(watcher!!) {
+														Database.transaction {
+															setFiles = GlobalState.set!!.getFiles().toMutableStateList()
+														}
+													}
 												},
 												enabled = watcher?.files?.isEmpty() == false
 											) {

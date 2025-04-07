@@ -9,6 +9,8 @@
 package me.gserv.archival.data.entities
 
 import me.gserv.archival.data.tables.ImageTable
+import me.gserv.archival.utils.EncodedHashes
+import me.gserv.archival.utils.Hashes
 import org.jetbrains.exposed.dao.Entity
 import org.jetbrains.exposed.dao.EntityClass
 import org.jetbrains.exposed.dao.id.EntityID
@@ -28,14 +30,26 @@ class Image(id: EntityID<String>) : Entity<String>(id) {
 			new(path, body)
 	}
 
-	val averageHash by ImageTable.averageHash
-	val differenceHash by ImageTable.differenceHash
-	val medianHash by ImageTable.medianHash
-	val perceptiveHash by ImageTable.perceptiveHash
-	val rotationalHash by ImageTable.rotationalHash
+	fun addHashes(hashes: Hashes) {
+		addHashes(hashes.encode())
+	}
 
-	val binder by Binder referencedOn ImageTable.binder
-	val set by Set referencedOn ImageTable.set
+	fun addHashes(hashes: EncodedHashes) {
+		averageHash = hashes.average
+		differenceHash = hashes.difference
+		medianHash = hashes.median
+		perceptiveHash = hashes.perceptive
+		rotationalHash = hashes.rotational
+	}
 
-	val quality by ImageTable.quality
+	var averageHash by ImageTable.averageHash
+	var differenceHash by ImageTable.differenceHash
+	var medianHash by ImageTable.medianHash
+	var perceptiveHash by ImageTable.perceptiveHash
+	var rotationalHash by ImageTable.rotationalHash
+
+	var binder by Binder referencedOn ImageTable.binder
+	var set by Set referencedOn ImageTable.set
+
+	var quality by ImageTable.quality
 }

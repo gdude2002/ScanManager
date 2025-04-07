@@ -2,6 +2,7 @@ import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
 plugins {
 	kotlin("jvm") version "2.1.10"
+	kotlin("plugin.serialization") version "2.1.10"
 
 	id("dev.yumi.gradle.licenser") version "2.1.+"
 	id("org.jetbrains.kotlin.plugin.compose") version "2.1.10"

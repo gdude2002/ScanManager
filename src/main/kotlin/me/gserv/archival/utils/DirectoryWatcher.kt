@@ -67,7 +67,7 @@ class DirectoryWatcher(val path: Path) : CoroutineScope {
 
 		launch {
 			runInterruptible(coroutineContext) {
-				while(true) {
+				while (true) {
 					val key: WatchKey? = service.poll(100L, TimeUnit.MILLISECONDS)
 
 					if (shouldStop) {
@@ -84,11 +84,11 @@ class DirectoryWatcher(val path: Path) : CoroutineScope {
 					try {
 						for (event in key.pollEvents()) {
 							try {
-								when(event.kind()) {
+								when (event.kind()) {
 									StandardWatchEventKinds.ENTRY_CREATE -> {
 										val filePath = path.resolve(event.context() as Path).toAbsolutePath()
 
-										logger.debug { "File created: $filePath"}
+										logger.debug { "File created: $filePath" }
 										files.add(filePath.toUri())
 
 										addedCallbacks.forEach { it.value(filePath.toUri()) }
@@ -97,7 +97,7 @@ class DirectoryWatcher(val path: Path) : CoroutineScope {
 									StandardWatchEventKinds.ENTRY_DELETE -> {
 										val filePath = path.resolve(event.context() as Path).toAbsolutePath()
 
-										logger.debug { "File deleted: $filePath"}
+										logger.debug { "File deleted: $filePath" }
 										files.remove(filePath.toUri())
 
 										deletedCallbacks.forEach { it.value(filePath.toUri()) }
