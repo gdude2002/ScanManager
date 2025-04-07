@@ -39,6 +39,7 @@ import me.gserv.archival.data.GlobalState
 import me.gserv.archival.data.entities.Set
 import me.gserv.archival.utils.StringTooltip
 import me.gserv.archival.utils.ZERO
+import me.gserv.archival.utils.components.DialogContainer
 import me.gserv.archival.utils.components.PrimaryButton
 import me.gserv.archival.utils.components.PrimaryIconButton
 import me.gserv.archival.utils.components.SecondaryButton
@@ -145,7 +146,7 @@ class EditSetDialog(
 		if (isOpen) {
 			Dialog({}, DialogProperties(false, false, true)) {
 				Colors.Theme { colors ->
-					Card(shape = RoundedCornerShape(15.dp)) {
+					DialogContainer {
 						Colors.Theme { colors ->
 							if (isDatePickerOpen) {
 								DatePickerModal()

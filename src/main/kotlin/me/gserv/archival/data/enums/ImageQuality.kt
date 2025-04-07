@@ -8,12 +8,17 @@
 
 package me.gserv.archival.data.enums
 
-enum class ImageQuality(val readableName: String) {
-	NOT_EVALUATED("Not Evaluated"),
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.*
+import androidx.compose.ui.graphics.vector.ImageVector
+import me.gserv.archival.utils.SelectableEnum
 
-	TERRIBLE("Terrible"),
-	BAD("Bad"),
-	FAIR("Fair"),
-	GOOD("Good"),
-	GREAT("Great");
+enum class ImageQuality(override val readableName: String, override val icon: ImageVector) : SelectableEnum {
+	NOT_EVALUATED("Not Evaluated", Icons.Rounded.QuestionMark),
+
+	TERRIBLE("Terrible", Icons.Rounded.SentimentVeryDissatisfied),
+	BAD("Bad", Icons.Rounded.SentimentDissatisfied),
+	FAIR("Fair", Icons.Rounded.SentimentNeutral),
+	GOOD("Good", Icons.Rounded.SentimentSatisfied),
+	GREAT("Great", Icons.Rounded.SentimentVerySatisfied);
 }

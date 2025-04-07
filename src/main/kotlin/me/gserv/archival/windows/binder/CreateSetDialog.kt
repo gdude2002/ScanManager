@@ -40,6 +40,7 @@ import me.gserv.archival.Colors
 import me.gserv.archival.data.Database
 import me.gserv.archival.data.GlobalState
 import me.gserv.archival.data.entities.Set
+import me.gserv.archival.utils.components.DialogContainer
 import me.gserv.archival.utils.components.PrimaryButton
 import me.gserv.archival.utils.components.SecondaryButton
 import me.gserv.archival.utils.now
@@ -78,7 +79,7 @@ class CreateSetDialog(
 		if (isOpen) {
 			Dialog({}, DialogProperties(false, false, true)) {
 				Colors.Theme { colors ->
-					Card(shape = RoundedCornerShape(15.dp)) {
+					DialogContainer {
 						Column(modifier = Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(20.dp)) {
 							Row(verticalAlignment = Alignment.CenterVertically) {
 								Icon(

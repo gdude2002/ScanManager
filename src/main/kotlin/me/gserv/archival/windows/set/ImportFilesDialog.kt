@@ -15,7 +15,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -23,6 +29,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.RenderVectorGroup
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
@@ -39,8 +46,11 @@ import com.skydoves.landscapist.components.rememberImageComponent
 import com.skydoves.landscapist.placeholder.placeholder.PlaceholderPlugin
 import io.github.oshai.kotlinlogging.KotlinLogging
 import me.gserv.archival.Colors
+import me.gserv.archival.data.enums.ImageQuality
 import me.gserv.archival.utils.DirectoryWatcher
 import me.gserv.archival.utils.PsdDecoder
+import me.gserv.archival.utils.components.DialogContainer
+import me.gserv.archival.utils.components.EnumDropdown
 import me.gserv.archival.utils.components.SecondaryOutlinedButton
 import me.gserv.archival.utils.components.SuccessButton
 import java.awt.Desktop
@@ -59,6 +69,8 @@ class ImportFilesDialog(
 	var isOpen by mutableStateOf(false)
 
 	fun close() {
+		callback = {}
+
 		directoryWatcher?.clearCallbacks(this)
 		directoryWatcher = null
 
@@ -101,14 +113,17 @@ class ImportFilesDialog(
 		if (isOpen) {
 			directoryWatcher!!.clearCallbacks(this)
 
-			var files by remember {
-				mutableStateOf(directoryWatcher!!.files)
-			}
+			var files = directoryWatcher!!.files
+				.map { EvaluatedImage(it) }
+				.toMutableStateList()
 
-			directoryWatcher!!.onAdded(this) { files.add(it) }
-			directoryWatcher!!.onDeleted(this) { files.remove(it) }
+			directoryWatcher!!.onAdded(this) { files.add(EvaluatedImage(it)) }
+			directoryWatcher!!.onDeleted(this) { files.remove(EvaluatedImage(it)) }
 
 			Dialog({}, DialogProperties(false, false, true)) {
+				val progressDialog = ImportProgressDialog()
+				progressDialog.create()
+
 				Colors.Theme { colors ->
 					val imageComponent = rememberImageComponent {
 						add(
@@ -136,7 +151,7 @@ class ImportFilesDialog(
 						)
 					}
 
-					Card(shape = RoundedCornerShape(15.dp)) {
+					DialogContainer {
 						Column(
 							modifier = Modifier.padding(10.dp),
 							verticalArrangement = Arrangement.spacedBy(5.dp)
@@ -176,8 +191,11 @@ class ImportFilesDialog(
 
 								SuccessButton(
 									onClick = {
-										// TODO: Save!
-										close()
+										progressDialog.open(files.toList()) {
+											// TODO: Callback
+
+											close()
+										}
 									},
 								) {
 									Icon(
@@ -318,17 +336,20 @@ class ImportFilesDialog(
 
 									verticalArrangement = Arrangement.spacedBy(10.dp)
 								) {
-									files.forEachIndexed { index, uri ->
+									files.forEachIndexed { index, image ->
 										Card {
 											Row(
 												verticalAlignment = Alignment.CenterVertically,
 												modifier = Modifier
 													.background(colors.SectionBackground, RoundedCornerShape(15.dp))
+													.height(170.dp)
 													.padding(10.dp)
 											) {
 												Column(
-													Modifier.weight(1f, true),
+													verticalArrangement = Arrangement.spacedBy(10.dp)
 												) {
+													Spacer(Modifier.weight(1f))
+
 													TextButton(
 														onClick = {
 															if (index > 0) {
@@ -336,6 +357,8 @@ class ImportFilesDialog(
 																	add(index - 1, removeAt(index))
 																}
 															}
+
+															logger.info { "($index -> ${index - 1}) ${files.map { it.uri }}" }
 														},
 
 														enabled = index != 0
@@ -346,8 +369,6 @@ class ImportFilesDialog(
 														)
 													}
 
-													Spacer(Modifier.weight(1f))
-
 													TextButton(
 														onClick = {
 															if (index < files.size - 1) {
@@ -355,6 +376,8 @@ class ImportFilesDialog(
 																	add(index + 1, removeAt(index))
 																}
 															}
+
+															logger.info { "($index -> ${index + 1}) ${files.map { it.uri }}" }
 														},
 
 														enabled = index != files.size - 1
@@ -364,19 +387,45 @@ class ImportFilesDialog(
 															"Move down"
 														)
 													}
+
+													Spacer(Modifier.weight(1f))
 												}
 
-												Text(
-													uri.toPath().fileName.toString() + " ($index)",
-													fontSize = TextUnit(1.25F, TextUnitType.Em)
-												)
+												Column(
+													modifier = Modifier.width(250.dp),
+													horizontalAlignment = Alignment.CenterHorizontally,
+													verticalArrangement = Arrangement.spacedBy(10.dp)
+												) {
+													Spacer(Modifier.weight(1f))
+
+													Text(
+														image.uri.toPath().fileName.toString() + " ($index)",
+														fontSize = TextUnit(1.25F, TextUnitType.Em),
+														textAlign = TextAlign.Center,
+														modifier = Modifier.fillMaxWidth()
+													)
+
+													EnumDropdown<ImageQuality>(
+														default = ImageQuality.NOT_EVALUATED,
+														selected = image.quality,
+														buttonPrefix = "Quality: ",
+														boxModifier = Modifier.absolutePadding(top = 10.dp),
+														buttonModifier = Modifier.fillMaxWidth()
+													) { selected ->
+														logger.info { "(${image.quality.readableName} -> ${selected.readableName}) ${image.uri}" }
+
+														image.quality = selected
+													}
+
+													Spacer(Modifier.weight(1f))
+												}
 
 												Spacer(Modifier.weight(1f))
 
 												OutlinedButton(
 													{
 														Desktop.getDesktop()
-															.browse(uri)
+															.browse(image.uri)
 													},
 													border = BorderStroke(0.dp, Color.Transparent),
 													modifier = Modifier.size(150.dp),
@@ -385,7 +434,7 @@ class ImportFilesDialog(
 												) {
 													CoilImage(
 														component = imageComponent,
-														imageModel = { uri.toPath().toFile() },
+														imageModel = { image.uri.toPath().toFile() },
 														imageLoader = { imageLoader },
 														modifier = Modifier.fillMaxSize(),
 
@@ -398,7 +447,7 @@ class ImportFilesDialog(
 													)
 												}
 											}
-										}
+								}
 									}
 
 								}

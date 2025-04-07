@@ -38,6 +38,7 @@ import io.github.vinceglb.filekit.core.FileKitPlatformSettings
 import me.gserv.archival.Colors
 import me.gserv.archival.config.AppConfig
 import me.gserv.archival.data.Filesystem
+import me.gserv.archival.utils.components.DialogContainer
 import me.gserv.archival.utils.components.PrimaryButton
 import me.gserv.archival.utils.components.PrimaryIconButton
 import me.gserv.archival.utils.components.SecondaryButton
@@ -104,7 +105,7 @@ class DataDirectoryDialog(
 
 			Dialog({}, DialogProperties(false, false, true)) {
 				Colors.Theme { colors ->
-					Card(shape = RoundedCornerShape(15.dp)) {
+					DialogContainer {
 						Column(modifier = Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(20.dp)) {
 							Row(verticalAlignment = Alignment.CenterVertically) {
 								Icon(

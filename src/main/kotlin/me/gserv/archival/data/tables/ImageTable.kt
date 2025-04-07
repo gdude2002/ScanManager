@@ -15,8 +15,11 @@ object ImageTable : IdTable<String>("images") {
 	override val id = text("id").entityId()
 	override val primaryKey: PrimaryKey = PrimaryKey(BinderTable.id)
 
+	val binder = reference("binder_id", BinderTable.id)
 	val set = reference("set_id", SetTable.id)
+
 	val quality = enumeration<ImageQuality>("quality")
+		.clientDefault { ImageQuality.NOT_EVALUATED }
 
 	val averageHash = text("average_hash")
 	val differenceHash = text("difference_hash")

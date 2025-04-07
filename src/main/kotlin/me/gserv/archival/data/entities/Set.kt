@@ -50,7 +50,7 @@ class Set(id: EntityID<Long>) : LongEntity(id) {
 	var totalScans by SetTable.totalScans
 
 	fun editFileName(index: String) =
-		Filesystem.fileName(binder.id.value, id.value.toString(), index, "pst")
+		Filesystem.fileName(binder.id.value, id.value.toString(), index, "psd")
 
 	fun originalFileName(index: String) =
 		Filesystem.fileName(binder.id.value, id.value.toString(), index, "jpeg")

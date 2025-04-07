@@ -34,6 +34,8 @@ class Image(id: EntityID<String>) : Entity<String>(id) {
 	val perceptiveHash by ImageTable.perceptiveHash
 	val rotationalHash by ImageTable.rotationalHash
 
+	val binder by Binder referencedOn ImageTable.binder
 	val set by Set referencedOn ImageTable.set
+
 	val quality by ImageTable.quality
 }
