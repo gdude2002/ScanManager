@@ -10,7 +10,6 @@ package me.gserv.archival.windows.set
 
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.*
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -24,10 +23,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.RenderVectorGroup
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.semantics.CustomAccessibilityAction
-import androidx.compose.ui.semantics.clearAndSetSemantics
-import androidx.compose.ui.semantics.customActions
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
@@ -48,7 +43,6 @@ import me.gserv.archival.utils.DirectoryWatcher
 import me.gserv.archival.utils.PsdDecoder
 import me.gserv.archival.utils.components.SecondaryOutlinedButton
 import me.gserv.archival.utils.components.SuccessButton
-import sh.calvin.reorderable.ReorderableColumn
 import java.awt.Desktop
 import kotlin.io.path.toPath
 
@@ -197,123 +191,216 @@ class ImportFilesDialog(
 							}
 
 							Text(
-								"Order the files by dragging them, and click \"Save\". Only .psd files are accepted."
+								"Order the files by clicking the corresponding arrows, and click \"Save\". " +
+									"Only .psd files are accepted."
 							)
 
 							val verticalScrollState = rememberScrollState(0)
 
 							Box {
-								ReorderableColumn(
-									list = files,
+//								ReorderableColumn(
+//									list = files,
+//
+//									onSettle = { fromIndex, toIndex ->
+//										logger.info { "===" }
+//										logger.info { "List before: ${files.joinToString { it.toPath().fileName.toString() }}" }
+//
+//										files.apply {
+//											add(toIndex, removeAt(fromIndex))
+//										}
+//
+//
+//										logger.info { "List after: ${files.joinToString { it.toPath().fileName.toString() }}" }
+//									},
+//
+//									modifier = Modifier
+//										.verticalScroll(verticalScrollState)
+//										.absolutePadding(right = 17.dp),
+//
+//									verticalArrangement = Arrangement.spacedBy(10.dp)
+//								) { index, uri, isDragging ->
+//									val interactionSource = remember { MutableInteractionSource() }
+//
+//									Card(
+//										onClick = {},
+//										interactionSource = interactionSource,
+//										modifier = Modifier
+//											.semantics {
+//												customActions = listOf(
+//													CustomAccessibilityAction(
+//														label = "Move Up",
+//
+//														action = {
+//															if (index > 0) {
+//																directoryWatcher!!.files.apply {
+//																	add(index - 1, removeAt(index))
+//																}
+//
+//																true
+//															} else {
+//																false
+//															}
+//														}
+//													),
+//
+//													CustomAccessibilityAction(
+//														label = "Move Down",
+//
+//														action = {
+//															if (index < directoryWatcher!!.files.size - 1) {
+//																directoryWatcher!!.files.apply {
+//																	add(index + 1, removeAt(index))
+//																}
+//
+//																true
+//															} else {
+//																false
+//															}
+//														}
+//													),
+//												)
+//											}
+//									) {
+//										Row(
+//											verticalAlignment = Alignment.CenterVertically,
+//											modifier = Modifier
+//												.background(colors.SectionBackground, RoundedCornerShape(15.dp))
+//												.padding(10.dp)
+//										) {
+//											IconButton(
+//												modifier = Modifier
+//													.draggableHandle(interactionSource = interactionSource)
+//													.clearAndSetSemantics { },
+//												onClick = {},
+//											) {
+//												Icon(Icons.Rounded.DragHandle, contentDescription = "Reorder")
+//											}
+//
+//											Text(
+//												uri.toPath().fileName.toString() + " ($index)",
+//												fontSize = TextUnit(1.25F, TextUnitType.Em)
+//											)
+//
+//											Spacer(Modifier.weight(1f))
+//
+//											OutlinedButton(
+//												{
+//													Desktop.getDesktop()
+//														.browse(uri)
+//												},
+//												border = BorderStroke(0.dp, Color.Transparent),
+//												modifier = Modifier.size(150.dp),
+//												shape = MaterialTheme.shapes.small,
+//												contentPadding = PaddingValues(0.dp),
+//											) {
+//												CoilImage(
+//													component = imageComponent,
+//													imageModel = { uri.toPath().toFile() },
+//													imageLoader = { imageLoader },
+//													modifier = Modifier.fillMaxSize(),
+//
+//													imageOptions = ImageOptions(
+//														contentScale = ContentScale.Crop,
+//														alignment = Alignment.Center,
+//														contentDescription = "Original image",
+//														requestSize = IntSize(1000, 1000),
+//													)
+//												)
+//											}
+//										}
+//									}
+//								}
 
-									onSettle = { fromIndex, toIndex ->
-										logger.info { "===" }
-										logger.info { "List before: ${files.joinToString { it.toPath().fileName.toString() }}" }
-
-										files.apply {
-											add(toIndex, removeAt(fromIndex))
-										}
-
-
-										logger.info { "List after: ${files.joinToString { it.toPath().fileName.toString() }}" }
-									},
-
+								Column(
 									modifier = Modifier
 										.verticalScroll(verticalScrollState)
 										.absolutePadding(right = 17.dp),
 
 									verticalArrangement = Arrangement.spacedBy(10.dp)
-								) { index, uri, isDragging ->
-									val interactionSource = remember { MutableInteractionSource() }
-
-									Card(
-										onClick = {},
-										interactionSource = interactionSource,
-										modifier = Modifier
-											.semantics {
-												customActions = listOf(
-													CustomAccessibilityAction(
-														label = "Move Up",
-
-														action = {
+								) {
+									files.forEachIndexed { index, uri ->
+										Card {
+											Row(
+												verticalAlignment = Alignment.CenterVertically,
+												modifier = Modifier
+													.background(colors.SectionBackground, RoundedCornerShape(15.dp))
+													.padding(10.dp)
+											) {
+												Column(
+													Modifier.weight(1f, true),
+												) {
+													TextButton(
+														onClick = {
 															if (index > 0) {
-																directoryWatcher!!.files.apply {
+																files.apply {
 																	add(index - 1, removeAt(index))
 																}
-
-																true
-															} else {
-																false
 															}
-														}
-													),
+														},
 
-													CustomAccessibilityAction(
-														label = "Move Down",
+														enabled = index != 0
+													) {
+														Icon(
+															Icons.Rounded.ArrowUpward,
+															"Move up"
+														)
+													}
 
-														action = {
-															if (index < directoryWatcher!!.files.size - 1) {
-																directoryWatcher!!.files.apply {
+													Spacer(Modifier.weight(1f))
+
+													TextButton(
+														onClick = {
+															if (index < files.size - 1) {
+																files.apply {
 																	add(index + 1, removeAt(index))
 																}
-
-																true
-															} else {
-																false
 															}
-														}
-													),
+														},
+
+														enabled = index != files.size - 1
+													) {
+														Icon(
+															Icons.Rounded.ArrowDownward,
+															"Move down"
+														)
+													}
+												}
+
+												Text(
+													uri.toPath().fileName.toString() + " ($index)",
+													fontSize = TextUnit(1.25F, TextUnitType.Em)
 												)
-											}
-									) {
-										Row(
-											verticalAlignment = Alignment.CenterVertically,
-											modifier = Modifier
-												.background(colors.SectionBackground, RoundedCornerShape(15.dp))
-												.padding(10.dp)
-										) {
-											IconButton(
-												modifier = Modifier
-													.draggableHandle(interactionSource = interactionSource)
-													.clearAndSetSemantics { },
-												onClick = {},
-											) {
-												Icon(Icons.Rounded.DragHandle, contentDescription = "Reorder")
-											}
 
-											Text(
-												uri.toPath().fileName.toString() + " ($index)",
-												fontSize = TextUnit(1.25F, TextUnitType.Em)
-											)
+												Spacer(Modifier.weight(1f))
 
-											Spacer(Modifier.weight(1f))
+												OutlinedButton(
+													{
+														Desktop.getDesktop()
+															.browse(uri)
+													},
+													border = BorderStroke(0.dp, Color.Transparent),
+													modifier = Modifier.size(150.dp),
+													shape = MaterialTheme.shapes.small,
+													contentPadding = PaddingValues(0.dp),
+												) {
+													CoilImage(
+														component = imageComponent,
+														imageModel = { uri.toPath().toFile() },
+														imageLoader = { imageLoader },
+														modifier = Modifier.fillMaxSize(),
 
-											OutlinedButton(
-												{
-													Desktop.getDesktop()
-														.browse(uri)
-												},
-												border = BorderStroke(0.dp, Color.Transparent),
-												modifier = Modifier.size(150.dp),
-												shape = MaterialTheme.shapes.small,
-												contentPadding = PaddingValues(0.dp),
-											) {
-												CoilImage(
-													component = imageComponent,
-													imageModel = { uri.toPath().toFile() },
-													imageLoader = { imageLoader },
-													modifier = Modifier.fillMaxSize(),
-
-													imageOptions = ImageOptions(
-														contentScale = ContentScale.Crop,
-														alignment = Alignment.Center,
-														contentDescription = "Original image",
-														requestSize = IntSize(1000, 1000),
+														imageOptions = ImageOptions(
+															contentScale = ContentScale.Crop,
+															alignment = Alignment.Center,
+															contentDescription = "Original image",
+															requestSize = IntSize(1000, 1000),
+														)
 													)
-												)
+												}
 											}
 										}
 									}
+
 								}
 
 								VerticalScrollbar(
