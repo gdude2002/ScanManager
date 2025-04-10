@@ -12,7 +12,7 @@ jobs:
         env:
           - os: ubuntu-latest
             type: app
-            name: Linux (AppImage)
+            name: Linux (Unpacked)
             executable: "./gradlew"
 
           - os: ubuntu-latest
