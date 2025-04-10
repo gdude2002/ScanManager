@@ -29,6 +29,11 @@ fun main() {
 
 	application {
 		logger.info {
+			"Compose application resources dir: " +
+				System.getProperties().getOrDefault("compose.application.resources.dir", "")?.toString()
+		}
+
+		logger.info {
 			"Java library path: " +
 				System.getProperties().getOrDefault("java.library.path", "")?.toString()
 		}

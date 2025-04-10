@@ -116,6 +116,15 @@ compose.desktop {
 
 			targetFormats(*formats)
 
+			modules("java.sql")
+
+			packageName = "ScanManager"
+			packageVersion = project.version.toString().split("-").first()
+
+			copyright = "© $year Gareth Coles, EUPL v1.2."
+			description = "Simple photo scan organiser and toolkit."
+			licenseFile = rootProject.file("LICENSE")
+
 			linux {
 				appCategory = "Productivity"
 				debMaintainer = "gareth@gserv.me"
@@ -137,15 +146,6 @@ compose.desktop {
 				menuGroup = "gserv.me"
 				upgradeUuid = "c82597f2-47a3-415c-92a0-5dc3e12d75b1"
 			}
-
-			modules("java.sql")
-
-			packageName = "ScanManager"
-			packageVersion = project.version.toString().split("-").first()
-
-			copyright = "© $year Gareth Coles, EUPL v1.2."
-			description = "Simple photo scan organiser and toolkit."
-			licenseFile = rootProject.file("LICENSE")
 		}
 	}
 }
