@@ -13,22 +13,42 @@ jobs:
           - os: ubuntu-latest
             type: deb
             name: Linux (.deb)
+            executable: "./gradlew"
 
           - os: ubuntu-latest
             type: rpm
             name: Linux (.rpm)
-
-          - os: windows-latest
-            type: exe
-            name: Windows (.exe)
+            executable: "./gradlew"
 
           - os: macos-13
             type: dmg
             name: Mac (Intel, .dmg)
+            executable: "./gradlew"
+
+          - os: macos-13
+            type: pkg
+            name: Mac (Intel, .pkg)
+            executable: "./gradlew"
 
           - os: macos-latest
             type: dmg
             name: Mac (Apple Silicon, .dmg)
+            executable: "./gradlew"
+
+          - os: macos-latest
+            type: pkg
+            name: Mac (Apple Silicon, .pkg)
+            executable: "./gradlew"
+
+          - os: windows-latest
+            type: exe
+            name: Windows (.exe)
+            executable: "gradlew.bat"
+
+          - os: windows-latest
+            type: msi
+            name: Windows (.msi)
+            executable: "gradlew.bat"
 
     runs-on: ${{ matrix.env.os }}
     name: ${{ matrix.env.name }}
@@ -47,7 +67,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
 
       - name: Gradle (Build)
-        run: "./gradlew checkLicenses build package"
+        run: "${{ matrix.env.executable }} -DbuildType=${{ matrix.env.type }} checkLicenses build packageDistributionForCurrentOS"
 
       - name: Upload artifact (Core JARs)
         uses: actions/upload-artifact@v4

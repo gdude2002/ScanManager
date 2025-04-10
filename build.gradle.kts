@@ -79,17 +79,24 @@ compose.desktop {
 		jvmArgs.add("--enable-native-access=ALL-UNNAMED")
 
 		nativeDistributions {
-			targetFormats(
-				// Windows
-				TargetFormat.Exe,
+			val buildType = System.getProperties().getOrDefault("buildType", null)?.toString()
 
-				// Mac
-				TargetFormat.Dmg,
+			val formats = when (buildType) {
+				"exe" -> arrayOf(TargetFormat.Exe)
+				"msi" -> arrayOf(TargetFormat.Msi)
+				"dmg" -> arrayOf(TargetFormat.Dmg)
+				"pkg" -> arrayOf(TargetFormat.Pkg)
+				"deb" -> arrayOf(TargetFormat.Deb)
+				"rpm" -> arrayOf(TargetFormat.Rpm)
 
-				// Linux
-				TargetFormat.Deb,
-				TargetFormat.Rpm
-			)
+				else -> arrayOf(
+					TargetFormat.Exe, TargetFormat.Msi,
+					TargetFormat.Dmg, TargetFormat.Pkg,
+					TargetFormat.Deb, TargetFormat.Rpm
+				)
+			}
+
+			targetFormats(*formats)
 
 			linux {
 				appCategory = "Productivity"
