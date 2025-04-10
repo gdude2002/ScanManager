@@ -46,12 +46,12 @@ jobs:
           - os: windows-latest
             type: exe
             name: Windows (.exe)
-            executable: "gradlew.bat"
+            executable: "./gradlew.bat"
 
           - os: windows-latest
             type: msi
             name: Windows (.msi)
-            executable: "gradlew.bat"
+            executable: "./gradlew.bat"
 
     runs-on: ${{ matrix.env.os }}
     name: ${{ matrix.env.name }}
