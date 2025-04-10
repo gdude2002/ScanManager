@@ -26,11 +26,6 @@ jobs:
             executable: "./gradlew"
 
           - os: macos-13
-            type: app
-            name: Mac (Intel, Unpacked)
-            executable: "./gradlew"
-
-          - os: macos-13
             type: dmg
             name: Mac (Intel, .dmg)
             executable: "./gradlew"
@@ -38,11 +33,6 @@ jobs:
           - os: macos-13
             type: pkg
             name: Mac (Intel, .pkg)
-            executable: "./gradlew"
-
-          - os: macos-latest
-            type: app
-            name: Mac (Apple Silicon, Unpacked)
             executable: "./gradlew"
 
           - os: macos-latest
