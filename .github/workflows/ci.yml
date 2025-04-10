@@ -81,16 +81,16 @@ jobs:
 
       - name: List Distribution Files
         run: |
-          echo ls .../main/
-          ls -al build/compose/binaries/main/
+          echo "ls .../main/"
+          ls build/compose/binaries/main/
 
           echo
-          echo ls .../main/*
-          ls -al build/compose/binaries/main/*
+          echo "ls .../main/*"
+          ls build/compose/binaries/main/*
 
           echo
-          echo ls .../main/*/*
-          ls -al build/compose/binaries/main/*/*
+          echo "ls .../main/*/*"
+          ls build/compose/binaries/main/*/*
 
       - name: Upload artifact (Core JARs)
         uses: actions/upload-artifact@v4
