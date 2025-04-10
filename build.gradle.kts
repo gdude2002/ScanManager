@@ -1,4 +1,5 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+import java.util.Calendar
 
 plugins {
 	kotlin("jvm") version "2.1.10"
@@ -9,8 +10,10 @@ plugins {
 	id("org.jetbrains.compose") version "1.7.3"
 }
 
+val projectVersion: String by project
+
 group = "me.gserv.archival"
-version = "1.0-SNAPSHOT"
+version = projectVersion
 
 repositories {
 	mavenCentral()
@@ -64,19 +67,58 @@ kotlin {
 }
 
 license {
-	// Add a license header rule, at least one must be present.
+	// Add a licence header rule, at least one must be present.
 	rule(file("codeformat/HEADER"))
 }
+
+val year = Calendar.getInstance().get(Calendar.YEAR)
 
 compose.desktop {
 	application {
 		mainClass = "me.gserv.archival.MainKt"
+		jvmArgs.add("--enable-native-access=ALL-UNNAMED")
 
 		nativeDistributions {
-			targetFormats(TargetFormat.Exe)
+			targetFormats(
+				// Windows
+				TargetFormat.Exe,
+
+				// Mac
+				TargetFormat.Dmg,
+
+				// Linux
+				TargetFormat.Deb,
+				TargetFormat.Rpm
+			)
+
+			linux {
+				appCategory = "Productivity"
+				debMaintainer = "gareth@gserv.me"
+				menuGroup = "gserv.me"
+				rpmLicenseType = "EUPL-1.2"
+			}
+
+			macOS {
+				appCategory = "public.app-category.productivity"
+				appStore = false
+				bundleID = project.group.toString()
+			}
+
+			windows {
+				console = false
+				dirChooser = true
+				perUserInstall = true
+
+				menuGroup = "gserv.me"
+				upgradeUuid = "c82597f2-47a3-415c-92a0-5dc3e12d75b1"
+			}
 
 			packageName = "ScanManager"
-			packageVersion = "1.0.0"
+			packageVersion = project.version.toString().split("-").first()
+
+			copyright = "© $year Gareth Coles, EUPL v1.2."
+			description = "Simple photo scan organiser and toolkit."
+			licenseFile = rootProject.file("LICENSE")
 		}
 	}
 }

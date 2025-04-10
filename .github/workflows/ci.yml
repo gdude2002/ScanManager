@@ -1,0 +1,50 @@
+jobs:
+  build:
+    strategy:
+      matrix:
+        env:
+          - os: ubuntu-latest
+            type: deb
+            name: Linux (.deb)
+
+          - os: ubuntu-latest
+            type: rpm
+            name: Linux (.rpm)
+
+          - os: windows-latest
+            type: exe
+            name: Windows (.exe)
+
+          - os: macos-13
+            type: dmg
+            name: Mac (Intel, .dmg)
+
+          - os: macos-latest
+            type: dmg
+            name: Mac (Apple Silicon, .dmg)
+
+    runs-on: ${{ matrix.env.os }}
+    name: ${{ matrix.env.name }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+
+        with:
+          java-version: 21
+          distribution: temurin
+
+      - name: Gradle (Setup)
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Gradle (Build)
+        run: "./gradlew checkLicenses build package"
+
+      - name: Upload artifact (Core JARs)
+        uses: actions/upload-artifact@v4
+
+        with:
+          name: Distribution - ${{ matrix.env.name }}
+          path: build/compose/binaries/main/${{ matrix.env.type }}/*.${{ matrix.env.type }}
