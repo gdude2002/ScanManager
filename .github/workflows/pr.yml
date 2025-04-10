@@ -1,9 +1,12 @@
-name: CI (Push)
+name: CI (Branch/Merge Group/PR)
 
 on:
   push:
-    branches:
+    branches-ignore:
       - root
+
+  pull_request:
+  merge_group:
 
 jobs:
   build:
