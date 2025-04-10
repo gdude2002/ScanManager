@@ -84,12 +84,13 @@ jobs:
 
       - name: List Distribution Files
         run: |
-          ls -l build/compose/binaries/main/
-          ls build/compose/binaries/main/*/
+          ls build/compose/binaries/main/
+          ls build/compose/binaries/main/*
+          ls build/compose/binaries/main/*/*
 
       - name: Upload artifact (Core JARs)
         uses: actions/upload-artifact@v4
 
         with:
           name: Distribution - ${{ matrix.env.name }}
-          path: build/compose/binaries/main/${{ matrix.env.type }}/*.${{ matrix.env.type }}
+          path: build/compose/binaries/main/${{ matrix.env.type }}/*
