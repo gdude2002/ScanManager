@@ -45,8 +45,25 @@ dependencies {
 	implementation("com.github.skydoves:landscapist-coil3:2.4.7")
 	implementation("com.github.skydoves:landscapist-placeholder:2.4.7")
 
+	implementation("org.apache.xmlgraphics", "batik-all", "1.18")
+	implementation("com.twelvemonkeys.imageio", "imageio-batik", "3.12.0")
+	implementation("com.twelvemonkeys.imageio", "imageio-bmp", "3.12.0")
+	implementation("com.twelvemonkeys.imageio", "imageio-dds", "3.12.0")
+	implementation("com.twelvemonkeys.imageio", "imageio-hdr", "3.12.0")
+	implementation("com.twelvemonkeys.imageio", "imageio-icns", "3.12.0")
+	implementation("com.twelvemonkeys.imageio", "imageio-iff", "3.12.0")
 	implementation("com.twelvemonkeys.imageio", "imageio-jpeg", "3.12.0")
+	implementation("com.twelvemonkeys.imageio", "imageio-pcx", "3.12.0")
+	implementation("com.twelvemonkeys.imageio", "imageio-pict", "3.12.0")
+	implementation("com.twelvemonkeys.imageio", "imageio-pnm", "3.12.0")
 	implementation("com.twelvemonkeys.imageio", "imageio-psd", "3.12.0")
+	implementation("com.twelvemonkeys.imageio", "imageio-sgi", "3.12.0")
+	implementation("com.twelvemonkeys.imageio", "imageio-tga", "3.12.0")
+	implementation("com.twelvemonkeys.imageio", "imageio-thumbsdb", "3.12.0")
+	implementation("com.twelvemonkeys.imageio", "imageio-tiff", "3.12.0")
+	implementation("com.twelvemonkeys.imageio", "imageio-webp", "3.12.0")
+	implementation("com.twelvemonkeys.imageio", "imageio-xwd", "3.12.0")
+
 	implementation("dev.brachtendorf", "JImageHash", "1.0.0")
 	implementation("com.github.romankh3", "image-comparison", "4.4.0")
 
@@ -82,6 +99,7 @@ compose.desktop {
 			val buildType = System.getProperties().getOrDefault("buildType", null)?.toString()
 
 			val formats = when (buildType) {
+				"app" -> arrayOf(TargetFormat.AppImage)
 				"exe" -> arrayOf(TargetFormat.Exe)
 				"msi" -> arrayOf(TargetFormat.Msi)
 				"dmg" -> arrayOf(TargetFormat.Dmg)
@@ -90,9 +108,9 @@ compose.desktop {
 				"rpm" -> arrayOf(TargetFormat.Rpm)
 
 				else -> arrayOf(
-					TargetFormat.Exe, TargetFormat.Msi,
-					TargetFormat.Dmg, TargetFormat.Pkg,
-					TargetFormat.Deb, TargetFormat.Rpm
+					// TargetFormat.Exe, TargetFormat.Msi,
+					// TargetFormat.Dmg, TargetFormat.Pkg,
+					TargetFormat.AppImage, // TargetFormat.Deb, TargetFormat.Rpm
 				)
 			}
 
@@ -119,6 +137,8 @@ compose.desktop {
 				menuGroup = "gserv.me"
 				upgradeUuid = "c82597f2-47a3-415c-92a0-5dc3e12d75b1"
 			}
+
+			modules("java.sql")
 
 			packageName = "ScanManager"
 			packageVersion = project.version.toString().split("-").first()

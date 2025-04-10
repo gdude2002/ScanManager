@@ -14,6 +14,11 @@ jobs:
       matrix:
         env:
           - os: ubuntu-latest
+            type: app
+            name: Linux (AppImage)
+            executable: "./gradlew"
+
+          - os: ubuntu-latest
             type: deb
             name: Linux (.deb)
             executable: "./gradlew"
@@ -21,6 +26,11 @@ jobs:
           - os: ubuntu-latest
             type: rpm
             name: Linux (.rpm)
+            executable: "./gradlew"
+
+          - os: macos-13
+            type: app
+            name: Mac (Intel, Unpacked)
             executable: "./gradlew"
 
           - os: macos-13
@@ -34,6 +44,11 @@ jobs:
             executable: "./gradlew"
 
           - os: macos-latest
+            type: app
+            name: Mac (Apple Silicon, Unpacked)
+            executable: "./gradlew"
+
+          - os: macos-latest
             type: dmg
             name: Mac (Apple Silicon, .dmg)
             executable: "./gradlew"
@@ -42,6 +57,11 @@ jobs:
             type: pkg
             name: Mac (Apple Silicon, .pkg)
             executable: "./gradlew"
+
+          - os: windows-latest
+            type: app
+            name: Windows (Unpacked)
+            executable: "./gradlew.bat"
 
           - os: windows-latest
             type: exe
@@ -72,9 +92,14 @@ jobs:
       - name: Gradle (Build)
         run: "${{ matrix.env.executable }} -DbuildType=${{ matrix.env.type }} checkLicenses build packageDistributionForCurrentOS"
 
+      - name: List Distribution Files
+        run: |
+          ls -l build/compose/binaries/main/
+          ls build/compose/binaries/main/*/
+
       - name: Upload artifact (Core JARs)
         uses: actions/upload-artifact@v4
 
         with:
-          name: ${{ matrix.env.name }}
+          name: Distribution - ${{ matrix.env.name }}
           path: build/compose/binaries/main/${{ matrix.env.type }}/*.${{ matrix.env.type }}
