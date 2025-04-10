@@ -130,7 +130,7 @@ compose.desktop {
 			}
 
 			windows {
-				console = false
+				console = true
 				dirChooser = true
 				perUserInstall = true
 
