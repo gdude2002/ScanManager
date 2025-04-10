@@ -16,22 +16,27 @@ jobs:
           - os: ubuntu-latest
             type: deb
             name: Linux (.deb)
+            executable: "./gradlew"
 
           - os: ubuntu-latest
             type: rpm
             name: Linux (.rpm)
+            executable: "./gradlew"
 
           - os: windows-latest
             type: exe
             name: Windows (.exe)
+            executable: "gradlew.bat"
 
           - os: macos-13
             type: dmg
             name: Mac (Intel, .dmg)
+            executable: "./gradlew"
 
           - os: macos-latest
             type: dmg
             name: Mac (Apple Silicon, .dmg)
+            executable: "./gradlew"
 
     runs-on: ${{ matrix.env.os }}
     name: ${{ matrix.env.name }}
@@ -50,7 +55,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
 
       - name: Gradle (Build)
-        run: "./gradlew checkLicenses build package"
+        run: "${{ matrix.env.executable }} checkLicenses build package"
 
       - name: Upload artifact (Core JARs)
         uses: actions/upload-artifact@v4
