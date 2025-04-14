@@ -31,8 +31,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.window.FrameWindowScope
-import coil3.ImageLoader
-import coil3.PlatformContext
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.animation.circular.CircularRevealPlugin
 import com.skydoves.landscapist.coil3.CoilImage
@@ -42,11 +40,11 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import me.gserv.archival.Colors
 import me.gserv.archival.data.enums.ImageQuality
 import me.gserv.archival.utils.DirectoryWatcher
-import me.gserv.archival.utils.PsdDecoder
 import me.gserv.archival.utils.components.DialogContainer
 import me.gserv.archival.utils.components.EnumDropdown
 import me.gserv.archival.utils.components.SecondaryOutlinedButton
 import me.gserv.archival.utils.components.SuccessButton
+import me.gserv.archival.utils.createImageLoader
 import java.awt.Desktop
 import kotlin.io.path.toPath
 
@@ -81,12 +79,7 @@ class ImportFilesDialog(
 	@Composable
 	@Preview
 	fun create() {
-		val imageLoader = ImageLoader
-			.Builder(PlatformContext.INSTANCE)
-			.components {
-				add(PsdDecoder.Factory)
-			}
-			.build()
+		val imageLoader = createImageLoader()
 
 		val iconTintPainter =
 			@Composable { image: ImageVector, color: Color ->

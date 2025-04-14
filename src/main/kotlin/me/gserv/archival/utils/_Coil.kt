@@ -8,7 +8,9 @@
 
 package me.gserv.archival.utils
 
+import androidx.compose.runtime.Composable
 import coil3.ImageLoader
+import coil3.PlatformContext
 import coil3.annotation.ExperimentalCoilApi
 import coil3.asImage
 import coil3.decode.DecodeResult
@@ -28,7 +30,16 @@ import org.jetbrains.skiko.toImage
 import javax.imageio.ImageIO
 import org.jetbrains.skia.Image as SkiaImage
 
-class PsdDecoder(
+@Composable
+fun createImageLoader() =
+	ImageLoader
+		.Builder(PlatformContext.INSTANCE)
+		.components {
+			add(ImageIODecoder.Factory)
+		}
+		.build()
+
+class ImageIODecoder(
 	val result: SourceFetchResult,
 	val options: Options,
 ) : Decoder {
@@ -60,16 +71,17 @@ class PsdDecoder(
 			options: Options,
 			imageLoader: ImageLoader
 		): Decoder? {
-			if (
-				result.mimeType != "image/vnd.adobe.photoshop" &&
-				result.source.fileOrNull()?.toFile()?.extension != "psd"
-			) {
-				return null
+			val format = ImageFormat.find(
+				result.source.fileOrNull()?.toFile()?.name,
+				result.mimeType
+			)
+
+			if (format != null) {
+				return ImageIODecoder(result, options)
 			}
 
-			return PsdDecoder(result, options)
+			return null
 		}
-
 	}
 }
 

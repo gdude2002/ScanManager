@@ -38,8 +38,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowState
-import coil3.ImageLoader
-import coil3.PlatformContext
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.animation.circular.CircularRevealPlugin
 import com.skydoves.landscapist.coil3.CoilImage
@@ -55,11 +53,11 @@ import me.gserv.archival.data.entities.Set
 import me.gserv.archival.dropTarget
 import me.gserv.archival.types.VisibilityTogglingWindow
 import me.gserv.archival.utils.DirectoryWatcher
-import me.gserv.archival.utils.PsdDecoder
 import me.gserv.archival.utils.StringTooltip
 import me.gserv.archival.utils.components.PrimaryButton
 import me.gserv.archival.utils.components.SecondaryButton
 import me.gserv.archival.utils.components.SuccessButton
+import me.gserv.archival.utils.createImageLoader
 import me.gserv.archival.windows.set.ImportFilesDialog
 import java.awt.Desktop
 import java.awt.Dimension
@@ -96,12 +94,7 @@ class SetWindow(val parent: BinderWindow) : VisibilityTogglingWindow() {
 
 	@Composable
 	fun create() {
-		val imageLoader = ImageLoader
-			.Builder(PlatformContext.INSTANCE)
-			.components {
-				add(PsdDecoder.Factory)
-			}
-			.build()
+		val imageLoader = createImageLoader()
 
 		if (isOpen) {
 			parent.hide()
