@@ -114,6 +114,8 @@ compose.desktop {
 				)
 			}
 
+			appResourcesRootDir.set(project.layout.projectDirectory.dir("src/main/natives/"))
+
 			targetFormats(*formats)
 
 			modules("java.sql")
@@ -139,7 +141,7 @@ compose.desktop {
 			}
 
 			windows {
-				console = true
+				console = false
 				dirChooser = true
 				perUserInstall = true
 

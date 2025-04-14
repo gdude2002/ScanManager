@@ -24,7 +24,7 @@ sealed class ImageFormat(
 	object JLS : ImageFormat("Lossless JPEG", setOf("image/jls"), regexSetOf("jls"))
 	object PCX : ImageFormat("Picture Exchange", setOf("image/vnd.zbrush.pcx", "image/x-pcx"), regexSetOf("dcx", "pcx"))
 	object PNG : ImageFormat("Portable Network Graphics", setOf("image/png"), regexSetOf("png"))
-	object PTNG : ImageFormat("Apple MacPaint Picture", setOf("image/x-macpaint"), regexSetOf("pntg"))
+	object PTNG : ImageFormat("Apple MacPaint Picture", setOf("image/x-macpaint"), regexSetOf("ptng"))
 	object SVG : ImageFormat("Scalable Vector Graphics", setOf("image/svg+xml"), regexSetOf("svg", "svgz"))
 	object TIFF : ImageFormat("Tag Image File Format", setOf("image/tiff"), regexSetOf("tif", "tiff"), setOf("tiff"))
 	object WBMP : ImageFormat("WAP Bitmap", setOf("image/vnd.wap.wbmp"), regexSetOf("wbmp"))
