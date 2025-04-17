@@ -37,7 +37,6 @@ fun loadNatives() {
 	}
 
 	val libDir = resourcesDir / "lib"
-	val appDir = cwd
 
 	logger.info { "Compose application resources dir: \n    $resourcesDir" }
 	logger.info { "Libraries dir: \n    $libDir" }
@@ -46,7 +45,10 @@ fun loadNatives() {
 	if (cwd == resourcesDir.parent) {
 		logger.info { "NOTE: We appear to be running in an installed application context." }
 	} else {
-		logger.info { "NOTE: We appear to be running in a development environment." }
+		logger.warn {
+			"NOTE: We appear to be running in an unpackaged development environment. " +
+				"The Java library path will be wrong."
+		}
 	}
 
 	val remaining: MutableList<File> = libDir.toFile().listFiles().toMutableList()
