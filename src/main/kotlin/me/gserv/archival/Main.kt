@@ -14,30 +14,44 @@ import me.gserv.archival.config.AppConfig
 import me.gserv.archival.data.Database
 import me.gserv.archival.windows.DropTargetWindow
 import me.gserv.archival.windows.MainWindow
+import kotlin.io.path.Path
+import kotlin.io.path.div
 import kotlin.system.exitProcess
 
 lateinit var mainWindow: MainWindow
 lateinit var dropTarget: DropTargetWindow
 
-fun main() {
-	val logger = KotlinLogging.logger { }
+private val logger = KotlinLogging.logger { }
 
+fun copyNatives() {
+	val resourcesDir = Path(System.getProperty("compose.application.resources.dir"))
+
+	logger.info {
+		"Java library path:\n" +
+			System.getProperties().getOrDefault("java.library.path", "")?.toString()
+				?.split(";")?.joinToString("    \n") + "\n"
+	}
+
+	logger.info { "Compose application resources dir: \n    $resourcesDir\n" }
+
+	val libDir = resourcesDir / "lib"
+	val appDir = resourcesDir.parent
+
+	libDir.toFile().listFiles().forEach { file ->
+		logger.info { "Copying file: ${file.name}" }
+		file.copyTo((appDir / file.name).toFile(), overwrite = true)
+	}
+}
+
+fun main() {
 	Thread.setDefaultUncaughtExceptionHandler { _, e ->
 		logger.error(e) { "Uncaught exception" }
 		exitProcess(1)
 	}
 
+	copyNatives()
+
 	application {
-		logger.info {
-			"Compose application resources dir: " +
-				System.getProperties().getOrDefault("compose.application.resources.dir", "")?.toString()
-		}
-
-		logger.info {
-			"Java library path: " +
-				System.getProperties().getOrDefault("java.library.path", "")?.toString()
-		}
-
 		if (System.getenv().contains("NO_LOAD")) {
 			Database.connect("mem:test")
 			Database.printCreateStatements()
