@@ -12,6 +12,7 @@ import androidx.compose.ui.window.application
 import io.github.oshai.kotlinlogging.KotlinLogging
 import me.gserv.archival.config.AppConfig
 import me.gserv.archival.data.Database
+import me.gserv.archival.utils.currentOs
 import me.gserv.archival.windows.DropTargetWindow
 import me.gserv.archival.windows.MainWindow
 import kotlin.io.path.Path
@@ -31,22 +32,28 @@ fun copyNatives() {
 	logger.info {
 		"Java library path:\n" +
 			System.getProperties().getOrDefault("java.library.path", "")?.toString()
-				?.split(";")?.joinToString("    \n") + "\n"
+				?.split(currentOs.envSep)?.joinToString("    \n") + "\n"
 	}
 
-	logger.info { "Compose application resources dir: \n    $resourcesDir\n" }
-
 	val libDir = resourcesDir / "lib"
+	val appDir = cwd
 
-	val appDir = if (resourcesDir in cwd) {
-		resourcesDir.parent
+	logger.info { "Compose application resources dir: \n    $resourcesDir" }
+	logger.info { "Libraries dir: \n    $libDir" }
+	logger.info { "Current working directory: \n    $cwd\n" }
+
+	if (cwd == resourcesDir.parent) {
+		logger.info { "NOTE: We appear to be running in an installed application context."}
 	} else {
-		cwd
+		logger.info { "NOTE: We appear to be running in a development environment."}
 	}
 
 	libDir.toFile().listFiles().forEach { file ->
-		logger.info { "Copying file: ${file.name}" }
-		file.copyTo((appDir / file.name).toFile(), overwrite = true)
+		val target = (appDir / file.name).toFile().absoluteFile
+
+		logger.info { "Copying: ${file.name} -> $target" }
+
+		file.copyTo(target, overwrite = true).absoluteFile
 	}
 }
 

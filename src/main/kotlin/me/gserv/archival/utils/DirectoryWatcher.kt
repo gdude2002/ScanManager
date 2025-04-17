@@ -15,6 +15,7 @@ import java.net.URI
 import java.nio.file.*
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.CoroutineContext
+import kotlin.io.path.name
 
 typealias FileCallback = (URI) -> Unit
 
@@ -88,6 +89,10 @@ class DirectoryWatcher(val path: Path) : CoroutineScope {
 									StandardWatchEventKinds.ENTRY_CREATE -> {
 										val filePath = path.resolve(event.context() as Path).toAbsolutePath()
 
+										if (filePath.name == ".DS_Store") {
+											return@runInterruptible
+										}
+
 										logger.debug { "File created: $filePath" }
 										files.add(filePath.toUri())
 
@@ -96,6 +101,10 @@ class DirectoryWatcher(val path: Path) : CoroutineScope {
 
 									StandardWatchEventKinds.ENTRY_DELETE -> {
 										val filePath = path.resolve(event.context() as Path).toAbsolutePath()
+
+										if (filePath.name == ".DS_Store") {
+											return@runInterruptible
+										}
 
 										logger.debug { "File deleted: $filePath" }
 										files.remove(filePath.toUri())
