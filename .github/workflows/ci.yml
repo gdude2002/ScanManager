@@ -70,7 +70,7 @@ jobs:
         uses: actions/setup-java@v4
 
         with:
-          java-version: 24
+          java-version: 23
           distribution: temurin
 
       - name: Gradle (Setup)
