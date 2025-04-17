@@ -64,6 +64,9 @@ dependencies {
 	implementation("com.twelvemonkeys.imageio", "imageio-webp", "3.12.0")
 	implementation("com.twelvemonkeys.imageio", "imageio-xwd", "3.12.0")
 
+	implementation("com.github.gotson.nightmonkeys:imageio-heif:1.0.0")
+	implementation("com.github.gotson.nightmonkeys:imageio-jxl:1.0.0")
+
 	implementation("dev.brachtendorf", "JImageHash", "1.0.0")
 	implementation("com.github.romankh3", "image-comparison", "4.4.0")
 

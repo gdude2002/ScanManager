@@ -195,8 +195,7 @@ class ImportFilesDialog(
 							}
 
 							Text(
-								"Order the files by clicking the corresponding arrows, and click \"Save\". " +
-									"Only .psd files are accepted."
+								"Order the files by clicking the corresponding arrows, and click \"Save\"."
 							)
 
 							val verticalScrollState = rememberScrollState(0)

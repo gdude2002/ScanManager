@@ -15,6 +15,7 @@ import me.gserv.archival.data.Database
 import me.gserv.archival.windows.DropTargetWindow
 import me.gserv.archival.windows.MainWindow
 import kotlin.io.path.Path
+import kotlin.io.path.absolute
 import kotlin.io.path.div
 import kotlin.system.exitProcess
 
@@ -24,6 +25,7 @@ lateinit var dropTarget: DropTargetWindow
 private val logger = KotlinLogging.logger { }
 
 fun copyNatives() {
+	val cwd = Path(".").absolute()
 	val resourcesDir = Path(System.getProperty("compose.application.resources.dir"))
 
 	logger.info {
@@ -35,7 +37,12 @@ fun copyNatives() {
 	logger.info { "Compose application resources dir: \n    $resourcesDir\n" }
 
 	val libDir = resourcesDir / "lib"
-	val appDir = resourcesDir.parent
+
+	val appDir = if (resourcesDir in cwd) {
+		resourcesDir.parent
+	} else {
+		cwd
+	}
 
 	libDir.toFile().listFiles().forEach { file ->
 		logger.info { "Copying file: ${file.name}" }

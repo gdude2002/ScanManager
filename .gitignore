@@ -151,3 +151,8 @@ replay_pid*
 /data
 output.log
 !gradle/wrapper/*
+
+/*.dll
+/*.a
+/*.so
+/*.dylib

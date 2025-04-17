@@ -20,6 +20,7 @@ import coil3.fetch.SourceFetchResult
 import coil3.request.Options
 import coil3.request.maxBitmapSize
 import coil3.size.Precision
+import coil3.util.DebugLogger
 import coil3.util.component1
 import coil3.util.component2
 import org.jetbrains.skia.Bitmap
@@ -37,6 +38,7 @@ fun createImageLoader() =
 		.components {
 			add(ImageIODecoder.Factory)
 		}
+		.logger(DebugLogger())
 		.build()
 
 class ImageIODecoder(
