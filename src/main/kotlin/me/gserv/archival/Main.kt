@@ -42,11 +42,9 @@ fun loadNatives() {
 	logger.info { "Libraries dir: \n    $libDir" }
 	logger.info { "Current working directory: \n    $cwd\n" }
 
-	if (cwd == resourcesDir.parent) {
-		logger.info { "NOTE: We appear to be running in an installed application context." }
-	} else {
+	if (cwd != resourcesDir.parent) {
 		logger.warn {
-			"NOTE: We appear to be running in an unpackaged development environment. " +
+			"This seems like an unpackaged development environment. " +
 				"The Java library path will be wrong."
 		}
 	}
