@@ -12,9 +12,9 @@ import androidx.compose.ui.window.application
 import io.github.oshai.kotlinlogging.KotlinLogging
 import me.gserv.archival.config.AppConfig
 import me.gserv.archival.data.Database
-import me.gserv.archival.utils.currentOs
 import me.gserv.archival.windows.DropTargetWindow
 import me.gserv.archival.windows.MainWindow
+import java.io.File
 import kotlin.io.path.Path
 import kotlin.io.path.absolute
 import kotlin.io.path.div
@@ -23,16 +23,17 @@ import kotlin.system.exitProcess
 lateinit var mainWindow: MainWindow
 lateinit var dropTarget: DropTargetWindow
 
+private const val TOTAL_ATTEMPTS = 5
 private val logger = KotlinLogging.logger { }
 
-fun copyNatives() {
+fun loadNatives() {
 	val cwd = Path(".").absolute()
 	val resourcesDir = Path(System.getProperty("compose.application.resources.dir"))
 
 	logger.info {
 		"Java library path:\n" +
 			System.getProperties().getOrDefault("java.library.path", "")?.toString()
-				?.split(currentOs.envSep)?.joinToString("    \n") + "\n"
+				?.split(File.pathSeparator)?.joinToString("    \n") + "\n"
 	}
 
 	val libDir = resourcesDir / "lib"
@@ -43,17 +44,48 @@ fun copyNatives() {
 	logger.info { "Current working directory: \n    $cwd\n" }
 
 	if (cwd == resourcesDir.parent) {
-		logger.info { "NOTE: We appear to be running in an installed application context."}
+		logger.info { "NOTE: We appear to be running in an installed application context." }
 	} else {
-		logger.info { "NOTE: We appear to be running in a development environment."}
+		logger.info { "NOTE: We appear to be running in a development environment." }
 	}
 
-	libDir.toFile().listFiles().forEach { file ->
-		val target = (appDir / file.name).toFile().absoluteFile
+	val remaining: MutableList<File> = libDir.toFile().listFiles().toMutableList()
 
-		logger.info { "Copying: ${file.name} -> $target" }
+	for (i in 1..TOTAL_ATTEMPTS) {
+		if (remaining.isEmpty()) {
+			break
+		}
 
-		file.copyTo(target, overwrite = true).absoluteFile
+		val finalAttempt = i == TOTAL_ATTEMPTS
+
+		tryLoad(remaining, i, finalAttempt)
+	}
+
+	if (remaining.isNotEmpty()) {
+		error(
+			"Failed to load ${remaining.size} native libraries:\n" +
+				remaining.joinToString("\n")
+		)
+	}
+}
+
+fun tryLoad(files: MutableList<File>, attempt: Int, finalAttempt: Boolean = false) {
+	logger.info { "=== Loading native libraries (Attempt $attempt) ===" }
+
+	files.toList().forEach { file ->
+		try {
+			System.loadLibrary(file.nameWithoutExtension)
+
+			logger.info { "Success: ${file.name}" }
+
+			files.remove(file)
+		} catch (e: UnsatisfiedLinkError) {
+			if (finalAttempt) {
+				logger.error(e) { "Fail: ${file.name}" }
+			} else {
+				logger.warn { "Fail: ${file.name}" }
+			}
+		}
 	}
 }
 
@@ -63,7 +95,7 @@ fun main() {
 		exitProcess(1)
 	}
 
-	copyNatives()
+	loadNatives()
 
 	application {
 		if (System.getenv().contains("NO_LOAD")) {

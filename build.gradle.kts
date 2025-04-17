@@ -93,9 +93,19 @@ license {
 
 val year = Calendar.getInstance().get(Calendar.YEAR)
 
+val APPDIR = "\$APPDIR"
+val pathSep: String = File.pathSeparator
+var dirSep: String = File.separator
+
+if (dirSep == "\\") {
+	dirSep = dirSep + dirSep
+}
+
 compose.desktop {
 	application {
 		mainClass = "me.gserv.archival.MainKt"
+
+		jvmArgs.add("-Djava.library.path=$APPDIR$pathSep$APPDIR${dirSep}resources${dirSep}lib$pathSep$APPDIR${dirSep}..${dirSep}runtime")
 		jvmArgs.add("--enable-native-access=ALL-UNNAMED")
 
 		nativeDistributions {
