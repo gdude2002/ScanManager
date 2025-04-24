@@ -66,7 +66,7 @@ class RawImageIOPlugin : ImageReaderSpi(
 		}
 	}
 
-	override fun createReaderInstance(extension: Any): ImageReader =
+	override fun createReaderInstance(extension: Any?): ImageReader =
 		Reader(this)
 
 	override fun getDescription(locale: Locale): String =
