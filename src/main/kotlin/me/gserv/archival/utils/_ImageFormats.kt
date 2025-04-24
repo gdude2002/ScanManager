@@ -8,6 +8,7 @@
 
 package me.gserv.archival.utils
 
+import org.librawfx.RAWDescriptor
 import kotlin.text.Regex.Companion.escape
 
 sealed class ImageFormat(
@@ -102,6 +103,27 @@ sealed class ImageFormat(
 		setOf("image/vnd.adobe.photoshop"),
 		regexSetOf("psb", "psd"),
 		setOf("psd")
+	)
+
+	object RAW : ImageFormat(
+		"Raw Image",
+
+		setOf(
+			"image/x-adobe-dng",
+			"image/x-canon-cr2", "image/x-canon-cr3", "image/x-canon-crw",
+			"image/x-fuji-raf",
+			"image/x-leica-rwl",
+			"image/x-mamiya-mef", "image/x-mamiya-mfw",
+			"image/x-nikon-nef", "image/x-nikon-nrw",
+			"image/x-olympus-orf", "image/x-olympus-ori",
+			"image/x-panasonic-raw", "image/x-panasonic-rw2",
+			"image/x-pentax-pef",
+			"image/x-samsung-srw",
+			"image/x-sigma-x3f",
+			"image/x-sony-arw",
+		),
+
+		regexSetOf(*RAWDescriptor.getInstance().extensions.toTypedArray())
 	)
 
 	object SGI : ImageFormat(
