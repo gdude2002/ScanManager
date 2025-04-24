@@ -14,7 +14,13 @@ import me.gserv.archival.config.AppConfig
 import me.gserv.archival.data.Database
 import me.gserv.archival.windows.DropTargetWindow
 import me.gserv.archival.windows.MainWindow
+import org.librawfx.LibrawImage
+import org.slf4j.bridge.SLF4JBridgeHandler
 import java.io.File
+import java.io.StringWriter
+import java.nio.file.Files
+import java.util.*
+import java.util.logging.LogManager
 import kotlin.io.path.Path
 import kotlin.io.path.absolute
 import kotlin.io.path.div
@@ -27,6 +33,7 @@ private const val TOTAL_ATTEMPTS = 5
 private val logger = KotlinLogging.logger { }
 
 fun loadNatives() {
+	val temp = Files.createTempDirectory("ScanManager")
 	val cwd = Path(".").absolute()
 	val resourcesDir = Path(System.getProperty("compose.application.resources.dir"))
 
@@ -67,6 +74,8 @@ fun loadNatives() {
 				remaining.joinToString("\n")
 		)
 	}
+
+	LibrawImage.loadLibs(temp.toString())
 }
 
 fun tryLoad(files: MutableList<File>, attempt: Int, finalAttempt: Boolean = false) {
@@ -90,6 +99,16 @@ fun tryLoad(files: MutableList<File>, attempt: Int, finalAttempt: Boolean = fals
 }
 
 fun main() {
+	SLF4JBridgeHandler.install()
+
+	val props = Properties()
+	val stream = StringWriter()
+
+	props.setProperty(".level", "FINEST")
+	props.store(stream, "")
+
+	LogManager.getLogManager().readConfiguration(stream.toString().byteInputStream())
+
 	Thread.setDefaultUncaughtExceptionHandler { _, e ->
 		logger.error(e) { "Uncaught exception" }
 		exitProcess(1)

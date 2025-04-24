@@ -1,5 +1,8 @@
+import org.gradle.declarative.dsl.schema.FqName.Empty.packageName
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+import java.lang.System.console
 import java.util.Calendar
+import kotlin.text.Typography.copyright
 
 plugins {
 	kotlin("jvm") version "2.1.10"
@@ -8,6 +11,8 @@ plugins {
 	id("dev.yumi.gradle.licenser") version "2.1.+"
 	id("org.jetbrains.kotlin.plugin.compose") version "2.1.10"
 	id("org.jetbrains.compose") version "1.7.3"
+
+	id("org.openjfx.javafxplugin") version "0.1.0"
 }
 
 val projectVersion: String by project
@@ -26,7 +31,9 @@ dependencies {
 	implementation(compose.material3)
 	implementation(compose.materialIconsExtended)
 
-	implementation("org.slf4j", "slf4j-simple", "2.0.16")
+	implementation("org.slf4j", "slf4j-simple", "2.0.17")
+	implementation("org.slf4j", "jul-to-slf4j", "2.0.17")
+
 	implementation("io.github.oshai", "kotlin-logging-jvm", "7.0.3")
 
 	implementation("io.github.kdroidfilter:platformtools.darkmodedetector:0.2.7")
@@ -46,6 +53,7 @@ dependencies {
 	implementation("com.github.skydoves:landscapist-placeholder:2.4.7")
 
 	implementation("org.apache.xmlgraphics", "batik-all", "1.18")
+	implementation("org.librawfx:LibRawFX:1.9.1")
 	implementation("com.twelvemonkeys.imageio", "imageio-batik", "3.12.0")
 	implementation("com.twelvemonkeys.imageio", "imageio-bmp", "3.12.0")
 	implementation("com.twelvemonkeys.imageio", "imageio-dds", "3.12.0")
@@ -63,7 +71,6 @@ dependencies {
 	implementation("com.twelvemonkeys.imageio", "imageio-tiff", "3.12.0")
 	implementation("com.twelvemonkeys.imageio", "imageio-webp", "3.12.0")
 	implementation("com.twelvemonkeys.imageio", "imageio-xwd", "3.12.0")
-
 	implementation("com.github.gotson.nightmonkeys:imageio-heif:1.0.0")
 	implementation("com.github.gotson.nightmonkeys:imageio-jxl:1.0.0")
 
@@ -80,6 +87,11 @@ dependencies {
 	implementation("org.jetbrains.exposed", "exposed-jdbc", "0.59.0")
 	implementation("org.jetbrains.exposed", "exposed-kotlin-datetime", "0.59.0")
 	implementation("org.jetbrains.kotlinx", "kotlinx-datetime", "0.6.1")
+}
+
+javafx {
+	version = "24.0.1"
+	modules.add("javafx.swing")
 }
 
 kotlin {
@@ -106,7 +118,13 @@ compose.desktop {
 		mainClass = "me.gserv.archival.MainKt"
 
 		jvmArgs.add("-Djava.library.path=$APPDIR$pathSep$APPDIR${dirSep}resources${dirSep}lib$pathSep$APPDIR${dirSep}..${dirSep}runtime")
+
 		jvmArgs.add("--enable-native-access=ALL-UNNAMED")
+		jvmArgs.add("--enable-native-access=org.librawfx")
+
+		jvmArgs.add("--add-exports=java.desktop/sun.awt.image=ALL-UNNAMED")
+		jvmArgs.add("--add-exports=javafx.graphics/com.sun.javafx.iio=ALL-UNNAMED")
+		jvmArgs.add("--add-exports=javafx.graphics/com.sun.javafx.iio.common=ALL-UNNAMED")
 
 		nativeDistributions {
 			val buildType = System.getProperties().getOrDefault("buildType", null)?.toString()
@@ -131,7 +149,7 @@ compose.desktop {
 
 			targetFormats(*formats)
 
-			modules("java.sql")
+			modules("java.sql", "java.desktop")
 
 			packageName = "ScanManager"
 			packageVersion = project.version.toString().split("-").first()
