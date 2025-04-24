@@ -1,3 +1,11 @@
+/*
+ * Copyrighted (Gareth Coles, 2024). Licensed under the EUPL-1.2
+ * with the specific provision (EUPL articles 14 & 15) that the
+ * applicable law is the (Republic of) Irish law and the Jurisdiction
+ * Dublin.
+ * Any redistribution must include the specific provision above.
+ */
+
 package me.gserv.archival.utils.imageio
 
 import com.sun.javafx.iio.ImageLoader
@@ -45,7 +53,7 @@ class RawImageIOPlugin : ImageReaderSpi(
 ) {
 	override fun canDecodeInput(input: Any): Boolean {
 		if (input !is ImageInputStream) {
-			return false;
+			return false
 		}
 
 		val buf = ByteArray(32)
@@ -70,14 +78,6 @@ class RawImageIOPlugin : ImageReaderSpi(
 		val byteArray: ByteArray = (input as ImageInputStream).toInputStream().readAllBytes()
 		val bytes: IntArray = rawImage.readPixelDataFromStream(byteArray).toJavaFX()
 
-		override fun getNumImages(allowSearch: Boolean): Int = 1
-
-		override fun getWidth(imageIndex: Int): Int =
-			rawImage.imageWidth.toInt()
-
-		override fun getHeight(imageIndex: Int): Int =
-			rawImage.imageHeight.toInt()
-
 		override fun getImageTypes(imageIndex: Int): Iterator<ImageTypeSpecifier?>? =
 			arrayOf(
 				ImageTypeSpecifier.createInterleaved(
@@ -88,12 +88,6 @@ class RawImageIOPlugin : ImageReaderSpi(
 					false
 				)
 			).iterator()
-
-		override fun getStreamMetadata(): IIOMetadata? =
-			null
-
-		override fun getImageMetadata(imageIndex: Int): IIOMetadata? =
-			null
 
 		override fun read(imageIndex: Int, param: ImageReadParam?): BufferedImage? {
 			val img = WritableImage(getWidth(imageIndex), getHeight(imageIndex))
@@ -112,6 +106,12 @@ class RawImageIOPlugin : ImageReaderSpi(
 
 			return SwingFXUtils.fromFXImage(img, null)
 		}
+
+		override fun getHeight(imageIndex: Int): Int = rawImage.imageHeight.toInt()
+		override fun getImageMetadata(imageIndex: Int): IIOMetadata? = null
+		override fun getNumImages(allowSearch: Boolean): Int = 1
+		override fun getStreamMetadata(): IIOMetadata? = null
+		override fun getWidth(imageIndex: Int): Int = rawImage.imageWidth.toInt()
 	}
 }
 
