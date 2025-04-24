@@ -16,12 +16,14 @@ sealed class ImageFormat(
 	val matchers: Set<Regex>,
 	val writableExtension: Set<String> = setOf(),
 ) {
+	object AVIF : ImageFormat("AV1 in HEIF", setOf("image/avif"), regexSetOf("avif"))
 	object CUR : ImageFormat("Windows Cursor", setOf(), regexSetOf("cur"))
 	object GIF : ImageFormat("Graphics Interchange Format", setOf("image/gif"), regexSetOf("gif"))
 	object HDR : ImageFormat("High Dynamic Range", setOf(), regexSetOf("hdr"))
 	object ICNS : ImageFormat("Apple Icon", setOf("image/x-icns"), regexSetOf("icns"), setOf("icns"))
 	object IFF : ImageFormat("Interchange File Format", setOf("application/x-iff"), regexSetOf("iff"), setOf("iff"))
 	object JLS : ImageFormat("Lossless JPEG", setOf("image/jls"), regexSetOf("jls"))
+	object JXL : ImageFormat("JPEG XL", setOf("image/jxl"), regexSetOf("jxl"))
 	object PCX : ImageFormat("Picture Exchange", setOf("image/vnd.zbrush.pcx", "image/x-pcx"), regexSetOf("dcx", "pcx"))
 	object PNG : ImageFormat("Portable Network Graphics", setOf("image/png"), regexSetOf("png"))
 	object PTNG : ImageFormat("Apple MacPaint Picture", setOf("image/x-macpaint"), regexSetOf("ptng"))
@@ -45,6 +47,14 @@ sealed class ImageFormat(
 
 		setOf("image/vnd-ms.dds", "image/x-direct-draw-surface"),
 		regexSetOf("dds")
+	)
+
+	object HEIF : ImageFormat(
+		"High Efficiency Image File",
+
+		setOf("image/heif", "image/heif-sequence", "image/heic", "image/heic-sequence", "image/avif"),
+		regexSetOf("heif", "heifs", "heic", "heics", "avci", "avcs", "HIF"),
+		setOf("ico")
 	)
 
 	object ICO : ImageFormat(
