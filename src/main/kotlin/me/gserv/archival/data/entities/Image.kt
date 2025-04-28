@@ -11,20 +11,20 @@ package me.gserv.archival.data.entities
 import me.gserv.archival.data.tables.ImageTable
 import me.gserv.archival.utils.EncodedHashes
 import me.gserv.archival.utils.Hashes
+import me.gserv.archival.utils.relativeToDataDir
 import org.jetbrains.exposed.dao.Entity
 import org.jetbrains.exposed.dao.EntityClass
 import org.jetbrains.exposed.dao.id.EntityID
 import java.io.File
 import java.nio.file.Path
-import kotlin.io.path.absolutePathString
 
 class Image(id: EntityID<String>) : Entity<String>(id) {
 	companion object : EntityClass<String, Image>(ImageTable) {
-		fun create(path: Path, body: Image.() -> Unit) =
-			create(path.absolutePathString(), body)
-
 		fun create(path: File, body: Image.() -> Unit) =
-			create(path.absolutePath, body)
+			create(path.toPath(), body)
+
+		fun create(path: Path, body: Image.() -> Unit) =
+			create(path.relativeToDataDir().toString(), body)
 
 		fun create(path: String, body: Image.() -> Unit) =
 			new(path, body)

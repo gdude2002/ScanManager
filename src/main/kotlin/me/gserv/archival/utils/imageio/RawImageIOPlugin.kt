@@ -73,6 +73,10 @@ class RawImageIOPlugin : ImageReaderSpi(
 		"RAW image plugin based on LibRaw"
 
 	inner class Reader(originatingProvider: ImageReaderSpi) : ImageReader(originatingProvider) {
+		init {
+			requireNotNull(input) { "input == null!" }
+		}
+
 		val loader: ImageLoader = loaderFactory.createImageLoader((input as ImageInputStream).toInputStream())
 		val rawImage = LibrawImage(loader as RAWImageLoader, hashMapOf("Default" to RawDecoderSettings()))
 		val byteArray: ByteArray = (input as ImageInputStream).toInputStream().readAllBytes()

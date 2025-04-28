@@ -32,6 +32,7 @@ import me.gserv.archival.dropTarget
 import me.gserv.archival.utils.components.DialogContainer
 import me.gserv.archival.utils.forEach
 import me.gserv.archival.utils.getHashes
+import me.gserv.archival.utils.relativeToDataDir
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
@@ -140,6 +141,9 @@ class ImportProgressDialog {
 				Image.findById(jpegFile.toString())?.delete()
 
 				forEach(psdFile, jpegFile) {
+					logger.info {
+						"Storing image hashes for file: $it\n  ->${it.toPath().relativeToDataDir()}"
+					}
 					Image.create(it) {
 						addHashes(hashes)
 

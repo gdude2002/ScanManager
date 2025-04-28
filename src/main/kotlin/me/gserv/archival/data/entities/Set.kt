@@ -12,6 +12,7 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import me.gserv.archival.data.Database
 import me.gserv.archival.data.Filesystem
 import me.gserv.archival.data.tables.SetTable
+import me.gserv.archival.utils.relativeToDataDir
 import org.jetbrains.exposed.dao.LongEntity
 import org.jetbrains.exposed.dao.LongEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
@@ -115,7 +116,7 @@ class Set(id: EntityID<Long>) : LongEntity(id) {
 				null
 			} else {
 				Database.transaction {
-					Image.findById(original!!.absolutePath) != null
+					Image.findById(original!!.toPath().relativeToDataDir().toString()) != null
 				}
 			}
 		}
@@ -125,7 +126,7 @@ class Set(id: EntityID<Long>) : LongEntity(id) {
 				null
 			} else {
 				Database.transaction {
-					Image.findById(edit!!.absolutePath) != null
+					Image.findById(edit!!.toPath().relativeToDataDir().toString()) != null
 				}
 			}
 		}
@@ -147,7 +148,7 @@ class Set(id: EntityID<Long>) : LongEntity(id) {
 				null
 			} else {
 				Database.transaction {
-					Image.findById(original.absolutePath) != null
+					Image.findById(original.toPath().relativeToDataDir().toString()) != null
 				}
 			}
 		}
@@ -157,7 +158,7 @@ class Set(id: EntityID<Long>) : LongEntity(id) {
 				null
 			} else {
 				Database.transaction {
-					Image.findById(edit.absolutePath) != null
+					Image.findById(edit.toPath().relativeToDataDir().toString()) != null
 				}
 			}
 		}
