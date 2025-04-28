@@ -36,8 +36,12 @@ dependencies {
 
 	implementation("io.github.oshai", "kotlin-logging-jvm", "7.0.3")
 
-	implementation("io.github.kdroidfilter", "platformtools.darkmodedetector", "0.2.9")
-	implementation("io.github.kdroidfilter", "platformtools.releasefetcher", "0.2.9")
+	implementation("io.github.kdroidfilter", "platformtools.darkmodedetector-jvm", "0.2.9")
+
+	implementation("io.github.kdroidfilter", "platformtools.releasefetcher-jvm", "0.2.9") {
+		exclude("io.github.kdroidfilter", "androidcontextprovider")
+	}
+
 	implementation("io.github.vinceglb", "filekit-compose", "0.8.8")
 
 	implementation("com.github.slugify", "slugify", "3.0.7") {

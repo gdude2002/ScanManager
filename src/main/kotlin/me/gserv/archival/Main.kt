@@ -29,6 +29,7 @@ import kotlin.system.exitProcess
 lateinit var mainWindow: MainWindow
 lateinit var dropTarget: DropTargetWindow
 
+private val EXTENSIONS = arrayOf("dll", "dylib", "so")
 private const val TOTAL_ATTEMPTS = 5
 private val logger = KotlinLogging.logger { }
 
@@ -56,7 +57,10 @@ fun loadNatives() {
 		}
 	}
 
-	val remaining: MutableList<File> = libDir.toFile().listFiles().toMutableList()
+	val remaining: MutableList<File> = libDir
+		.toFile()
+		.listFiles { file -> file.extension in EXTENSIONS }
+		.toMutableList()
 
 	for (i in 1..TOTAL_ATTEMPTS) {
 		if (remaining.isEmpty()) {
