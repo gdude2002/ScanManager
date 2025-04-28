@@ -36,7 +36,8 @@ dependencies {
 
 	implementation("io.github.oshai", "kotlin-logging-jvm", "7.0.3")
 
-	implementation("io.github.kdroidfilter:platformtools.darkmodedetector:0.2.7")
+	implementation("io.github.kdroidfilter", "platformtools.darkmodedetector", "0.2.9")
+	implementation("io.github.kdroidfilter", "platformtools.releasefetcher", "0.2.9")
 	implementation("io.github.vinceglb", "filekit-compose", "0.8.8")
 
 	implementation("com.github.slugify", "slugify", "3.0.7") {
@@ -48,12 +49,12 @@ dependencies {
 	implementation("org.openjfx", "javafx-base", "11.0.2", classifier = "win")
 	implementation("org.openjfx", "javafx-graphics", "11.0.2", classifier = "win")
 
-	implementation("com.github.skydoves:landscapist-animation:2.4.7")
-	implementation("com.github.skydoves:landscapist-coil3:2.4.7")
-	implementation("com.github.skydoves:landscapist-placeholder:2.4.7")
+	implementation("com.github.skydoves", "landscapist-animation", "2.4.7")
+	implementation("com.github.skydoves", "landscapist-coil3", "2.4.7")
+	implementation("com.github.skydoves", "landscapist-placeholder", "2.4.7")
 
 	implementation("org.apache.xmlgraphics", "batik-all", "1.18")
-	implementation("org.librawfx:LibRawFX:1.9.1")
+	implementation("org.librawfx", "LibRawFX", "1.9.1")
 	implementation("com.twelvemonkeys.imageio", "imageio-batik", "3.12.0")
 	implementation("com.twelvemonkeys.imageio", "imageio-bmp", "3.12.0")
 	implementation("com.twelvemonkeys.imageio", "imageio-dds", "3.12.0")
@@ -71,13 +72,13 @@ dependencies {
 	implementation("com.twelvemonkeys.imageio", "imageio-tiff", "3.12.0")
 	implementation("com.twelvemonkeys.imageio", "imageio-webp", "3.12.0")
 	implementation("com.twelvemonkeys.imageio", "imageio-xwd", "3.12.0")
-	implementation("com.github.gotson.nightmonkeys:imageio-heif:1.0.0")
-	implementation("com.github.gotson.nightmonkeys:imageio-jxl:1.0.0")
+	implementation("com.github.gotson.nightmonkeys", "imageio-heif", "1.0.0")
+	implementation("com.github.gotson.nightmonkeys", "imageio-jxl", "1.0.0")
 
 	implementation("dev.brachtendorf", "JImageHash", "1.0.0")
 	implementation("com.github.romankh3", "image-comparison", "4.4.0")
 
-	implementation("sh.calvin.reorderable:reorderable:2.4.3")
+	implementation("sh.calvin.reorderable", "reorderable", "2.4.3")
 
 	implementation("com.h2database", "h2", "2.3.232")
 	implementation("org.flywaydb", "flyway-core", "11.3.1")
