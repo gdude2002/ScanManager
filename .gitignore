@@ -156,3 +156,6 @@ output.log
 /*.a
 /*.so
 /*.dylib
+
+generated.conveyor.conf
+output/

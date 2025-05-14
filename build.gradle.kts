@@ -1,18 +1,17 @@
-import org.gradle.declarative.dsl.schema.FqName.Empty.packageName
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
-import java.lang.System.console
-import java.util.Calendar
-import kotlin.text.Typography.copyright
+import java.util.*
 
 plugins {
-	kotlin("jvm") version "2.1.10"
-	kotlin("plugin.serialization") version "2.1.10"
+	kotlin("jvm") version "2.1.20"
+	kotlin("plugin.serialization") version "2.1.20"
 
 	id("dev.yumi.gradle.licenser") version "2.1.+"
 	id("org.jetbrains.kotlin.plugin.compose") version "2.1.10"
 	id("org.jetbrains.compose") version "1.7.3"
 
 	id("org.openjfx.javafxplugin") version "0.1.0"
+
+	id("dev.hydraulic.conveyor") version "1.12"
 }
 
 val projectVersion: String by project
@@ -50,8 +49,8 @@ dependencies {
 		}
 	}
 
-	implementation("org.openjfx", "javafx-base", "11.0.2", classifier = "win")
-	implementation("org.openjfx", "javafx-graphics", "11.0.2", classifier = "win")
+	implementation("org.openjfx", "javafx-base", "24", classifier = "win")
+	implementation("org.openjfx", "javafx-graphics", "24", classifier = "win")
 
 	implementation("com.github.skydoves", "landscapist-animation", "2.4.7")
 	implementation("com.github.skydoves", "landscapist-coil3", "2.4.7")
@@ -95,12 +94,12 @@ dependencies {
 }
 
 javafx {
-	version = "24.0.1"
+	version = "24"
 	modules.add("javafx.swing")
 }
 
 kotlin {
-	jvmToolchain(21)
+	jvmToolchain(JavaVersion.VERSION_24.majorVersion.toInt())
 }
 
 license {
@@ -121,8 +120,6 @@ if (dirSep == "\\") {
 compose.desktop {
 	application {
 		mainClass = "me.gserv.archival.MainKt"
-
-		jvmArgs.add("-Djava.library.path=$APPDIR$pathSep$APPDIR${dirSep}resources${dirSep}lib$pathSep$APPDIR${dirSep}..${dirSep}runtime")
 
 		jvmArgs.add("--enable-native-access=ALL-UNNAMED")
 		jvmArgs.add("--enable-native-access=org.librawfx")
@@ -156,7 +153,7 @@ compose.desktop {
 
 			modules("java.sql", "java.desktop")
 
-			packageName = "ScanManager"
+			packageName = "scan-manager"
 			packageVersion = project.version.toString().split("-").first()
 
 			copyright = "© $year Gareth Coles, EUPL v1.2."

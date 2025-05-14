@@ -142,8 +142,9 @@ class ImportProgressDialog {
 
 				forEach(psdFile, jpegFile) {
 					logger.info {
-						"Storing image hashes for file: $it\n  ->${it.toPath().relativeToDataDir()}"
+						"Storing image data for file: $it\n  ->${it.toPath().relativeToDataDir()}"
 					}
+
 					Image.create(it) {
 						addHashes(hashes)
 
