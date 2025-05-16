@@ -10,61 +10,7 @@ on:
 
 jobs:
   build:
-    strategy:
-      matrix:
-        env:
-          - os: ubuntu-latest
-            type: app
-            name: Linux (Unpacked)
-            executable: "./gradlew"
-
-          - os: ubuntu-latest
-            type: deb
-            name: Linux (Unsigned .deb)
-            executable: "./gradlew"
-
-          - os: ubuntu-latest
-            type: rpm
-            name: Linux (Unsigned .rpm)
-            executable: "./gradlew"
-
-          - os: macos-13
-            type: dmg
-            name: Mac (Intel, unsigned .dmg)
-            executable: "./gradlew"
-
-          - os: macos-13
-            type: pkg
-            name: Mac (Intel, unsigned .pkg)
-            executable: "./gradlew"
-
-          - os: macos-latest
-            type: dmg
-            name: Mac (Apple Silicon, unsigned .dmg)
-            executable: "./gradlew"
-
-          - os: macos-latest
-            type: pkg
-            name: Mac (Apple Silicon, unsigned .pkg)
-            executable: "./gradlew"
-
-          - os: windows-latest
-            type: app
-            name: Windows (Unpacked)
-            executable: "./gradlew.bat"
-
-          - os: windows-latest
-            type: exe
-            name: Windows (Unsigned .exe)
-            executable: "./gradlew.bat"
-
-          - os: windows-latest
-            type: msi
-            name: Windows (Unsigned .msi)
-            executable: "./gradlew.bat"
-
-    runs-on: ${{ matrix.env.os }}
-    name: ${{ matrix.env.name }}
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
@@ -80,24 +26,4 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
 
       - name: Gradle (Build)
-        run: "${{ matrix.env.executable }} -DbuildType=${{ matrix.env.type }} checkLicenses build packageDistributionForCurrentOS"
-
-      - name: List Distribution Files
-        run: |
-          echo "ls .../main/"
-          ls build/compose/binaries/main/
-
-          echo ""
-          echo "ls .../main/*"
-          ls build/compose/binaries/main/*
-
-          echo ""
-          echo "ls .../main/*/*"
-          ls build/compose/binaries/main/*/*
-
-      - name: Upload artifact (Core JARs)
-        uses: actions/upload-artifact@v4
-
-        with:
-          name: Distribution - ${{ matrix.env.name }}
-          path: build/compose/binaries/main/${{ matrix.env.type }}/*
+        run: "./gradlew checkLicenses build"

@@ -23,6 +23,7 @@ import java.util.*
 import java.util.logging.LogManager
 import kotlin.io.path.Path
 import kotlin.io.path.absolute
+import kotlin.io.path.copyTo
 import kotlin.io.path.div
 import kotlin.system.exitProcess
 
@@ -44,7 +45,7 @@ fun loadNatives() {
 				?.split(File.pathSeparator)?.joinToString("    \n") + "\n"
 	}
 
-	val libDir = cwd
+	val libDir = resourcesDir / "bin"
 
 	logger.info { "Compose application resources dir: \n    $resourcesDir" }
 	logger.info { "Libraries dir: \n    $libDir" }
@@ -54,6 +55,11 @@ fun loadNatives() {
 		.toFile()
 		.listFiles { file -> file.extension in EXTENSIONS }
 		.toMutableList()
+
+	remaining.forEach {
+		logger.info { "Copying file to resources dir: ${it.name}" }
+		it.toPath().copyTo(resourcesDir / it.name, overwrite = true)
+	}
 
 	for (i in 1..TOTAL_ATTEMPTS) {
 		if (remaining.isEmpty()) {

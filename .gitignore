@@ -159,3 +159,8 @@ output.log
 
 generated.conveyor.conf
 output/
+
+*.deb
+*.exe
+*.msi
+*.msix
