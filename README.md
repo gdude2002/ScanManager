@@ -5,6 +5,16 @@ Basic open-source scan manager for photo archivists.
 The goal is to create a useful, general-purpose tool that helps with scan file management, can keep track of
 progress, and can help fix problems caused by poor historical project management.
 
+## Privacy
+
+This is a JetBrains Compose Multiplatform application.
+
+It doesn't collect any data from you and, aside from checking for and downloading updates, doesn't connect to the
+internet or interact with anything on your local network.
+
+This application doesn't interact with any files aside from those placed within its configured data directory,
+and those you explicitly tell it to work with.
+
 ## Feature List
 
 - [x] Keep track of scanning progress, including binders, sets, and set data.
