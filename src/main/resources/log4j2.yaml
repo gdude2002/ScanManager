@@ -1,0 +1,41 @@
+Configuration:
+  Appenders:
+    Console:
+      name: "CONSOLE"
+
+      PatternLayout:
+        pattern: "%d{dd/MM/yyyy HH:mm:ss} | %30.30c | %highlight{%5p} | %m{ansi}%notEmpty{:%n    %ex}%n"
+
+    RollingFile:
+      name: "MAIN"
+
+      fileName: "${sys:user.home}/ScanManager/logs/output.log"
+      filePattern: "${sys:user.home}/ScanManager/logs/output-%d{COMPACT}.log.gz"
+
+      PatternLayout:
+        pattern: "%d{dd/MM/yyyy HH:mm:ss} | %30.30c | %5p | %m%notEmpty{:%n    %ex}%n"
+
+      DefaultRolloverStrategy:
+        max: 30
+
+      Policies:
+        OnStartupTriggeringPolicy:
+          minSize: 1
+
+    File:
+      - name: "DEBUG"
+        fileName: "${sys:user.home}/ScanManager/logs/debug.log"
+        append: false
+
+        PatternLayout:
+          pattern: "%d{dd/MM/yyyy HH:mm:ss} | %30.30c | %5p | %m%notEmpty{:%n    %ex}%n"
+
+  Loggers:
+    Root:
+      level: "DEBUG"
+      AppenderRef:
+        - ref: "MAIN"
+          level: "INFO"
+
+        - ref: "CONSOLE"
+        - ref: "DEBUG"

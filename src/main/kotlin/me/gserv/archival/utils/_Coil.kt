@@ -20,18 +20,17 @@ import coil3.fetch.SourceFetchResult
 import coil3.request.Options
 import coil3.request.maxBitmapSize
 import coil3.size.Precision
-import coil3.util.DebugLogger
+import coil3.util.Logger
 import coil3.util.component1
 import coil3.util.component2
+import io.github.oshai.kotlinlogging.KotlinLogging
 import org.jetbrains.skia.Bitmap
 import org.jetbrains.skia.Canvas
 import org.jetbrains.skia.Rect
 import org.jetbrains.skia.impl.use
 import org.jetbrains.skiko.toImage
 import javax.imageio.ImageIO
-import kotlin.io.path.inputStream
 import org.jetbrains.skia.Image as SkiaImage
-
 
 @Composable
 fun createImageLoader(): ImageLoader =
@@ -40,8 +39,28 @@ fun createImageLoader(): ImageLoader =
 		.components {
 			add(ImageIODecoder.Factory)
 		}
-		.logger(DebugLogger())
+		.logger(SLF4JLogger())
 		.build()
+
+class SLF4JLogger(override var minLevel: Logger.Level = Logger.Level.Debug) : Logger {
+	private val logger = KotlinLogging.logger("coil3.util.Logger")
+
+	override fun log(
+		tag: String,
+		level: Logger.Level,
+		message: String?,
+		throwable: Throwable?
+	) {
+		when (level) {
+			Logger.Level.Verbose -> logger.trace(throwable) { message }
+			Logger.Level.Debug -> logger.debug(throwable) { message }
+			Logger.Level.Info -> logger.info(throwable) { message }
+			Logger.Level.Error -> logger.error(throwable) { message }
+			Logger.Level.Warn -> logger.warn(throwable) { message }
+		}
+	}
+
+}
 
 class ImageIODecoder(
 	val result: SourceFetchResult,

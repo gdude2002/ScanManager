@@ -17,7 +17,7 @@ import kotlin.io.path.*
 
 object AppConfig {
 	val logger = KotlinLogging.logger { }
-	val configFile = Path(System.getProperty("user.home"), "ScanManager.properties")
+	val configFile = Path(System.getProperty("user.home"), "ScanManager", "config.properties")
 
 	var loaded = false
 

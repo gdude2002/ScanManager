@@ -34,7 +34,12 @@ dependencies {
 	implementation(compose.material3)
 	implementation(compose.materialIconsExtended)
 
-	implementation("org.slf4j", "slf4j-simple", "2.0.17")
+	implementation(platform("org.apache.logging.log4j:log4j-bom:2.24.3"))
+	implementation("org.apache.logging.log4j", "log4j-core")
+	implementation("org.apache.logging.log4j", "log4j-slf4j2-impl")
+	implementation("org.fusesource.jansi", "jansi", "2.4.2")
+	implementation("com.fasterxml.jackson.dataformat", "jackson-dataformat-yaml", "2.18.0")
+
 	implementation("org.slf4j", "jul-to-slf4j", "2.0.17")
 
 	implementation("io.github.oshai", "kotlin-logging-jvm", "7.0.3")
@@ -43,6 +48,7 @@ dependencies {
 
 	implementation("io.github.kdroidfilter", "platformtools.releasefetcher-jvm", "0.2.9") {
 		exclude("io.github.kdroidfilter", "androidcontextprovider")
+		exclude("org.slf4j", "slf4j-simple")
 	}
 
 	implementation("io.github.vinceglb", "filekit-compose", "0.8.8")
@@ -81,6 +87,9 @@ dependencies {
 	implementation("com.twelvemonkeys.imageio", "imageio-xwd", "3.12.0")
 	implementation("com.github.gotson.nightmonkeys", "imageio-heif", "1.0.0")
 	implementation("com.github.gotson.nightmonkeys", "imageio-jxl", "1.0.0")
+
+	implementation("me.saharnooby", "qoi-java", "1.2.1")
+	implementation("me.saharnooby", "qoi-java-awt", "1.2.1")
 
 	implementation("dev.brachtendorf", "JImageHash", "1.0.0")
 	implementation("com.github.romankh3", "image-comparison", "4.4.0")
@@ -166,17 +175,28 @@ compose.desktop {
 
 			val os = DefaultNativePlatform.getCurrentOperatingSystem()
 
-			val append = if (System.getProperties().contains("debug") || System.getenv().containsKey("DEBUG")) {
+			var paths = mutableListOf(
+				".",
+				"./bin", "../bin",
+				"./runtime", "../runtime",
+				"./resources/bin", "../resources/bin",
+				"./app/resources/bin", "../app/resources/bin",
+				"$APPDIR/resources/bin"
+			)
+
+			if (System.getProperties().contains("debug") || System.getenv().containsKey("DEBUG")) {
 				val path = project.rootProject.projectDir.toPath() / "build/compose/tmp/prepareAppResources/bin"
-				";${path.absolutePathString()}"
-			} else {
-				""
+				paths.add(path.absolutePathString())
 			}
 
-			when {
-				os.isWindows -> jvmArgs.add("-Djava.library.path=.;.\\\\bin;..\\\\bin;.\\\\runtime;..\\\\runtime;.\\\\resources\\\\bin;..\\\\resources\\\\bin;.\\\\app\\\\resources\\\\bin;..\\\\app\\\\resources\\\\bin;$APPDIR\\\\resources\\\\bin$append")
-				os.isMacOsX || os.isLinux -> jvmArgs.add("-Djava.library.path=.;./bin;../bin;./runtime;../runtime;./resources/bin;../resources/bin;./app/resources/bin;../app/resources/bin;$APPDIR/resources/bin$append")
+			if (os.isWindows) {
+				paths = paths
+					.map { it.replace("/", "\\\\") }
+					.toMutableList()
 			}
+
+			jvmArgs.add("-Djava.library.path=" + paths.joinToString(";"))
+			jvmArgs.add("-Dlog4j2.skipJansi=false")
 
 			linux {
 				appCategory = "Productivity"
