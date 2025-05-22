@@ -1,5 +1,9 @@
+
+import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import java.util.*
+import kotlin.io.path.absolutePathString
+import kotlin.io.path.div
 
 plugins {
 	kotlin("jvm") version "2.1.20"
@@ -159,6 +163,20 @@ compose.desktop {
 			copyright = "© $year Gareth Coles, EUPL v1.2."
 			description = "Simple photo scan organiser and toolkit."
 			licenseFile = rootProject.file("LICENSE")
+
+			val os = DefaultNativePlatform.getCurrentOperatingSystem()
+
+			val append = if (System.getProperties().contains("debug") || System.getenv().containsKey("DEBUG")) {
+				val path = project.rootProject.projectDir.toPath() / "build/compose/tmp/prepareAppResources/bin"
+				";${path.absolutePathString()}"
+			} else {
+				""
+			}
+
+			when {
+				os.isWindows -> jvmArgs.add("-Djava.library.path=.;.\\\\bin;..\\\\bin;.\\\\runtime;..\\\\runtime;.\\\\resources\\\\bin;..\\\\resources\\\\bin;.\\\\app\\\\resources\\\\bin;..\\\\app\\\\resources\\\\bin;$APPDIR\\\\resources\\\\bin$append")
+				os.isMacOsX || os.isLinux -> jvmArgs.add("-Djava.library.path=.;./bin;../bin;./runtime;../runtime;./resources/bin;../resources/bin;./app/resources/bin;../app/resources/bin;$APPDIR/resources/bin$append")
+			}
 
 			linux {
 				appCategory = "Productivity"

@@ -29,6 +29,7 @@ import org.jetbrains.skia.Rect
 import org.jetbrains.skia.impl.use
 import org.jetbrains.skiko.toImage
 import javax.imageio.ImageIO
+import kotlin.io.path.inputStream
 import org.jetbrains.skia.Image as SkiaImage
 
 
@@ -48,7 +49,7 @@ class ImageIODecoder(
 ) : Decoder {
 	override suspend fun decode(): DecodeResult? {
 		val image = ImageIO
-			.read(result.source.source().inputStream())
+			.read(result.source.file().toFile().inputStream())
 			.toImage()
 
 		val isSampled: Boolean

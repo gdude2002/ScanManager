@@ -24,6 +24,8 @@ import java.util.logging.LogManager
 import kotlin.io.path.Path
 import kotlin.io.path.absolute
 import kotlin.io.path.copyTo
+import kotlin.io.path.createDirectories
+import kotlin.io.path.createDirectory
 import kotlin.io.path.div
 import kotlin.system.exitProcess
 
@@ -33,6 +35,13 @@ lateinit var dropTarget: DropTargetWindow
 private val EXTENSIONS = arrayOf("dll", "dylib", "so")
 private const val TOTAL_ATTEMPTS = 5
 private val logger = KotlinLogging.logger { }
+
+val home = Path(System.getProperty("user.home"))
+val baseDir = home / "ScanManager"
+
+fun setup() {
+	(baseDir / "logs").createDirectories()
+}
 
 fun loadNatives() {
 	val temp = Files.createTempDirectory("ScanManager")
@@ -55,11 +64,6 @@ fun loadNatives() {
 		.toFile()
 		.listFiles { file -> file.extension in EXTENSIONS }
 		.toMutableList()
-
-	remaining.forEach {
-		logger.info { "Copying file to resources dir: ${it.name}" }
-		it.toPath().copyTo(resourcesDir / it.name, overwrite = true)
-	}
 
 	for (i in 1..TOTAL_ATTEMPTS) {
 		if (remaining.isEmpty()) {
@@ -102,6 +106,7 @@ fun tryLoad(files: MutableList<File>, attempt: Int, finalAttempt: Boolean = fals
 }
 
 fun main() {
+	setup()
 	SLF4JBridgeHandler.install()
 
 	val props = Properties()
