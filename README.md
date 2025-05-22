@@ -5,6 +5,10 @@ Basic open-source scan manager for photo archivists.
 The goal is to create a useful, general-purpose tool that helps with scan file management, can keep track of
 progress, and can help fix problems caused by poor historical project management.
 
+This app [will be available on the Microsoft store](https://apps.microsoft.com/detail/9MZ9FWV42BD1).
+Want to help test and give feedback?
+[See this issue.](https://github.com/gdude2002/ScanManager/issues/2)
+
 ## Privacy
 
 This is a JetBrains Compose Multiplatform application.
@@ -19,7 +23,7 @@ and those you explicitly tell it to work with.
 
 - [x] Keep track of scanning progress, including binders, sets, and set data.
   - Set data includes numbers, batches, and descriptions — everything already kept track of.
-- [ ] Analyze existing scan data, importing, comparing, and reorganising files as needed.
+- [ ] Analyse existing scan data, importing, comparing, and reorganising files as needed.
   - Import existing scans, compare original and edited files, and re-export originals as needed.
   - Import existing tracking data from Markdown tracking files.
 - [ ] Store data in a format that users can move between devices easily.
