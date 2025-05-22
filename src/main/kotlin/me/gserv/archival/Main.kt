@@ -54,7 +54,7 @@ fun loadNatives() {
 				?.split(File.pathSeparator)?.joinToString("    \n") + "\n"
 	}
 
-	val libDir = resourcesDir / "bin"
+	val libDir = resourcesDir
 
 	logger.info { "Compose application resources dir: \n    $resourcesDir" }
 	logger.info { "Libraries dir: \n    $libDir" }

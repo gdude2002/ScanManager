@@ -4,7 +4,7 @@ Configuration:
       name: "CONSOLE"
 
       PatternLayout:
-        pattern: "%d{dd/MM/yyyy HH:mm:ss} | %30.30c | %highlight{%5p} | %m{ansi}%notEmpty{:%n    %ex}%n"
+        pattern: "%d{dd/MM/yyyy HH:mm:ss} | %30.30c | %highlight{%5p} | %m{ansi}%n"
 
     RollingFile:
       name: "MAIN"
@@ -13,7 +13,7 @@ Configuration:
       filePattern: "${sys:user.home}/ScanManager/logs/output-%d{COMPACT}.log.gz"
 
       PatternLayout:
-        pattern: "%d{dd/MM/yyyy HH:mm:ss} | %30.30c | %5p | %m%notEmpty{:%n    %ex}%n"
+        pattern: "%d{dd/MM/yyyy HH:mm:ss} | %30.30c | %5p | %m%n"
 
       DefaultRolloverStrategy:
         max: 30
@@ -28,7 +28,7 @@ Configuration:
         append: false
 
         PatternLayout:
-          pattern: "%d{dd/MM/yyyy HH:mm:ss} | %30.30c | %5p | %m%notEmpty{:%n    %ex}%n"
+          pattern: "%d{dd/MM/yyyy HH:mm:ss} | %30.30c | %5p | %m%n"
 
   Loggers:
     Root:

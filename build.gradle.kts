@@ -173,29 +173,6 @@ compose.desktop {
 			description = "Simple photo scan organiser and toolkit."
 			licenseFile = rootProject.file("LICENSE")
 
-			val os = DefaultNativePlatform.getCurrentOperatingSystem()
-
-			var paths = mutableListOf(
-				".",
-				"./bin", "../bin",
-				"./runtime", "../runtime",
-				"./resources/bin", "../resources/bin",
-				"./app/resources/bin", "../app/resources/bin",
-				"$APPDIR/resources/bin"
-			)
-
-			if (System.getProperties().contains("debug") || System.getenv().containsKey("DEBUG")) {
-				val path = project.rootProject.projectDir.toPath() / "build/compose/tmp/prepareAppResources/bin"
-				paths.add(path.absolutePathString())
-			}
-
-			if (os.isWindows) {
-				paths = paths
-					.map { it.replace("/", "\\\\") }
-					.toMutableList()
-			}
-
-			jvmArgs.add("-Djava.library.path=" + paths.joinToString(";"))
 			jvmArgs.add("-Dlog4j2.skipJansi=false")
 
 			linux {
