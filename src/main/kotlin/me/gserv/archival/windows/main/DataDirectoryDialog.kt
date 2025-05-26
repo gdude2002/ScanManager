@@ -51,24 +51,27 @@ class DataDirectoryDialog(
 
 	val logger = KotlinLogging.logger { }
 
+	var allowCancel by mutableStateOf(true)
 	var isOpen by mutableStateOf(false)
 	var isPickerOpen by mutableStateOf(false)
 
 	var dataDirectory by mutableStateOf(
 		AppConfig.dataFolder
-			?: File("./data").absolutePath
+			?: File("data").absolutePath
 	)
 
 	var newDirectory by mutableStateOf(
 		AppConfig.dataFolder
-			?: File("./data").absolutePath
+			?: File("data").absolutePath
 	)
 
 	fun close() {
+		this.allowCancel = true
 		isOpen = false
 	}
 
-	fun open() {
+	fun open(allowCancel: Boolean = true) {
+		this.allowCancel = allowCancel
 		isOpen = true
 	}
 
@@ -145,18 +148,20 @@ class DataDirectoryDialog(
 							}
 
 							Row {
-								SecondaryButton(onClick = {
-									logger.debug { "Closing without changing data directory" }
+								if (allowCancel) {
+									SecondaryButton(onClick = {
+										logger.debug { "Closing without changing data directory" }
 
-									close()
-								}) {
-									Icon(
-										Icons.Rounded.Cancel,
-										"",
-										modifier = Modifier.absolutePadding(right = 4.dp)
-									)
+										close()
+									}) {
+										Icon(
+											Icons.Rounded.Cancel,
+											"",
+											modifier = Modifier.absolutePadding(right = 4.dp)
+										)
 
-									Text("Cancel")
+										Text("Cancel")
+									}
 								}
 
 								Spacer(Modifier.weight(1f, true))

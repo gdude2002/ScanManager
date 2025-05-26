@@ -459,6 +459,8 @@ class MainWindow(val applicationScope: ApplicationScope) : VisibilityTogglingWin
 											softWrap = false,
 										)
 									}
+								} else {
+									dataDirectoryDialog.open(false)
 								}
 							}
 						}
