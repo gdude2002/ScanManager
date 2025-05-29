@@ -34,6 +34,7 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import io.github.vinceglb.filekit.compose.rememberDirectoryPickerLauncher
 import io.github.vinceglb.filekit.core.FileKitPlatformSettings
 import me.gserv.archival.Colors
+import me.gserv.archival.baseDir
 import me.gserv.archival.config.AppConfig
 import me.gserv.archival.data.Filesystem
 import me.gserv.archival.utils.components.DialogContainer
@@ -41,6 +42,8 @@ import me.gserv.archival.utils.components.PrimaryButton
 import me.gserv.archival.utils.components.PrimaryIconButton
 import me.gserv.archival.utils.components.SecondaryButton
 import java.io.File
+import kotlin.io.path.absolutePathString
+import kotlin.io.path.div
 
 class DataDirectoryDialog(
 	val parent: FrameWindowScope,
@@ -57,12 +60,12 @@ class DataDirectoryDialog(
 
 	var dataDirectory by mutableStateOf(
 		AppConfig.dataFolder
-			?: File("data").absolutePath
+			?: (baseDir / "data").absolutePathString()
 	)
 
 	var newDirectory by mutableStateOf(
 		AppConfig.dataFolder
-			?: File("data").absolutePath
+			?: (baseDir / "data").absolutePathString()
 	)
 
 	fun close() {
