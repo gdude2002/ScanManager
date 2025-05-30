@@ -66,7 +66,7 @@ dependencies {
 	implementation("com.github.skydoves", "landscapist-coil3", "2.4.7")
 	implementation("com.github.skydoves", "landscapist-placeholder", "2.4.7")
 
-	implementation("org.apache.xmlgraphics", "batik-all", "1.18")
+	implementation("org.apache.xmlgraphics", "batik-all", "1.19")
 	implementation("org.librawfx", "LibRawFX", "1.9.1")
 	implementation("com.twelvemonkeys.imageio", "imageio-batik", "3.12.0")
 	implementation("com.twelvemonkeys.imageio", "imageio-bmp", "3.12.0")

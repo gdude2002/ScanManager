@@ -45,7 +45,7 @@ import me.gserv.archival.data.Filesystem
 import me.gserv.archival.data.GlobalState
 import me.gserv.archival.dropTarget
 import me.gserv.archival.types.VisibilityTogglingWindow
-import me.gserv.archival.utils.StringTooltip
+import me.gserv.archival.utils.components.StringTooltip
 import me.gserv.archival.utils.components.PrimaryButton
 import me.gserv.archival.utils.components.PrimaryOutlinedButton
 import me.gserv.archival.utils.components.SecondaryButton

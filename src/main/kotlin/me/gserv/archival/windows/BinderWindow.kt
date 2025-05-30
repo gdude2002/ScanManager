@@ -41,11 +41,12 @@ import me.gserv.archival.data.entities.Binder
 import me.gserv.archival.data.entities.Set
 import me.gserv.archival.data.tables.SetTable
 import me.gserv.archival.dropTarget
-import me.gserv.archival.utils.StringTooltip
 import me.gserv.archival.utils.components.PrimaryButton
 import me.gserv.archival.utils.components.SecondaryButton
+import me.gserv.archival.utils.components.StringTooltip
 import me.gserv.archival.utils.components.TertiaryButton
 import me.gserv.archival.utils.format
+import me.gserv.archival.utils.ilike
 import me.gserv.archival.windows.binder.*
 import org.jetbrains.exposed.sql.SortOrder
 import org.jetbrains.exposed.sql.SqlExpressionBuilder
@@ -136,6 +137,10 @@ class BinderWindow(val parent: MainWindow) {
 					FilterState.Incomplete -> current = current and (SetTable.finishedAt eq null)
 				}
 
+				if (filterText.isNotBlank()) {
+					current = current and (SetTable.description ilike "%${filterText.replace("%", "\\%")}%")
+				}
+
 				current
 			}
 
@@ -181,19 +186,6 @@ class BinderWindow(val parent: MainWindow) {
 				}
 
 				LaunchedEffect(filterState, filterText, sortState, sortAsc) {
-					var filtered = allSets.toList()
-
-					when (filterState) {
-						FilterState.Incomplete -> filtered = filtered.filter { it.finishedAt == null }
-						FilterState.Complete -> filtered = filtered.filter { it.finishedAt != null }
-
-						FilterState.All -> {}
-					}
-
-					if (filterText.isNotBlank()) {
-						filtered = filtered.filter { it.description?.contains(filterText, true) == true }
-					}
-
 					updateSets()
 				}
 			}

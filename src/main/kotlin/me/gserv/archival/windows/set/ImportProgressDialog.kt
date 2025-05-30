@@ -188,7 +188,14 @@ class ImportProgressDialog {
 		}
 
 		if (isOpen) {
-			Dialog({}, DialogProperties(false, false, true)) {
+			Dialog(
+				{},
+				DialogProperties(
+					dismissOnBackPress = false,
+					dismissOnClickOutside = false,
+					usePlatformDefaultWidth = true
+				)
+			) {
 				Colors.Theme { colors ->
 					DialogContainer {
 						Column(

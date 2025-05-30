@@ -100,14 +100,20 @@ class ImportFilesDialog(
 		if (isOpen) {
 			directoryWatcher!!.clearCallbacks(this)
 
-			var files = directoryWatcher!!.files
+			val files = directoryWatcher!!.files
 				.map { EvaluatedImage(it) }
 				.toMutableStateList()
 
 			directoryWatcher!!.onAdded(this) { files.add(EvaluatedImage(it)) }
 			directoryWatcher!!.onDeleted(this) { files.remove(EvaluatedImage(it)) }
 
-			Dialog({}, DialogProperties(false, false, true)) {
+			Dialog(
+				{}, DialogProperties(
+					dismissOnBackPress = false,
+					dismissOnClickOutside = false,
+					usePlatformDefaultWidth = true
+				)
+			) {
 				val progressDialog = ImportProgressDialog()
 				progressDialog.create()
 

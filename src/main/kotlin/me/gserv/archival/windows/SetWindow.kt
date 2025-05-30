@@ -53,7 +53,7 @@ import me.gserv.archival.data.entities.Set
 import me.gserv.archival.dropTarget
 import me.gserv.archival.types.VisibilityTogglingWindow
 import me.gserv.archival.utils.DirectoryWatcher
-import me.gserv.archival.utils.StringTooltip
+import me.gserv.archival.utils.components.StringTooltip
 import me.gserv.archival.utils.components.PrimaryButton
 import me.gserv.archival.utils.components.SecondaryButton
 import me.gserv.archival.utils.components.SuccessButton

@@ -23,9 +23,7 @@ import java.util.*
 import java.util.logging.LogManager
 import kotlin.io.path.Path
 import kotlin.io.path.absolute
-import kotlin.io.path.copyTo
 import kotlin.io.path.createDirectories
-import kotlin.io.path.createDirectory
 import kotlin.io.path.div
 import kotlin.system.exitProcess
 

@@ -73,7 +73,14 @@ class CreateBinderDialog(
 	@Preview
 	fun create() {
 		if (isOpen) {
-			Dialog({}, DialogProperties(false, false, true)) {
+			Dialog(
+				{},
+				DialogProperties(
+					dismissOnBackPress = false,
+					dismissOnClickOutside = false,
+					usePlatformDefaultWidth = true
+				)
+			) {
 				Colors.Theme { colors ->
 					DialogContainer {
 						Column(modifier = Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(20.dp)) {

@@ -6,7 +6,7 @@
  * Any redistribution must include the specific provision above.
  */
 
-package me.gserv.archival.utils
+package me.gserv.archival.utils.components
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.TooltipArea

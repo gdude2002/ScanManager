@@ -36,7 +36,6 @@ import me.gserv.archival.Colors
 import me.gserv.archival.data.Database
 import me.gserv.archival.data.GlobalState
 import me.gserv.archival.data.entities.Set
-import me.gserv.archival.utils.StringTooltip
 import me.gserv.archival.utils.ZERO
 import me.gserv.archival.utils.components.*
 import me.gserv.archival.utils.format
@@ -139,7 +138,14 @@ class EditSetDialog(
 	@Preview
 	fun create() {
 		if (isOpen) {
-			Dialog({}, DialogProperties(false, false, true)) {
+			Dialog(
+				{},
+				DialogProperties(
+					dismissOnBackPress = false,
+					dismissOnClickOutside = false,
+					usePlatformDefaultWidth = true
+				)
+			) {
 				Colors.Theme { colors ->
 					DialogContainer {
 						Colors.Theme { colors ->
@@ -338,11 +344,11 @@ class EditSetDialog(
 
 											GlobalState.sets.removeIf { it.id == set!!.id }
 											GlobalState.sets.add(set!!)
-											GlobalState.sets.sortByDescending { it.id.value.toLong() }
+											GlobalState.sets.sortByDescending { it.id.value }
 
 											parent.allSets.removeIf { it.id == set!!.id }
 											parent.allSets.add(set!!)
-											parent.allSets.sortByDescending { it.id.value.toLong() }
+											parent.allSets.sortByDescending { it.id.value }
 
 											logger.debug { "Done, closing dialog." }
 

@@ -75,7 +75,14 @@ class CreateSetDialog(
 	@Preview
 	fun create() {
 		if (isOpen) {
-			Dialog({}, DialogProperties(false, false, true)) {
+			Dialog(
+				{},
+				DialogProperties(
+					dismissOnBackPress = false,
+					dismissOnClickOutside = false,
+					usePlatformDefaultWidth = true
+				)
+			) {
 				Colors.Theme { colors ->
 					DialogContainer {
 						Column(modifier = Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(20.dp)) {
@@ -203,10 +210,10 @@ class CreateSetDialog(
 										logger.debug { "Set created, updating global and window states..." }
 
 										GlobalState.sets.add(set)
-										GlobalState.sets.sortByDescending { it.id.value.toLong() }
+										GlobalState.sets.sortByDescending { it.id.value }
 
 										parent.allSets.add(set)
-										parent.allSets.sortByDescending { it.id.value.toLong() }
+										parent.allSets.sortByDescending { it.id.value }
 
 										logger.debug { "Done, closing dialog" }
 
