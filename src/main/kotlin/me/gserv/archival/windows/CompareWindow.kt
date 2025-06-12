@@ -40,7 +40,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import me.gserv.archival.Colors
-import me.gserv.archival.dropTarget
 import me.gserv.archival.types.VisibilityTogglingWindow
 import me.gserv.archival.utils.components.PrimaryButton
 import java.awt.image.BufferedImage
@@ -102,8 +101,6 @@ class CompareWindow(val parent: VisibilityTogglingWindow) {
 	lateinit var processingScope: CoroutineScope
 
 	fun close() {
-		dropTarget.clearState()
-
 		isOpen = false
 
 		parent.show()
@@ -126,20 +123,10 @@ class CompareWindow(val parent: VisibilityTogglingWindow) {
 
 	fun open() {
 		isOpen = true
-
-		dropTarget.clearState()
-
-		dropTarget.smallText = "Waiting..."
-		dropTarget.icon = Icons.Default.Image
 	}
 
 	fun open(firstImage: File, secondImage: File) {
 		isOpen = true
-
-		dropTarget.clearState()
-
-		dropTarget.smallText = "Waiting..."
-		dropTarget.icon = Icons.Default.Image
 
 		processingScope.launch {
 			filePicked(firstImage, firstImageFileState, firstImageState)
@@ -158,10 +145,7 @@ class CompareWindow(val parent: VisibilityTogglingWindow) {
 		logger.debug { "Loading image: ${file.absolutePath}" }
 
 		statusText = "Loading image..."
-		dropTarget.smallText = "Loading..."
-
 		progress = null
-		dropTarget.loadingProgress = null
 
 		fileTarget.value = file
 		imageTarget.value = ImageIO.read(file)
@@ -172,11 +156,7 @@ class CompareWindow(val parent: VisibilityTogglingWindow) {
 			logger.debug { "Image loaded successfully" }
 
 			statusText = "Image loaded."
-			dropTarget.smallText = "Done."
-			dropTarget.icon = Icons.Default.Check
-
 			progress = 1f
-			dropTarget.loadingProgress = 1f
 		}
 	}
 
@@ -184,11 +164,7 @@ class CompareWindow(val parent: VisibilityTogglingWindow) {
 		isViewReversed = false
 
 		statusText = "Resizing images..."
-		dropTarget.smallText = "Resizing..."
-		dropTarget.icon = Icons.Default.FormatSize
-
 		progress = 0f
-		dropTarget.loadingProgress = 0f
 
 		var maxWidth = maxOf(first.width, second.width)
 		var maxHeight = maxOf(first.height, second.height)
@@ -212,7 +188,6 @@ class CompareWindow(val parent: VisibilityTogglingWindow) {
 			}
 
 		progress = 0.33f
-		dropTarget.loadingProgress = 0.33f
 
 		val secondImageResized =
 			if (second.width != maxWidth || second.height != maxHeight) {
@@ -226,11 +201,7 @@ class CompareWindow(val parent: VisibilityTogglingWindow) {
 		logger.debug { "Visually comparing images..." }
 
 		statusText = "Comparing images..."
-		dropTarget.smallText = "Comparing..."
-		dropTarget.icon = Icons.Default.Visibility
-
 		progress = 0.66f
-		dropTarget.loadingProgress = 0.66f
 
 		comparisonImage = ImageComparison(firstImageResized, secondImageResized)
 			.setRectangleLineWidth(5)
@@ -245,11 +216,7 @@ class CompareWindow(val parent: VisibilityTogglingWindow) {
 		logger.debug { "Comparison finished successfully" }
 
 		statusText = "Comparison done."
-		dropTarget.smallText = "Done."
-		dropTarget.icon = Icons.Default.Check
-
 		progress = 1f
-		dropTarget.loadingProgress = 1f
 	}
 
 	@Composable

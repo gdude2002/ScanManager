@@ -12,7 +12,6 @@ import androidx.compose.ui.window.application
 import io.github.oshai.kotlinlogging.KotlinLogging
 import me.gserv.archival.config.AppConfig
 import me.gserv.archival.data.Database
-import me.gserv.archival.windows.DropTargetWindow
 import me.gserv.archival.windows.MainWindow
 import org.librawfx.LibrawImage
 import org.slf4j.bridge.SLF4JBridgeHandler
@@ -28,7 +27,6 @@ import kotlin.io.path.div
 import kotlin.system.exitProcess
 
 lateinit var mainWindow: MainWindow
-lateinit var dropTarget: DropTargetWindow
 
 private val EXTENSIONS = arrayOf("dll", "dylib", "so")
 private const val TOTAL_ATTEMPTS = 5
@@ -130,9 +128,6 @@ fun main() {
 			AppConfig.load()
 
 			mainWindow = MainWindow(this)
-			dropTarget = DropTargetWindow(mainWindow)
-
-			dropTarget.create()
 			mainWindow.open()
 		}
 	}

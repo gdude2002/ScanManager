@@ -28,7 +28,6 @@ import me.gserv.archival.Colors
 import me.gserv.archival.data.Database
 import me.gserv.archival.data.GlobalState
 import me.gserv.archival.data.entities.Image
-import me.gserv.archival.dropTarget
 import me.gserv.archival.utils.components.DialogContainer
 import me.gserv.archival.utils.forEach
 import me.gserv.archival.utils.getHashes
@@ -37,7 +36,9 @@ import java.io.File
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
 import javax.imageio.ImageIO
+import kotlin.io.path.copyTo
 import kotlin.io.path.deleteExisting
+import kotlin.io.path.extension
 import kotlin.io.path.toPath
 
 class ImportProgressDialog {
@@ -95,12 +96,11 @@ class ImportProgressDialog {
 					set.editFileName(currentFileIndex.toString())
 				).absoluteFile
 
-				val jpegFile = File(
+				val originalFile = File(
 					binder.originalsDirectory,
-					set.originalFileName(currentFileIndex.toString())
+					set.originalFileName(currentFileIndex.toString(), path.extension)
 				).absoluteFile
 
-				dropTarget.loadingProgress = currentProgress
 				progress = currentProgress
 
 				progressFilename = fileName
@@ -126,11 +126,11 @@ class ImportProgressDialog {
 					StandardCopyOption.COPY_ATTRIBUTES,
 				)
 
-				progressText = "Saving JPEG..."
+				progressText = "Copying original..."
 
-				logger.info { "Saving JPEG: $jpegFile" }
+				logger.info { "Copying original: $originalFile" }
 
-				ImageIO.write(image, "jpeg", jpegFile)
+				path.copyTo(originalFile.toPath(), StandardCopyOption.COPY_ATTRIBUTES)
 
 				progressText = "Saving to database..."
 
@@ -138,9 +138,9 @@ class ImportProgressDialog {
 
 				// Delete existing image data.
 				Image.findById(psdFile.toString())?.delete()
-				Image.findById(jpegFile.toString())?.delete()
+				Image.findById(originalFile.toString())?.delete()
 
-				forEach(psdFile, jpegFile) {
+				forEach(psdFile, originalFile) {
 					logger.info {
 						"Storing image data for file: $it\n  ->${it.toPath().relativeToDataDir()}"
 					}
@@ -162,8 +162,6 @@ class ImportProgressDialog {
 
 		progressFilename = ""
 		progressText = "Cleaning up old files..."
-
-		dropTarget.loadingProgress = 1.0f
 		progress = 1.0f
 
 		files.forEach { (uri, _) ->

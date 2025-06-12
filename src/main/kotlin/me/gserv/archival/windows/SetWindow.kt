@@ -50,7 +50,6 @@ import me.gserv.archival.data.Database
 import me.gserv.archival.data.Filesystem
 import me.gserv.archival.data.GlobalState
 import me.gserv.archival.data.entities.Set
-import me.gserv.archival.dropTarget
 import me.gserv.archival.types.VisibilityTogglingWindow
 import me.gserv.archival.utils.DirectoryWatcher
 import me.gserv.archival.utils.components.StringTooltip
@@ -101,11 +100,6 @@ class SetWindow(val parent: BinderWindow) : VisibilityTogglingWindow() {
 
 			LaunchedEffect(GlobalState.set) {
 				if (GlobalState.set != null) {
-					dropTarget.state {
-						smallText = "Set"
-						bigText = GlobalState.set!!.id.value.toString()
-					}
-
 					Database.transaction {
 						setFiles = GlobalState.set!!.getFiles().toMutableStateList()
 					}

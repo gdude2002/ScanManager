@@ -43,7 +43,6 @@ import me.gserv.archival.config.AppConfig
 import me.gserv.archival.data.Database
 import me.gserv.archival.data.Filesystem
 import me.gserv.archival.data.GlobalState
-import me.gserv.archival.dropTarget
 import me.gserv.archival.types.VisibilityTogglingWindow
 import me.gserv.archival.utils.components.StringTooltip
 import me.gserv.archival.utils.components.PrimaryButton
@@ -100,18 +99,6 @@ class MainWindow(val applicationScope: ApplicationScope) : VisibilityTogglingWin
 
 			val deleteBinderDialog = DeleteBinderDialog(this)
 			deleteBinderDialog.create()
-
-			if (isVisible) {
-				dropTarget.state {
-					if (AppConfig.dataFolder == null) {
-						icon = Icons.Default.FolderOff
-						smallText = "No data\nfolder"
-					} else {
-						icon = Icons.Default.WavingHand
-						smallText = "Welcome!"
-					}
-				}
-			}
 
 			Colors.Theme { colors ->
 				Box(Modifier.background(colors.WindowBackground)) {

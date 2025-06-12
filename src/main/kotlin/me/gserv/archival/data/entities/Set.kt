@@ -53,8 +53,8 @@ class Set(id: EntityID<Long>) : LongEntity(id) {
 	fun editFileName(index: String) =
 		Filesystem.fileName(binder.id.value, id.value.toString(), index, "psd")
 
-	fun originalFileName(index: String) =
-		Filesystem.fileName(binder.id.value, id.value.toString(), index, "jpeg")
+	fun originalFileName(index: String, extension: String) =
+		Filesystem.fileName(binder.id.value, id.value.toString(), index, extension)
 
 	fun getHighestIndex(): Long {
 		val files = getFiles()

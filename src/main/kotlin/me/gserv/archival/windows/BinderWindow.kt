@@ -40,7 +40,6 @@ import me.gserv.archival.data.GlobalState
 import me.gserv.archival.data.entities.Binder
 import me.gserv.archival.data.entities.Set
 import me.gserv.archival.data.tables.SetTable
-import me.gserv.archival.dropTarget
 import me.gserv.archival.utils.components.PrimaryButton
 import me.gserv.archival.utils.components.SecondaryButton
 import me.gserv.archival.utils.components.StringTooltip
@@ -85,16 +84,6 @@ class BinderWindow(val parent: MainWindow) {
 		scope.window.isVisible = true
 		scope.window.requestFocus()
 		isVisible = true
-
-		dropTarget.state {
-			if (GlobalState.sets.isEmpty()) {
-				icon = Icons.Default.QuestionMark
-				smallText = "No sets\nvisible"
-			} else {
-				smallText = "Set"
-				bigText = GlobalState.sets[dropTarget.currentSet].id.value.toString()
-			}
-		}
 	}
 
 	fun close() {
@@ -169,22 +158,6 @@ class BinderWindow(val parent: MainWindow) {
 	fun create() {
 		if (isOpen) {
 			if (isVisible) {
-				LaunchedEffect(GlobalState.sets, dropTarget.currentSet) {
-					if (dropTarget.currentSet >= GlobalState.sets.size) {
-						dropTarget.currentSet = 0
-					}
-
-					dropTarget.state {
-						if (GlobalState.sets.isEmpty()) {
-							icon = Icons.Default.QuestionMark
-							smallText = "No sets\nvisible"
-						} else {
-							smallText = "Set"
-							bigText = GlobalState.sets[dropTarget.currentSet].id.value.toString()
-						}
-					}
-				}
-
 				LaunchedEffect(filterState, filterText, sortState, sortAsc) {
 					updateSets()
 				}
@@ -279,7 +252,6 @@ class BinderWindow(val parent: MainWindow) {
 
 											filterState = FilterState.Incomplete
 											isFilterDropdownOpen = false
-											dropTarget.currentSet = 0
 										},
 
 										colors = if (filterState == FilterState.Incomplete) {
@@ -298,7 +270,6 @@ class BinderWindow(val parent: MainWindow) {
 
 											filterState = FilterState.Complete
 											isFilterDropdownOpen = false
-											dropTarget.currentSet = 0
 										},
 
 										colors = if (filterState == FilterState.Complete) {
@@ -486,7 +457,6 @@ class BinderWindow(val parent: MainWindow) {
 									logger.debug { "Updating description filter: \"$it\"" }
 
 									filterText = it
-									dropTarget.currentSet = 0
 								},
 
 								label = { Text("Description") },
@@ -521,14 +491,7 @@ class BinderWindow(val parent: MainWindow) {
 									Column(
 										verticalArrangement = Arrangement.spacedBy(10.dp),
 										modifier = Modifier
-											.background(
-												if (index == dropTarget.currentSet) {
-													colors.RowHovered
-												} else {
-													colors.SectionBackground
-												},
-												RoundedCornerShape(15.dp)
-											)
+											.background(colors.SectionBackground, RoundedCornerShape(15.dp))
 											.fillMaxWidth()
 											.padding(10.dp)
 									) {
@@ -592,16 +555,6 @@ class BinderWindow(val parent: MainWindow) {
 											}
 
 											Spacer(Modifier.weight(1f, true))
-
-											Row(verticalAlignment = Alignment.CenterVertically) {
-												Text("Select:", modifier = Modifier.absolutePadding(bottom = 5.dp))
-
-												Checkbox(
-													dropTarget.currentSet == index,
-													{ dropTarget.currentSet = index },
-													enabled = dropTarget.currentSet != index,
-												)
-											}
 										}
 
 										if (set.description != null) {
