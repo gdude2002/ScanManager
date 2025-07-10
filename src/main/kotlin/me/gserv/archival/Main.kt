@@ -13,7 +13,7 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import me.gserv.archival.config.AppConfig
 import me.gserv.archival.data.Database
 import me.gserv.archival.windows.MainWindow
-import org.librawfx.LibrawImage
+import org.librawjava.LibrawImage
 import org.slf4j.bridge.SLF4JBridgeHandler
 import java.io.File
 import java.io.StringWriter

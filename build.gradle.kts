@@ -1,5 +1,6 @@
 
 import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
+import org.jetbrains.compose.ComposeBuildConfig
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import java.util.*
 import kotlin.io.path.absolutePathString
@@ -10,8 +11,8 @@ plugins {
 	kotlin("plugin.serialization") version "2.1.20"
 
 	id("dev.yumi.gradle.licenser") version "2.1.+"
-	id("org.jetbrains.kotlin.plugin.compose") version "2.1.10"
-	id("org.jetbrains.compose") version "1.7.3"
+	id("org.jetbrains.kotlin.plugin.compose") version "2.1.20"
+	id("org.jetbrains.compose") version "1.8.2"
 
 	id("org.openjfx.javafxplugin") version "0.1.0"
 
@@ -30,27 +31,25 @@ repositories {
 
 dependencies {
 	implementation(compose.desktop.currentOs)
+	implementation("org.jetbrains.compose.material3.adaptive:adaptive-desktop:1.1.2")
+
+	implementation(compose.animation)
+	implementation(compose.animationGraphics)
 	implementation(compose.foundation)
 	implementation(compose.material3)
+	implementation(compose.material3AdaptiveNavigationSuite)
 	implementation(compose.materialIconsExtended)
+	implementation(compose.ui)
 
-	implementation(platform("org.apache.logging.log4j:log4j-bom:2.24.3"))
+	implementation("com.fasterxml.jackson.dataformat", "jackson-dataformat-yaml", "2.18.0")
+	implementation("io.github.oshai", "kotlin-logging-jvm", "7.0.3")
 	implementation("org.apache.logging.log4j", "log4j-core")
 	implementation("org.apache.logging.log4j", "log4j-slf4j2-impl")
 	implementation("org.fusesource.jansi", "jansi", "2.4.2")
-	implementation("com.fasterxml.jackson.dataformat", "jackson-dataformat-yaml", "2.18.0")
-
 	implementation("org.slf4j", "jul-to-slf4j", "2.0.17")
-
-	implementation("io.github.oshai", "kotlin-logging-jvm", "7.0.3")
+	implementation(platform("org.apache.logging.log4j:log4j-bom:2.24.3"))
 
 	implementation("io.github.kdroidfilter", "platformtools.darkmodedetector-jvm", "0.2.9")
-
-	implementation("io.github.kdroidfilter", "platformtools.releasefetcher-jvm", "0.2.9") {
-		exclude("io.github.kdroidfilter", "androidcontextprovider")
-		exclude("org.slf4j", "slf4j-simple")
-	}
-
 	implementation("io.github.vinceglb", "filekit-compose", "0.8.8")
 
 	implementation("com.github.slugify", "slugify", "3.0.7") {
@@ -66,8 +65,8 @@ dependencies {
 	implementation("com.github.skydoves", "landscapist-coil3", "2.4.7")
 	implementation("com.github.skydoves", "landscapist-placeholder", "2.4.7")
 
-	implementation("org.apache.xmlgraphics", "batik-all", "1.19")
-	implementation("org.librawfx", "LibRawFX", "1.9.1")
+	implementation("com.github.gotson.nightmonkeys", "imageio-heif", "1.0.0")
+	implementation("com.github.gotson.nightmonkeys", "imageio-jxl", "1.0.0")
 	implementation("com.twelvemonkeys.imageio", "imageio-batik", "3.12.0")
 	implementation("com.twelvemonkeys.imageio", "imageio-bmp", "3.12.0")
 	implementation("com.twelvemonkeys.imageio", "imageio-dds", "3.12.0")
@@ -85,11 +84,10 @@ dependencies {
 	implementation("com.twelvemonkeys.imageio", "imageio-tiff", "3.12.0")
 	implementation("com.twelvemonkeys.imageio", "imageio-webp", "3.12.0")
 	implementation("com.twelvemonkeys.imageio", "imageio-xwd", "3.12.0")
-	implementation("com.github.gotson.nightmonkeys", "imageio-heif", "1.0.0")
-	implementation("com.github.gotson.nightmonkeys", "imageio-jxl", "1.0.0")
-
 	implementation("me.saharnooby", "qoi-java", "1.2.1")
 	implementation("me.saharnooby", "qoi-java-awt", "1.2.1")
+	implementation("org.apache.xmlgraphics", "batik-all", "1.19")
+	implementation("org.librawfx", "LibRawFX", "1.9.3")
 
 	implementation("dev.brachtendorf", "JImageHash", "1.0.0")
 	implementation("com.github.romankh3", "image-comparison", "4.4.0")
@@ -98,7 +96,6 @@ dependencies {
 
 	implementation("com.h2database", "h2", "2.3.232")
 	implementation("org.flywaydb", "flyway-core", "11.3.1")
-
 	implementation("org.jetbrains.exposed", "exposed-core", "0.59.0")
 	implementation("org.jetbrains.exposed", "exposed-dao", "0.59.0")
 	implementation("org.jetbrains.exposed", "exposed-jdbc", "0.59.0")
@@ -135,7 +132,6 @@ compose.desktop {
 		mainClass = "me.gserv.archival.MainKt"
 
 		jvmArgs.add("--enable-native-access=ALL-UNNAMED")
-		jvmArgs.add("--enable-native-access=org.librawfx")
 
 		jvmArgs.add("--add-exports=java.desktop/sun.awt.image=ALL-UNNAMED")
 		jvmArgs.add("--add-exports=javafx.graphics/com.sun.javafx.iio=ALL-UNNAMED")
