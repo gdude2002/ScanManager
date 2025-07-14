@@ -34,7 +34,7 @@ class NavigationScope {
 				colors = colors,
 				enabled = enabled,
 				icon = icon,
-				interactionSource = interactionSource  ?: MutableInteractionSource(),
+				interactionSource = interactionSource ?: MutableInteractionSource(),
 				label = label,
 				modifier = modifier,
 				onClick = onClick,

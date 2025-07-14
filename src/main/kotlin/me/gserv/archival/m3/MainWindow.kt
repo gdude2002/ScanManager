@@ -8,21 +8,11 @@
 
 package me.gserv.archival.m3
 
-import androidx.compose.foundation.layout.IntrinsicSize
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBarDefaults
-import androidx.compose.material3.NavigationRail
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteDefaults
-import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
-import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.DpSize
@@ -32,8 +22,7 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowState
 import me.gserv.archival.config.AppConfig
 import me.gserv.archival.data.Database
-import me.gserv.archival.m3.components.WindowNavigation
-import me.gserv.archival.m3.components.navigation.WindowNavigationSuite
+import me.gserv.archival.m3.components.navigation.WindowNavigation
 
 @Composable
 fun mainWindow(scope: ApplicationScope) {
@@ -73,8 +62,6 @@ fun mainWindow(scope: ApplicationScope) {
 			colors = NavigationSuiteDefaults.colors(
 				navigationRailContainerColor = NavigationBarDefaults.containerColor
 			),
-
-			layoutType = NavigationSuiteType.NavigationRail,
 		) {
 
 		}

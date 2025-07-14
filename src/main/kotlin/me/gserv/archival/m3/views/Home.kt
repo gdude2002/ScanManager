@@ -8,10 +8,7 @@
 
 package me.gserv.archival.m3.views
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.vector.ImageVector
 
 @Composable
 fun homeView() {

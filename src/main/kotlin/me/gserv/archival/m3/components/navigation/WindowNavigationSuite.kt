@@ -8,18 +8,27 @@
 
 package me.gserv.archival.m3.components.navigation
 
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.material3.*
-import androidx.compose.material3.adaptive.navigationsuite.*
+import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.MenuOpen
+import androidx.compose.material.icons.outlined.Menu
+import androidx.compose.material3.BadgedBox
+import androidx.compose.material3.Icon
+import androidx.compose.material3.PermanentDrawerSheet
+import androidx.compose.material3.PermanentNavigationDrawer
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteColors
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import me.gserv.archival.m3.components.WindowAdaptiveInfoDefault
+import androidx.compose.ui.unit.dp
 
 @Composable
 private fun rememberStateOfItems(
 	content: NavigationScope.() -> Unit
 ): State<NavigationScope> {
 	val latestContent = rememberUpdatedState(content)
+
 	return remember {
 		derivedStateOf { NavigationScope().apply(latestContent.value) }
 	}
@@ -42,116 +51,107 @@ private fun NavigationItemIcon(
 @Composable
 fun WindowNavigationSuite(
 	modifier: Modifier = Modifier,
-	layoutType: NavigationSuiteType =
-		NavigationSuiteScaffoldDefaults.calculateFromAdaptiveInfo(WindowAdaptiveInfoDefault),
 	colors: NavigationSuiteColors = NavigationSuiteDefaults.colors(),
 	content: NavigationScope.() -> Unit
 ) {
 	val scope by rememberStateOfItems(content)
 	val defaultItemColors = NavigationSuiteDefaults.itemColors()
+	var expanded by remember { mutableStateOf(false) }
 
-	when (layoutType) {
-		NavigationSuiteType.NavigationBar -> {
-			NavigationBar(
-				modifier = modifier,
-				containerColor = colors.navigationBarContainerColor,
-				contentColor = colors.navigationBarContentColor
-			) {
-				@Composable
-				fun display(it: NavigationItem) {
-					NavigationBarItem(
-						modifier = it.modifier,
-						selected = it.selected,
-						onClick = it.onClick,
-						icon = { NavigationItemIcon(icon = it.icon, badge = it.badge) },
-						enabled = it.enabled,
-						label = it.label,
-						alwaysShowLabel = it.alwaysShowLabel,
-						colors = it.colors?.navigationBarItemColors
-							?: defaultItemColors.navigationBarItemColors,
-						interactionSource = it.interactionSource
-					)
+	// I'm only supporting the drawer type. Do I look like Google??
+
+	Row(
+		modifier = Modifier
+			.animateContentSize()
+			.width(
+				if (expanded) {
+					154.dp
+				} else {
+					72.dp
 				}
+			),
+	) {
+		PermanentNavigationDrawer(
+			modifier = modifier,
+			drawerContent = {
+				PermanentDrawerSheet(
+					drawerContainerColor = colors.navigationRailContainerColor,
+					drawerContentColor = colors.navigationDrawerContentColor
+				) {
 
-				scope.getStart().forEach { display(it) }
+					@Composable
+					fun display(it: NavigationItem) {
+						if (!it.enabled) {
+							return
+						}
 
-				Spacer(Modifier.weight(1f))
+						DrawerItem(
+							modifier = it.modifier
+								.padding(end = 8.dp, start = 8.dp),
+							selected = it.selected,
+							onClick = it.onClick,
+							icon = it.icon,
+							badge = it.badge,
+							label = { it.label?.invoke() },
+							showLabel = expanded,
+							colors = it.colors?.navigationDrawerItemColors
+								?: defaultItemColors.navigationDrawerItemColors,
+							interactionSource = it.interactionSource
+						)
+					}
 
-				scope.getMiddle().forEach { display(it) }
+					Spacer(Modifier.height(8.dp))
 
-				Spacer(Modifier.weight(1f))
+					DrawerItem(
+						modifier = Modifier
+							.padding(end = 8.dp, start = 8.dp),
+						selected = false,
+						onClick = { expanded = !expanded },
 
-				scope.getEnd().forEach { display(it) }
-			}
-		}
+						icon = {
+							if (expanded) {
+								Icon(Icons.AutoMirrored.Outlined.MenuOpen, "")
+							} else {
+								Icon(Icons.Outlined.Menu, "")
+							}
+						},
 
-		NavigationSuiteType.NavigationRail -> {
-			NavigationRail(
-				modifier = modifier,
-				containerColor = colors.navigationRailContainerColor,
-				contentColor = colors.navigationRailContentColor
-			) {
-				@Composable
-				fun display(it: NavigationItem) {
-					NavigationRailItem(
-						modifier = it.modifier,
-						selected = it.selected,
-						onClick = it.onClick,
-						icon = { NavigationItemIcon(icon = it.icon, badge = it.badge) },
-						enabled = it.enabled,
-						label = it.label,
-						alwaysShowLabel = it.alwaysShowLabel,
-						colors = it.colors?.navigationRailItemColors
-							?: defaultItemColors.navigationRailItemColors,
-						interactionSource = it.interactionSource
+						colors = defaultItemColors.navigationDrawerItemColors,
 					)
+
+					// TODO: Back button
+
+					scope.getStart().filter { it.enabled }.forEachIndexed { index, item ->
+						Spacer(Modifier.height(8.dp))
+
+						display(item)
+					}
+
+					Spacer(Modifier.weight(1f))
+
+					scope.getMiddle().filter { it.enabled }.forEachIndexed { index, item ->
+						if (index != 0) {
+							Spacer(Modifier.height(8.dp))
+						}
+
+						display(item)
+					}
+
+					Spacer(Modifier.weight(1f))
+
+					scope.getEnd().filter { it.enabled }.forEachIndexed { index, item ->
+						if (index != 0) {
+							Spacer(Modifier.height(8.dp))
+						}
+
+						display(item)
+					}
+
+					Spacer(Modifier.height(8.dp))
 				}
-
-				scope.getStart().forEach { display(it) }
-
-				Spacer(Modifier.weight(1f))
-
-				scope.getMiddle().forEach { display(it) }
-
-				Spacer(Modifier.weight(1f))
-
-				scope.getEnd().forEach { display(it) }
 			}
+		) {
+
 		}
-
-		NavigationSuiteType.NavigationDrawer -> {
-			PermanentDrawerSheet(
-				modifier = modifier,
-				drawerContainerColor = colors.navigationDrawerContainerColor,
-				drawerContentColor = colors.navigationDrawerContentColor
-			) {
-				@Composable
-				fun display(it: NavigationItem) {
-					NavigationDrawerItem(
-						modifier = it.modifier,
-						selected = it.selected,
-						onClick = it.onClick,
-						icon = it.icon,
-						badge = it.badge,
-						label = { it.label?.invoke() ?: Text("") },
-						colors = it.colors?.navigationDrawerItemColors
-							?: defaultItemColors.navigationDrawerItemColors,
-						interactionSource = it.interactionSource
-					)
-				}
-
-				scope.getStart().forEach { display(it) }
-
-				Spacer(Modifier.weight(1f))
-
-				scope.getMiddle().forEach { display(it) }
-
-				Spacer(Modifier.weight(1f))
-
-				scope.getEnd().forEach { display(it) }
-			}
-		}
-
-		NavigationSuiteType.None -> { /* Do nothing. */ }
 	}
 }

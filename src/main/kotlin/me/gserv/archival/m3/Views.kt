@@ -9,11 +9,9 @@
 package me.gserv.archival.m3
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Book
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.Book
 import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.Image
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -33,6 +31,15 @@ object Views {
 		override val icon: ImageVector = Icons.Outlined.Book
 		override val label: String = "Binders"
 		override val ordinal: Int = 1
+		override val render: @Composable (() -> Unit) = { }
+
+		override val needsDataDir: Boolean = true
+	}
+
+	object Sets : View() {
+		override val icon: ImageVector = Icons.Outlined.Image
+		override val label: String = "Sets"
+		override val ordinal: Int = 2
 		override val render: @Composable (() -> Unit) = { }
 
 		override val needsDataDir: Boolean = true
