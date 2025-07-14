@@ -48,10 +48,10 @@ class NavigationScope {
 		itemList.filter { it.position == NavigationPosition.START }
 
 	fun getMiddle() =
-		itemList.filter { it.position == NavigationPosition.START }
+		itemList.filter { it.position == NavigationPosition.MIDDLE }
 
 	fun getEnd() =
-		itemList.filter { it.position == NavigationPosition.START }
+		itemList.filter { it.position == NavigationPosition.END }
 
 	val itemList: MutableList<NavigationItem> = mutableListOf()
 
