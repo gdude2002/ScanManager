@@ -8,6 +8,8 @@
 
 package me.gserv.archival.m3.components.navigation
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -17,9 +19,11 @@ import androidx.compose.material3.NavigationDrawerItemDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
@@ -50,25 +54,35 @@ fun DrawerItem(
 		color = colors.containerColor(selected).value,
 		interactionSource = interactionSource,
 	) {
+		val animatedWidth by animateDpAsState(
+			if (label != null && showLabel) {
+				24.dp
+			} else {
+				16.dp
+			},
+			label = "width",
+		)
+
 		Row(
-			Modifier.padding(
-				start = 16.dp,
-				end = if (label != null && showLabel) {
-					24.dp
-				} else {
-					16.dp
-				}
-			),
+			Modifier
+				.padding(
+					start = 16.dp,
+					end = animatedWidth
+				),
 			verticalAlignment = Alignment.CenterVertically
 		) {
 			if (icon != null) {
 				val iconColor = colors.iconColor(selected).value
-				CompositionLocalProvider(LocalContentColor provides iconColor, content = icon)
-				Spacer(Modifier.width(12.dp))
+
+				Box(Modifier.requiredWidth(24.dp).wrapContentWidth(unbounded = true)) {
+					CompositionLocalProvider(LocalContentColor provides iconColor, content = icon)
+				}
+
+				Spacer(Modifier.width(16.dp))
 			}
 
-			if (showLabel) {
-				if (label != null) {
+			if (label != null) {
+				if (showLabel) {
 					Box(Modifier.weight(1f)) {
 						val labelColor = colors.textColor(selected).value
 						CompositionLocalProvider(LocalContentColor provides labelColor, content = label)

@@ -9,6 +9,9 @@
 package me.gserv.archival.m3
 
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.requiredWidth
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.material3.Text
@@ -49,7 +52,7 @@ fun mainWindow(scope: ApplicationScope) {
 					.forEach {
 						item(
 							icon = { Icon(it.icon, it.label) },
-							label = { Text(it.label) },
+							label = { Text(it.label, softWrap = false) },
 							selected = currentDestination == it,
 							onClick = { currentDestination = it },
 							position = it.position,
