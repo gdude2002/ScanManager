@@ -66,7 +66,7 @@ fun mainWindow(scope: ApplicationScope) {
 				navigationRailContainerColor = NavigationBarDefaults.containerColor
 			),
 		) {
-
+			currentDestination.render()
 		}
 	}
 }

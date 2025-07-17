@@ -8,22 +8,20 @@
 
 package me.gserv.archival.m3.components.navigation
 
-import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.MenuOpen
 import androidx.compose.material.icons.outlined.Menu
-import androidx.compose.material3.Icon
-import androidx.compose.material3.PermanentDrawerSheet
-import androidx.compose.material3.PermanentNavigationDrawer
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteColors
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import kotlin.math.exp
 
 @Composable
 private fun rememberStateOfItems(
@@ -40,25 +38,24 @@ private fun rememberStateOfItems(
 fun WindowNavigationSuite(
 	modifier: Modifier = Modifier,
 	colors: NavigationSuiteColors = NavigationSuiteDefaults.colors(),
-	content: NavigationScope.() -> Unit
+	expanded: Boolean,
+	setExpandedState: (Boolean) -> Unit,
+	content: NavigationScope.() -> Unit,
+	render: @Composable () -> Unit,
 ) {
 	val scope by rememberStateOfItems(content)
 	val defaultItemColors = NavigationSuiteDefaults.itemColors()
-	var expanded by remember { mutableStateOf(false) }
-	var showLabels by remember { mutableStateOf(false) }
 
 	// I'm only supporting the drawer type. Do I look like Google??
 
 	val animatedWidth by animateDpAsState(
 		if (expanded) {
-			154.dp
+			170.dp
 		} else {
 			72.dp
 		},
+
 		label = "width",
-		finishedListener = { dp ->
-			showLabels = expanded
-		}
 	)
 
 	PermanentNavigationDrawer(
@@ -99,7 +96,7 @@ fun WindowNavigationSuite(
 					modifier = Modifier
 						.padding(end = 8.dp, start = 8.dp),
 					selected = false,
-					onClick = { expanded = !expanded },
+					onClick = { setExpandedState(!expanded) },
 
 					icon = {
 						if (expanded) {
@@ -146,6 +143,13 @@ fun WindowNavigationSuite(
 			}
 		}
 	) {
+		Surface(
+			Modifier.consumeWindowInsets(DrawerDefaults.windowInsets)
+				.padding(10.dp),
 
+			shape = RoundedCornerShape(10.dp)
+		) {
+			render()
+		}
 	}
 }

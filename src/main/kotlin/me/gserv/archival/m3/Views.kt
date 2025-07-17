@@ -17,7 +17,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import me.gserv.archival.m3.components.navigation.NavigationPosition
+import me.gserv.archival.m3.views.bindersView
 import me.gserv.archival.m3.views.homeView
+import me.gserv.archival.m3.views.setsView
+import me.gserv.archival.m3.views.settingsView
 
 object Views {
 	object Home : View() {
@@ -31,7 +34,7 @@ object Views {
 		override val icon: ImageVector = Icons.Outlined.Book
 		override val label: String = "Binders"
 		override val ordinal: Int = 1
-		override val render: @Composable (() -> Unit) = { }
+		override val render: @Composable (() -> Unit) = { bindersView() }
 
 		override val needsDataDir: Boolean = true
 	}
@@ -40,7 +43,7 @@ object Views {
 		override val icon: ImageVector = Icons.Outlined.Image
 		override val label: String = "Sets"
 		override val ordinal: Int = 2
-		override val render: @Composable (() -> Unit) = { }
+		override val render: @Composable (() -> Unit) = { setsView() }
 
 		override val needsDataDir: Boolean = true
 	}
@@ -49,7 +52,7 @@ object Views {
 		override val icon: ImageVector = Icons.Outlined.Settings
 		override val label: String = "Settings"
 		override val ordinal: Int = 999
-		override val render: @Composable (() -> Unit) = { }
+		override val render: @Composable (() -> Unit) = { settingsView() }
 
 		override val position: NavigationPosition = NavigationPosition.END
 	}

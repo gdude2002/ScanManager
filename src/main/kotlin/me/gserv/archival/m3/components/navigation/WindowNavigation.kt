@@ -8,14 +8,26 @@
 
 package me.gserv.archival.m3.components.navigation
 
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.DrawerDefaults
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.navigationsuite.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import me.gserv.archival.m3.View
 
 @Composable
 fun WindowNavigation(
@@ -28,6 +40,8 @@ fun WindowNavigation(
 ) {
 	// I'm only supporting the drawer type. Do I look like Google??
 
+	var expanded by remember { mutableStateOf(false) }
+
 	Surface(modifier = modifier, color = containerColor, contentColor = contentColor) {
 		NavigationSuiteScaffoldLayout(
 			layoutType = NavigationSuiteType.NavigationDrawer,
@@ -36,16 +50,11 @@ fun WindowNavigation(
 				WindowNavigationSuite(
 					colors = colors,
 					content = items,
+					expanded = expanded,
+					setExpandedState = { expanded = it },
+					render = content
 				)
 			},
-
-			content = {
-				Box(
-					Modifier.consumeWindowInsets(DrawerDefaults.windowInsets)
-				) {
-					content()
-				}
-			}
 		)
 	}
 }
