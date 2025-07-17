@@ -10,6 +10,7 @@ package me.gserv.archival.m3
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Book
+import androidx.compose.material.icons.outlined.Construction
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Image
 import androidx.compose.material.icons.outlined.Settings
@@ -21,6 +22,7 @@ import me.gserv.archival.m3.views.bindersView
 import me.gserv.archival.m3.views.homeView
 import me.gserv.archival.m3.views.setsView
 import me.gserv.archival.m3.views.settingsView
+import me.gserv.archival.m3.views.toolsView
 
 object Views {
 	object Home : View() {
@@ -44,6 +46,15 @@ object Views {
 		override val label: String = "Sets"
 		override val ordinal: Int = 2
 		override val render: @Composable (() -> Unit) = { setsView() }
+
+		override val needsDataDir: Boolean = true
+	}
+
+	object Tools : View() {
+		override val icon: ImageVector = Icons.Outlined.Construction
+		override val label: String = "Tools"
+		override val ordinal: Int = 3
+		override val render: @Composable (() -> Unit) = { toolsView() }
 
 		override val needsDataDir: Boolean = true
 	}
