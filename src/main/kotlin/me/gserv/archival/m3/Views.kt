@@ -13,11 +13,13 @@ import androidx.compose.material.icons.outlined.Book
 import androidx.compose.material.icons.outlined.Construction
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Image
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import me.gserv.archival.m3.components.navigation.NavigationPosition
+import me.gserv.archival.m3.views.aboutView
 import me.gserv.archival.m3.views.bindersView
 import me.gserv.archival.m3.views.homeView
 import me.gserv.archival.m3.views.setsView
@@ -57,6 +59,15 @@ object Views {
 		override val render: @Composable (() -> Unit) = { toolsView() }
 
 		override val needsDataDir: Boolean = true
+	}
+
+	object About : View() {
+		override val icon: ImageVector = Icons.Outlined.Info
+		override val label: String = "About"
+		override val ordinal: Int = 998
+		override val render: @Composable (() -> Unit) = { aboutView() }
+
+		override val position: NavigationPosition = NavigationPosition.END
 	}
 
 	object Settings : View() {
