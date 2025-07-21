@@ -39,6 +39,7 @@ dependencies {
 	implementation(compose.material3)
 	implementation(compose.material3AdaptiveNavigationSuite)
 	implementation(compose.materialIconsExtended)
+	implementation(compose.components.resources)
 	implementation(compose.ui)
 
 	implementation("com.fasterxml.jackson.dataformat", "jackson-dataformat-yaml", "2.18.0")

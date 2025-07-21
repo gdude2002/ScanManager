@@ -17,6 +17,7 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import me.gserv.archival.config.AppConfig
 import me.gserv.archival.data.Database
 import me.gserv.archival.loadNatives
+import me.gserv.archival.m3.resources.fonts.Fonts
 import me.gserv.archival.setup
 import org.slf4j.bridge.SLF4JBridgeHandler
 import java.io.StringWriter
@@ -59,7 +60,10 @@ fun main() {
 				lightColorScheme()
 			}
 
-			MaterialTheme(colorScheme) {
+			MaterialTheme(
+				colorScheme = colorScheme,
+				typography = Fonts.Inter.typography(),
+			) {
 				mainWindow(this@application)
 			}
 		}
