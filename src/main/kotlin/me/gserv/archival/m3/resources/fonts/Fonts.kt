@@ -26,7 +26,7 @@ sealed class Fonts(val name: String) {
 		return fontToTypography(font())
 	}
 
-	object APhont : Fonts("APhont") {
+	object APHont : Fonts("APHont") {
 		@Composable
 		override fun font() = FontFamily(
 			Font(Res.font.APHont_Bold, FontWeight.Bold),
