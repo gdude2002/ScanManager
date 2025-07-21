@@ -73,6 +73,21 @@ sealed class Fonts(val name: String) {
 		)
 	}
 
+	object Lexend : Fonts("Lexend") {
+		@Composable
+		override fun font() = FontFamily(
+			Font(Res.font.Lexend_Black, FontWeight.Black),
+			Font(Res.font.Lexend_Bold, FontWeight.Bold),
+			Font(Res.font.Lexend_ExtraBold, FontWeight.ExtraBold),
+			Font(Res.font.Lexend_ExtraLight, FontWeight.ExtraLight),
+			Font(Res.font.Lexend_Light, FontWeight.Light),
+			Font(Res.font.Lexend_Medium, FontWeight.Medium),
+			Font(Res.font.Lexend_Regular, FontWeight.Normal),
+			Font(Res.font.Lexend_SemiBold, FontWeight.SemiBold),
+			Font(Res.font.Lexend_Thin, FontWeight.Thin),
+		)
+	}
+
 	object Luicole : Fonts("Luicole") {
 		@Composable
 		override fun font() = FontFamily(
