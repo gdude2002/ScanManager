@@ -14,4 +14,4 @@ import kotlin.io.path.absolute
 import kotlin.io.path.relativeTo
 
 fun Path.relativeToDataDir(): Path =
-	absolute().relativeTo(Path.of(AppConfig.dataFolder!!).absolute())
+	absolute().relativeTo(Path.of(AppConfig.dataFolder).absolute())

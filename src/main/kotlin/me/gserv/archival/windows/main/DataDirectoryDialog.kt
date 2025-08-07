@@ -60,12 +60,10 @@ class DataDirectoryDialog(
 
 	var dataDirectory by mutableStateOf(
 		AppConfig.dataFolder
-			?: (baseDir / "data").absolutePathString()
 	)
 
 	var newDirectory by mutableStateOf(
 		AppConfig.dataFolder
-			?: (baseDir / "data").absolutePathString()
 	)
 
 	fun close() {

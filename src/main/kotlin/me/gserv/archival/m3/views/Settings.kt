@@ -14,6 +14,17 @@ import androidx.compose.runtime.Composable
 
 @Composable
 fun settingsView() {
+	/* Necessary settings
+	 *   Fonts (Support system fonts too).
+	 *   Themes.
+	 *   Always expand the sidebar.
+	 *
+	 *   Data dir:
+	 *     Image formats (saved files only).
+	 *     Filename patterns.
+	 *     Storage tree.
+	 */
+
 	Row {
 		Text("Settings!")
 	}

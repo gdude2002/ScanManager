@@ -56,8 +56,6 @@ fun mainWindow(scope: ApplicationScope) {
 							selected = currentDestination == it,
 							onClick = { currentDestination = it },
 							position = it.position,
-
-							enabled = !it.needsDataDir || AppConfig.dataFolder != null,
 						)
 					}
 			},
