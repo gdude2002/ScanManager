@@ -9,11 +9,6 @@
 package me.gserv.archival.data
 
 import me.gserv.archival.config.AppConfig
-import me.gserv.archival.data.Filesystem.EDIT_FOLDER_NAME
-import me.gserv.archival.data.Filesystem.FILE_TEMPLATE
-import me.gserv.archival.data.Filesystem.ORIGINAL_FOLDER_NAME
-import me.gserv.archival.data.Filesystem.bindersFolder
-import me.gserv.archival.data.Filesystem.inputFolder
 import me.gserv.archival.data.entities.Binder
 import java.io.File
 import kotlin.io.path.Path
@@ -25,10 +20,12 @@ object Filesystem {
 	const val FILE_TEMPLATE = "{binder}-{set}-{index}.{extension}"
 
 	val bindersFolder
-		get() = Path(AppConfig.dataFolder, "binders").absolute()
+		get() =
+			AppConfig.dataFolder?.let { Path(it, "binders").absolute() }
 
 	val inputFolder
-		get() = Path(AppConfig.dataFolder, "import").absolute()
+		get() =
+			AppConfig.dataFolder?.let { Path(it, "import").absolute() }
 
 	/* Omitting an argument will return a regex pattern that matches all valid files matching the provided arguments. */
 	fun fileName(

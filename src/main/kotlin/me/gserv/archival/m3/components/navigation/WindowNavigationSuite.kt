@@ -22,6 +22,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import me.gserv.archival.m3.config.AppSettings
+import me.gserv.archival.m3.config.SidebarMode
 
 @Composable
 private fun rememberStateOfItems(
@@ -46,10 +48,15 @@ fun WindowNavigationSuite(
 	val scope by rememberStateOfItems(content)
 	val defaultItemColors = NavigationSuiteDefaults.itemColors()
 
+	val shouldExpand by derivedStateOf {
+		AppSettings.alwaysExpandSidebar == SidebarMode.OPEN ||
+			(expanded && AppSettings.alwaysExpandSidebar == SidebarMode.TOGGLE)
+	}
+
 	// I'm only supporting the drawer type. Do I look like Google??
 
 	val animatedWidth by animateDpAsState(
-		if (expanded) {
+		if (shouldExpand) {
 			170.dp
 		} else {
 			72.dp
@@ -83,7 +90,7 @@ fun WindowNavigationSuite(
 						icon = it.icon,
 						badge = it.badge,
 						label = { it.label?.invoke() },
-						showLabel = expanded,
+						showLabel = shouldExpand,
 						colors = it.colors?.navigationDrawerItemColors
 							?: defaultItemColors.navigationDrawerItemColors,
 						interactionSource = it.interactionSource
@@ -92,24 +99,26 @@ fun WindowNavigationSuite(
 
 				Spacer(Modifier.height(8.dp))
 
-				DrawerItem(
-					modifier = Modifier
-						.padding(end = 8.dp, start = 8.dp),
-					selected = false,
-					onClick = { setExpandedState(!expanded) },
+				if (AppSettings.alwaysExpandSidebar == SidebarMode.TOGGLE) {
+					DrawerItem(
+						modifier = Modifier
+							.padding(end = 8.dp, start = 8.dp),
+						selected = false,
+						onClick = { setExpandedState(!expanded) },
 
-					icon = {
-						if (expanded) {
-							Icon(Icons.AutoMirrored.Outlined.MenuOpen, "")
-						} else {
-							Icon(Icons.Outlined.Menu, "")
-						}
-					},
+						icon = {
+							if (expanded) {
+								Icon(Icons.AutoMirrored.Outlined.MenuOpen, "")
+							} else {
+								Icon(Icons.Outlined.Menu, "")
+							}
+						},
 
-					label = { Text("Hide", softWrap = false) },
-					showLabel = expanded,
-					colors = defaultItemColors.navigationDrawerItemColors,
-				)
+						label = { Text("Hide", softWrap = false) },
+						showLabel = expanded,
+						colors = defaultItemColors.navigationDrawerItemColors,
+					)
+				}
 
 				// TODO: Back button
 

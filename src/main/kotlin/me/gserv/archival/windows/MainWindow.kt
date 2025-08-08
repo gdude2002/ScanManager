@@ -428,22 +428,26 @@ class MainWindow(val applicationScope: ApplicationScope) : VisibilityTogglingWin
 
 								Spacer(Modifier.weight(1f))
 
-								Row(verticalAlignment = Alignment.CenterVertically) {
-									Icon(
-										Icons.Rounded.Folder,
-										"Data folder",
-										modifier = Modifier.absolutePadding(right = 4.dp),
-										tint = colors.Material.primary,
-									)
+								if (AppConfig.dataFolder != null) {
+									Row(verticalAlignment = Alignment.CenterVertically) {
+										Icon(
+											Icons.Rounded.Folder,
+											"Data folder",
+											modifier = Modifier.absolutePadding(right = 4.dp),
+											tint = colors.Material.primary,
+										)
 
-									Text(
-										dataDirectoryDialog.dataDirectory,
+										Text(
+											dataDirectoryDialog.dataDirectory,
 
-										maxLines = 1,
-										modifier = Modifier.weight(1f),
-										overflow = TextOverflow.Ellipsis,
-										softWrap = false,
-									)
+											maxLines = 1,
+											modifier = Modifier.weight(1f),
+											overflow = TextOverflow.Ellipsis,
+											softWrap = false,
+										)
+									}
+								} else {
+									dataDirectoryDialog.open(false)
 								}
 							}
 						}

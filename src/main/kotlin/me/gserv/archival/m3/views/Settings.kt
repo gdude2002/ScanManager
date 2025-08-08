@@ -8,9 +8,14 @@
 
 package me.gserv.archival.m3.views
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import me.gserv.archival.m3.config.AppSettings
+import me.gserv.archival.m3.config.SidebarMode
+import me.gserv.archival.m3.config.Theme
+import me.gserv.archival.utils.components.EnumDropdown
 
 @Composable
 fun settingsView() {
@@ -25,7 +30,25 @@ fun settingsView() {
 	 *     Storage tree.
 	 */
 
-	Row {
-		Text("Settings!")
+	Column {
+		Row {
+			Text("Settings!")
+		}
+
+		EnumDropdown(
+			SidebarMode.TOGGLE,
+			AppSettings.alwaysExpandSidebar
+		) {
+			AppSettings.alwaysExpandSidebar = it
+		}
+
+		EnumDropdown(
+			Theme.AUTOMATIC,
+			AppSettings.theme
+		) {
+			AppSettings.theme = it
+		}
 	}
+
+
 }

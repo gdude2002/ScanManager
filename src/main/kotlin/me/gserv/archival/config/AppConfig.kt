@@ -8,14 +8,10 @@
 
 package me.gserv.archival.config
 
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import io.github.oshai.kotlinlogging.KotlinLogging
-import me.gserv.archival.baseDir
 import me.gserv.archival.data.Database
 import me.gserv.archival.data.Filesystem
-import me.gserv.archival.m3.resources.fonts.Fonts
 import java.util.*
 import kotlin.io.path.*
 
@@ -25,15 +21,25 @@ object AppConfig {
 
 	var loaded = false
 
-	var dataFolder: String
+	var dataFolder: String?
 		get() = current.dataFolder
 		set(value) {
 			current.dataFolder = value
 
-			Database.connect(value)
+			if (value != null) {
+				Database.connect(value)
+			} else {
+				Database.close()
+			}
 		}
 
-	var current: Config by mutableStateOf(Config())
+	var currentState = mutableStateOf(Config())
+
+	var current: Config
+		get() = currentState.value
+		set(value) {
+			currentState.value = value
+		}
 
 	fun load(force: Boolean = true) {
 		logger.debug { "Loading configuration..." }
@@ -52,7 +58,7 @@ object AppConfig {
 			props.load(configFile.reader(Charsets.UTF_8))
 
 			current = Config(
-				dataFolder = props.getProperty("dataFolder") ?: (baseDir / "data").absolutePathString(),
+				dataFolder = props.getProperty("dataFolder"),
 			)
 		} else {
 			logger.debug { "Saving default configuration to file: ${configFile.absolutePathString()}" }
@@ -61,13 +67,15 @@ object AppConfig {
 			save(current)
 		}
 
-		logger.debug { "Ensuring data folder exists..." }
+		if (dataFolder != null) {
+			logger.debug { "Ensuring data folder exists..." }
 
-		Filesystem.ensureBinders()
+			Filesystem.ensureBinders()
 
-		logger.debug { "Connecting to database..." }
+			logger.debug { "Connecting to database..." }
 
-		Database.connect(dataFolder)
+			Database.connect(dataFolder!!)
+		}
 
 		loaded = true
 	}
@@ -75,22 +83,18 @@ object AppConfig {
 	fun save(config: Config = current) {
 		val props = Properties()
 
-		props.setProperty("dataFolder", config.dataFolder)
+		if (config.dataFolder != null) {
+			props.setProperty("dataFolder", config.dataFolder)
+		}
+
 		props.store(configFile.writer(Charsets.UTF_8), null)
 
 		logger.debug { "Configuration saved successfully" }
 	}
 
 	data class Config(
-		var dataFolder: String = (baseDir / "data").absolutePathString(),
-
-		var lightMode: Boolean? = null,
-		var alwaysExpandSidebar: Boolean = false,
-
-		var headerFont: String = Fonts.Poppins.name,
-		var textFont: String = Fonts.Inter.name,
+		var dataFolder: String? = null,
 	) {
-		fun save() =
-			save(this)
+		fun save() = save(this)
 	}
 }

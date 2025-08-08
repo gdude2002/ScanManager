@@ -9,9 +9,6 @@
 package me.gserv.archival.m3
 
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.requiredWidth
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.material3.Text
@@ -23,48 +20,33 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.ApplicationScope
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowState
-import me.gserv.archival.config.AppConfig
 import me.gserv.archival.data.Database
 import me.gserv.archival.m3.components.navigation.WindowNavigation
 
 @Composable
-fun mainWindow(scope: ApplicationScope) {
+fun mainWindow(state: WindowState) {
 	var currentDestination: View by remember { mutableStateOf(Views.Home) }
 
-	val state = WindowState(
-		size = DpSize(1000.dp, 800.dp)
-	)
+	WindowNavigation(
+		modifier = Modifier.height(state.size.height),
 
-	Window(
-		onCloseRequest = {
-			Database.close()
-			scope.exitApplication()
+		items = {
+			Views.all
+				.forEach {
+					item(
+						icon = { Icon(it.icon, it.label) },
+						label = { Text(it.label, softWrap = false) },
+						selected = currentDestination == it,
+						onClick = { currentDestination = it },
+						position = it.position,
+					)
+				}
 		},
 
-		state = state,
-		title = "Scan Manager"
+		colors = NavigationSuiteDefaults.colors(
+			navigationRailContainerColor = NavigationBarDefaults.containerColor
+		),
 	) {
-		WindowNavigation(
-			modifier = Modifier.height(state.size.height),
-
-			items = {
-				Views.all
-					.forEach {
-						item(
-							icon = { Icon(it.icon, it.label) },
-							label = { Text(it.label, softWrap = false) },
-							selected = currentDestination == it,
-							onClick = { currentDestination = it },
-							position = it.position,
-						)
-					}
-			},
-
-			colors = NavigationSuiteDefaults.colors(
-				navigationRailContainerColor = NavigationBarDefaults.containerColor
-			),
-		) {
-			currentDestination.render()
-		}
+		currentDestination.render()
 	}
 }
