@@ -49,6 +49,4 @@ fun settingsView() {
 			AppSettings.theme = it
 		}
 	}
-
-
 }

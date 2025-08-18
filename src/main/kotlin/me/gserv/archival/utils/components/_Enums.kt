@@ -16,15 +16,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.KeyboardArrowDown
 import androidx.compose.material.icons.rounded.KeyboardArrowUp
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import me.gserv.archival.Colors
 import me.gserv.archival.utils.SelectableEnum
 
 @Composable
@@ -44,116 +41,117 @@ fun <T : SelectableEnum> EnumDropdown(
 
 	callback: (T) -> Unit,
 ) {
-	var selected = selected
-	var expanded by mutableStateOf(false)
-	val finalOptions = options.toSet() - default
+	var expanded by remember { mutableStateOf(false) }
+	val finalOptions by derivedStateOf { options.toSet() - default }
 
-	Colors.Theme { colors ->
-		Box(boxModifier) {
-			PrimaryOutlinedButton(
-				onClick = { expanded = !expanded },
-				modifier = buttonModifier
+	Box(boxModifier) {
+		OutlinedButton(
+			onClick = { expanded = !expanded },
+			modifier = buttonModifier
+		) {
+			Row(
+				horizontalArrangement = Arrangement.spacedBy(10.dp),
+				verticalAlignment = Alignment.CenterVertically,
 			) {
-				Row(
-					horizontalArrangement = Arrangement.spacedBy(10.dp),
-					verticalAlignment = Alignment.CenterVertically,
-				) {
-					Text(
-						buttonPrefix + selected.readableName,
-						textAlign = TextAlign.Start,
-						softWrap = wrapText
-					)
+				Text(
+					buttonPrefix + selected.readableName,
+					textAlign = TextAlign.Start,
+					softWrap = wrapText
+				)
 
-					Spacer(Modifier.weight(1f))
+				Spacer(Modifier.weight(1f))
 
-					if (expanded) {
-						Icon(Icons.Rounded.KeyboardArrowUp, "")
-					} else {
-						Icon(Icons.Rounded.KeyboardArrowDown, "")
-					}
+				if (expanded) {
+					Icon(Icons.Rounded.KeyboardArrowUp, "")
+				} else {
+					Icon(Icons.Rounded.KeyboardArrowDown, "")
 				}
 			}
+		}
 
-			DropdownMenu(
-				expanded,
-				onDismissRequest = { expanded = false },
-				modifier = menuModifier,
-			) {
+		DropdownMenu(
+			expanded,
+			onDismissRequest = { expanded = false },
+			modifier = menuModifier,
+		) {
+			DropdownMenuItem(
+				onClick = {
+					expanded = false
+
+					callback(default)
+				},
+
+				leadingIcon = {
+					Icon(
+						default.icon,
+						""
+					)
+				},
+
+				colors = if (default == selected) {
+					MenuDefaults.itemColors(
+						textColor = MaterialTheme.colorScheme.primary,
+						leadingIconColor = MaterialTheme.colorScheme.primary,
+					)
+				} else {
+					MenuDefaults.itemColors()
+				},
+
+				modifier = itemModifier,
+
+				text = {
+					Text(
+						itemPrefix + default.readableName,
+
+						color = if (default == selected) {
+							MaterialTheme.colorScheme.primary
+						} else {
+							Color.Unspecified
+						}
+					)
+				}
+			)
+
+			HorizontalDivider()
+
+			finalOptions.forEach { option ->
 				DropdownMenuItem(
 					onClick = {
-						selected = default
 						expanded = false
 
-						callback(default)
+						callback(option)
 					},
 
 					leadingIcon = {
 						Icon(
-							default.icon,
+							option.icon,
 							""
 						)
 					},
 
-					colors = if (default == selected) {
-						colors.successMenuItemColors()
+					colors = if (option == selected) {
+						MenuDefaults.itemColors(
+							textColor = MaterialTheme.colorScheme.primary,
+							leadingIconColor = MaterialTheme.colorScheme.primary,
+						)
 					} else {
-						colors.defaultMenuItemColors()
+						MenuDefaults.itemColors()
 					},
 
 					modifier = itemModifier,
 
 					text = {
 						Text(
-							itemPrefix + default.readableName,
+							itemPrefix + option.readableName,
 
-							color = if (default == selected) {
-								colors.MaterialSuccess
+							color = if (option == selected) {
+								MaterialTheme.colorScheme.primary
 							} else {
-								colors.Text
+								Color.Unspecified
 							}
 						)
 					}
 				)
-
-				HorizontalDivider()
-
-				finalOptions.forEach { option ->
-					DropdownMenuItem(
-						onClick = {
-							selected = option
-							expanded = false
-
-							callback(option)
-						},
-
-						leadingIcon = {
-							Icon(
-								option.icon,
-								""
-							)
-						},
-
-						colors = if (option == selected) {
-							colors.successMenuItemColors()
-						} else {
-							colors.defaultMenuItemColors()
-						},
-
-						modifier = itemModifier,
-
-						text = {
-							Text(
-								itemPrefix + option.readableName,
-
-								color = if (option == selected) {
-									colors.MaterialSuccess
-								} else {
-									colors.Text
-								}
-							)
-						}
-					)
-				}
 			}
 		}
 	}
