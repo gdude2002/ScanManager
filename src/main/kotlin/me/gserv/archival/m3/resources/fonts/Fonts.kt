@@ -11,11 +11,16 @@ package me.gserv.archival.m3.resources.fonts
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.toMutableStateList
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import io.github.oshai.kotlinlogging.KotlinLogging
 import me.gserv.archival.scanmanager.generated.resources.*
 import org.jetbrains.compose.resources.Font
+import org.jetbrains.skia.FontMgr
 
 sealed class Fonts(val name: String) {
 	@Composable
@@ -125,6 +130,12 @@ sealed class Fonts(val name: String) {
 		)
 	}
 
+	class SystemFont(name: String) : Fonts(name) {
+		@OptIn(ExperimentalTextApi::class)
+		@Composable
+		override fun font() = FontFamily(name)
+	}
+
 	@Composable
 	fun fontToTypography(font: FontFamily): Typography {
 		return with(MaterialTheme.typography) {
@@ -153,13 +164,47 @@ sealed class Fonts(val name: String) {
 	}
 
 	companion object {
+		private val logger = KotlinLogging.logger { }
+		val fontManager = FontMgr.default
+		val systemFonts = mutableStateListOf<SystemFont>()
+
+		init {
+			reloadSystemFonts()
+		}
+
+		fun reloadSystemFonts() {
+			systemFonts.clear()
+
+			systemFonts.addAll(
+				(0 until fontManager.familiesCount)
+					.map { i -> fontManager.getFamilyName(i) }
+					.sorted()
+					.map { name -> SystemFont(name) }
+					.toMutableStateList()
+			)
+		}
+
 		val all by lazy {
 			Fonts::class.sealedSubclasses
+				.filter { it.simpleName != "SystemFont" }
+				.also {
+					it.forEach { f ->
+						logger.info {
+							"Found font: ${f.simpleName}"
+						}
+
+						logger.info { "  -> f" }
+					}
+				}
 				.map { it.objectInstance as Fonts }
 				.sortedBy { it.name.lowercase() }
 		}
 
+		@OptIn(ExperimentalTextApi::class)
 		fun get(name: String) =
-			all.firstOrNull { it.name.equals(name, true) }
+			all
+				.filter { it !is SystemFont }
+				.firstOrNull { it.name.equals(name, true) }
+				?: systemFonts.firstOrNull { it.name.equals(name, true) }
 	}
 }
