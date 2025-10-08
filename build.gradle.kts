@@ -7,12 +7,12 @@ import kotlin.io.path.absolutePathString
 import kotlin.io.path.div
 
 plugins {
-	kotlin("jvm") version "2.1.20"
-	kotlin("plugin.serialization") version "2.1.20"
+	kotlin("jvm") version "2.2.20"
+	kotlin("plugin.serialization") version "2.2.20"
 
 	id("dev.yumi.gradle.licenser") version "2.1.+"
-	id("org.jetbrains.kotlin.plugin.compose") version "2.1.20"
-	id("org.jetbrains.compose") version "1.8.2"
+	id("org.jetbrains.kotlin.plugin.compose") version "2.2.20"
+	id("org.jetbrains.compose") version "1.10.0-alpha02"
 
 	id("org.openjfx.javafxplugin") version "0.1.0"
 
@@ -31,7 +31,7 @@ repositories {
 
 dependencies {
 	implementation(compose.desktop.currentOs)
-	implementation("org.jetbrains.compose.material3.adaptive:adaptive-desktop:1.1.2")
+	implementation("org.jetbrains.compose.material3.adaptive:adaptive-desktop:1.2.0-alpha06")
 
 	implementation(compose.animation)
 	implementation(compose.animationGraphics)

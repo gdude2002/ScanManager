@@ -192,8 +192,6 @@ sealed class Fonts(val name: String) {
 						logger.info {
 							"Found font: ${f.simpleName}"
 						}
-
-						logger.info { "  -> f" }
 					}
 				}
 				.map { it.objectInstance as Fonts }
