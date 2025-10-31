@@ -93,6 +93,7 @@ dependencies {
 	implementation("dev.brachtendorf", "JImageHash", "1.0.0")
 	implementation("com.github.romankh3", "image-comparison", "4.4.0")
 
+	implementation("com.mikepenz:multiplatform-markdown-renderer-jvm:0.37.0")
 	implementation("sh.calvin.reorderable", "reorderable", "2.4.3")
 
 	implementation("com.h2database", "h2", "2.3.232")
