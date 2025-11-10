@@ -38,12 +38,23 @@ object AppSettings {
 	var dataFolder: String
 		get() = current.dataFolder
 		set(value) {
+			current.previousFolders.remove(value)
+			current.previousFolders.remove(dataFolder)
+			current.previousFolders.add(dataFolder)
+			current.previousFolders.add(value)
+
+			current.previousFolders = current.previousFolders.take(10).toMutableSet()
+
 			current.dataFolder = value
 
 			Database.connect(value)
 
 			save()
 		}
+
+	val previousFolders: List<String> by derivedStateOf {
+		current.previousFolders.filter { it != dataFolder }.reversed()
+	}
 
 	var alwaysExpandSidebar: SidebarMode by mutableStateOf(SidebarMode.TOGGLE)
 	var headerFont: String by mutableStateOf(Fonts.Poppins.name)
@@ -174,6 +185,7 @@ object AppSettings {
 	@Serializable
 	data class Config(
 		var dataFolder: String = (baseDir / "data").absolutePathString(),
+		var previousFolders: MutableSet<String> = mutableSetOf(),
 
 		var theme: Theme = Theme.AUTOMATIC,
 		var alwaysExpandSidebar: SidebarMode = SidebarMode.TOGGLE,
