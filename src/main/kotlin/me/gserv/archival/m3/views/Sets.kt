@@ -8,13 +8,38 @@
 
 package me.gserv.archival.m3.views
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
+import me.gserv.archival.m3.components.MainHeader
+import me.gserv.archival.m3.data.GlobalState
 
 @Composable
 fun setsView() {
-	Row {
-		Text("Sets!")
+	Column {
+		Row {
+			MainHeader(
+				"Sets",
+				textAlign = TextAlign.Center,
+				modifier = Modifier
+					.weight(1f)
+			)
+		}
+
+		if (GlobalState.binder == null) {
+			Row {
+				Text(
+					"No binder selected. Please pick one from the Binders page.",
+					textAlign = TextAlign.Center,
+					modifier = Modifier
+						.weight(1f)
+				)
+			}
+		} else {
+			Text("#TODO")
+		}
 	}
 }

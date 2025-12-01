@@ -15,7 +15,9 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import me.gserv.archival.baseDir
-import me.gserv.archival.data.Database
+import me.gserv.archival.m3.data.Database
+import me.gserv.archival.m3.data.Filesystem
+import me.gserv.archival.m3.data.GlobalState
 import me.gserv.archival.m3.resources.fonts.Fonts
 import java.util.*
 import kotlin.io.path.*
@@ -143,11 +145,13 @@ object AppSettings {
 
 		logger.debug { "Ensuring data folder exists..." }
 
-//		Filesystem.ensureBinders()
+		Filesystem.ensureBinders()
 
 		logger.debug { "Connecting to database..." }
 
-//		Database.connect(dataFolder)
+		Database.connect(dataFolder)
+
+		logger.debug { "Connected, found ${GlobalState.binders.size} binders." }
 
 		alwaysExpandSidebar = current.alwaysExpandSidebar
 		headerFont = current.headerFont
@@ -169,9 +173,10 @@ object AppSettings {
 
 		save(newConfig)
 
-		oldConfigFile.moveTo(
-			Path(System.getProperty("user.home"), "ScanManager", "config-old.properties")
-		)
+		val backupLocation = Path(System.getProperty("user.home"), "ScanManager", "config-old.properties")
+
+		backupLocation.deleteIfExists()
+		oldConfigFile.moveTo(backupLocation)
 	}
 
 	fun save(config: Config = current) {
