@@ -89,11 +89,8 @@ fun aboutView() {
 							- [JasPer](https://github.com/jasper-software/jasper) (JasPer Licence Version 2.0)
 							- [Little CMS](https://github.com/mm2/Little-CMS) (BSD 3-Clause Licence)
 							- [libaom](https://github.com/mozilla/aom) (BSD 2-Clause Licence)
-							- [libde265](https://github.com/strukturag/libde265) (LGPL 3 Licence)
-							- [libheif](https://github.com/strukturag/libheif) (LGPL 3 Licence)
 							- [libjpeg](https://github.com/winlibs/libjpeg) (Independent JPEG Group / BSD 3-Clause Licence)
 							- [libjxl](https://github.com/libjxl/libjxl) (BSD 3-Clause Licence)
-							- [x265](https://github.com/videolan/x265) (GPL 2 Licence)
 							- [zlib](https://github.com/madler/zlib) (zlib Licence)
 
 							This software is based in part on the work of the Independent JPEG Group.

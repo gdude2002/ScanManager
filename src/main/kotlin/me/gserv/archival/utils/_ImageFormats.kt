@@ -17,7 +17,6 @@ sealed class ImageFormat(
 	val matchers: Set<Regex>,
 	val writableExtension: Set<String> = setOf(),
 ) {
-	object AVIF : ImageFormat("AV1 in HEIF", setOf("image/avif"), regexSetOf("avif"))
 	object CUR : ImageFormat("Windows Cursor", setOf(), regexSetOf("cur"))
 	object GIF : ImageFormat("Graphics Interchange Format", setOf("image/gif"), regexSetOf("gif"))
 	object HDR : ImageFormat("High Dynamic Range", setOf(), regexSetOf("hdr"))
@@ -49,14 +48,6 @@ sealed class ImageFormat(
 
 		setOf("image/vnd-ms.dds", "image/x-direct-draw-surface"),
 		regexSetOf("dds")
-	)
-
-	object HEIF : ImageFormat(
-		"High Efficiency Image File",
-
-		setOf("image/heif", "image/heif-sequence", "image/heic", "image/heic-sequence", "image/avif"),
-		regexSetOf("heif", "heifs", "heic", "heics", "avci", "avcs", "HIF"),
-		setOf("ico")
 	)
 
 	object ICO : ImageFormat(
