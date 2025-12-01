@@ -15,11 +15,14 @@ import androidx.compose.material3.ShapeDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import kotlinx.serialization.json.JsonNull.content
 
 @Composable
 fun Container(
 	modifier: Modifier = Modifier,
+	backgroundColor: Color? = null,
 	contentAlignment: Alignment = Alignment.TopStart,
 	propagateMinConstraints: Boolean = false,
 
@@ -27,7 +30,7 @@ fun Container(
 ) {
 	Box(
 		modifier = modifier
-			.background(MaterialTheme.colorScheme.surfaceContainer, ShapeDefaults.Small)
+			.background(backgroundColor ?: MaterialTheme.colorScheme.surfaceContainer, ShapeDefaults.Small)
 			.padding(10.dp),
 
 		contentAlignment = contentAlignment,
@@ -41,6 +44,7 @@ fun ContainerColumn(
 	modifier: Modifier = Modifier,
 	contentAlignment: Alignment = Alignment.TopStart,
 	propagateMinConstraints: Boolean = false,
+	backgroundColor: Color? = null,
 
 	columnModifier: Modifier = Modifier,
 	verticalArrangement: Arrangement.Vertical = Arrangement.Top,
@@ -51,6 +55,7 @@ fun ContainerColumn(
 	Container(
 		modifier = modifier,
 		contentAlignment = contentAlignment,
+		backgroundColor = backgroundColor,
 		propagateMinConstraints = propagateMinConstraints,
 	) {
 		Column(
@@ -66,6 +71,7 @@ fun ContainerColumn(
 fun ContainerRow(
 	modifier: Modifier = Modifier,
 	contentAlignment: Alignment = Alignment.TopStart,
+	backgroundColor: Color? = null,
 	propagateMinConstraints: Boolean = false,
 
 	rowModifier: Modifier = Modifier,
@@ -77,6 +83,7 @@ fun ContainerRow(
 	Container(
 		modifier = modifier,
 		contentAlignment = contentAlignment,
+		backgroundColor = backgroundColor,
 		propagateMinConstraints = propagateMinConstraints,
 	) {
 		Row(
